@@ -9,10 +9,8 @@
 /* Begin PBXBuildFile section */
 		9BAB474121BD86F400AD54CA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAB474021BD86F400AD54CA /* AppDelegate.swift */; };
 		9BAB474321BD86F400AD54CA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAB474221BD86F400AD54CA /* ViewController.swift */; };
-		9BAB474621BD86F400AD54CA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9BAB474421BD86F400AD54CA /* Main.storyboard */; };
 		9BAB474821BD86F600AD54CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9BAB474721BD86F600AD54CA /* Assets.xcassets */; };
 		9BAB474B21BD86F600AD54CA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9BAB474921BD86F600AD54CA /* LaunchScreen.storyboard */; };
-		9BAB475621BD86F600AD54CA /* libra_iosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAB475521BD86F600AD54CA /* libra_iosTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,12 +27,10 @@
 		9BAB473D21BD86F400AD54CA /* libra-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "libra-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BAB474021BD86F400AD54CA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9BAB474221BD86F400AD54CA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		9BAB474521BD86F400AD54CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9BAB474721BD86F600AD54CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9BAB474A21BD86F600AD54CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9BAB474C21BD86F600AD54CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9BAB475121BD86F600AD54CA /* libra-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "libra-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9BAB475521BD86F600AD54CA /* libra_iosTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = libra_iosTests.swift; sourceTree = "<group>"; };
 		9BAB475721BD86F600AD54CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -79,7 +75,6 @@
 			children = (
 				9BAB474021BD86F400AD54CA /* AppDelegate.swift */,
 				9BAB474221BD86F400AD54CA /* ViewController.swift */,
-				9BAB474421BD86F400AD54CA /* Main.storyboard */,
 				9BAB474721BD86F600AD54CA /* Assets.xcassets */,
 				9BAB474921BD86F600AD54CA /* LaunchScreen.storyboard */,
 				9BAB474C21BD86F600AD54CA /* Info.plist */,
@@ -90,7 +85,6 @@
 		9BAB475421BD86F600AD54CA /* libra-iosTests */ = {
 			isa = PBXGroup;
 			children = (
-				9BAB475521BD86F600AD54CA /* libra_iosTests.swift */,
 				9BAB475721BD86F600AD54CA /* Info.plist */,
 			);
 			path = "libra-iosTests";
@@ -179,7 +173,6 @@
 			files = (
 				9BAB474B21BD86F600AD54CA /* LaunchScreen.storyboard in Resources */,
 				9BAB474821BD86F600AD54CA /* Assets.xcassets in Resources */,
-				9BAB474621BD86F400AD54CA /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,7 +199,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9BAB475621BD86F600AD54CA /* libra_iosTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,14 +213,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		9BAB474421BD86F400AD54CA /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9BAB474521BD86F400AD54CA /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		9BAB474921BD86F600AD54CA /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
