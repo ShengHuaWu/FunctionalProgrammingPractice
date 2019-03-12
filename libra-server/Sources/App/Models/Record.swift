@@ -24,3 +24,6 @@ extension Record: Content {}
 
 // MARK: - Migration
 extension Record: Migration {}
+
+// MARK: - Parameter
+extension Record: Parameter {}
