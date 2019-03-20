@@ -3,8 +3,16 @@ import FluentPostgreSQL
 
 final class Record: Codable {
     enum Category {
-        case expense(Double)
+        case expense(Double) // TODO: Consider currency
         case other(String)
+    }
+    
+    enum Mood: String, Codable {
+        case good
+        case neutral
+        case bad
+        // TODO: Maybe `upset`, `sad`, `clam`, etc...
+        // http://quantifiedself.com/2012/12/how-is-mood-measured-get-your-mood-on-part-2/
     }
     
     var id: UUID?
@@ -12,14 +20,15 @@ final class Record: Codable {
     var title: String
     var note: String?
     var date: Date
+    var mood: Mood
     
-    // TODO: `creator`, `contributor`, `attachments` properties
-    
-    init(category: Category, title: String, note: String?, date: Date) {
+    // TODO: `creator`, `partners`, `attachments` properties
+    init(category: Category, title: String, note: String?, date: Date, mood: Mood) {
         self.category = category
         self.title = title
         self.note = note
         self.date = date
+        self.mood = mood
     }
 }
 
@@ -37,6 +46,10 @@ extension Record: Parameter {}
 
 // MARK: - Record Category Codable
 extension Record.Category: Codable {
+    /*
+     Examples: ["expense": 21.05], ["other": "whatever it is"]
+     */
+    
     enum CodingKeys: String, CodingKey {
         case expense
         case other
