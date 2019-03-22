@@ -15,20 +15,23 @@ final class Record: Codable {
         // http://quantifiedself.com/2012/12/how-is-mood-measured-get-your-mood-on-part-2/
     }
     
+    // TODO: Add `category` and `mood` back
+    // Consider `struct Category` and `enum Mood: PostgreSQLEnum`
+    
     var id: UUID?
-    var category: Category
+//    var category: Category
     var title: String
-    var note: String?
+    var note: String
     var date: Date
-    var mood: Mood
+//    var mood: Mood
     
     // TODO: `creator`, `partners`, `attachments` properties
-    init(category: Category, title: String, note: String?, date: Date, mood: Mood) {
-        self.category = category
+    init(title: String, note: String, date: Date) {
+//        self.category = category
         self.title = title
         self.note = note
         self.date = date
-        self.mood = mood
+//        self.mood = mood
     }
 }
 

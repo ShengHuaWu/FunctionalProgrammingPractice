@@ -21,21 +21,28 @@ private extension RecordsController {
     }
     
     func createHandler(_ req: Request) throws -> Future<Record> {
-        return try req.content.decode(Record.self).flatMap { (Record) in
-            return Record.save(on: req)
+        return try req.content.decode(json: Record.self, using: .custom(dates: .millisecondsSince1970)).flatMap { record in
+            return record.save(on: req)
         }
     }
     
     func updateHandler(_ req: Request) throws -> Future<Record> {
-        return try flatMap(to: Record.self, req.parameters.next(Record.self), req.content.decode(Record.self)) { (record, _) in
-            // TODO: Update old record
+        return try flatMap(to: Record.self, req.parameters.next(Record.self), req.content.decode(Record.self)) { (record, updatedRecord) in
+            // TODO: Add `category` and `mood` back
+            
+//            record.category = updatedRecord.category
+            record.title = updatedRecord.title
+            record.note = updatedRecord.note
+            record.date = updatedRecord.date
+//            record.mood = updatedRecord.mood
+            
             return record.save(on: req)
         }
     }
     
     func deleteHandler(_ req: Request) throws -> Future<HTTPStatus> {
-        return try req.parameters.next(Record.self).flatMap { (Record) in
-            return Record.delete(on: req).transform(to: HTTPStatus.noContent)
+        return try req.parameters.next(Record.self).flatMap { record in
+            return record.delete(on: req).transform(to: HTTPStatus.noContent)
         }
     }
 }
