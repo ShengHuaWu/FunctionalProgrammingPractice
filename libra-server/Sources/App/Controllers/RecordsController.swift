@@ -27,14 +27,16 @@ private extension RecordsController {
     }
     
     func updateHandler(_ req: Request) throws -> Future<Record> {
-        return try flatMap(to: Record.self, req.parameters.next(Record.self), req.content.decode(Record.self)) { (record, updatedRecord) in
-            // TODO: Add `category` and `mood` back
+        return try flatMap(to: Record.self,
+                           req.parameters.next(Record.self),
+                           req.content.decode(json: Record.self, using: .custom(dates: .millisecondsSince1970))) { (record, updatedRecord) in
+            // TODO: Add `category` back
             
 //            record.category = updatedRecord.category
             record.title = updatedRecord.title
             record.note = updatedRecord.note
             record.date = updatedRecord.date
-//            record.mood = updatedRecord.mood
+            record.mood = updatedRecord.mood
             
             return record.save(on: req)
         }
