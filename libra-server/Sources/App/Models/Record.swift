@@ -8,8 +8,15 @@ final class Record: Codable {
         case note
         case date
         case amount
-        case currency
+        case _currency = "currency"
         case _mood = "mood"
+    }
+    
+    enum Currency: String {
+        case euro
+        case usd
+        case none
+        // TODO: Support more currencies
     }
     
     enum Mood: String {
@@ -26,7 +33,7 @@ final class Record: Codable {
     var note: String
     var date: Date
     var amount: Double
-    var currency: String?
+    private var _currency: String
     private var _mood: String
     
     var mood: Mood {
@@ -38,13 +45,23 @@ final class Record: Codable {
         }
     }
     
+    var currency: Currency {
+        set {
+            _currency = newValue.rawValue
+        }
+        
+        get {
+            return Currency(rawValue: _currency) ?? .none
+        }
+    }
+    
     // TODO: `creator`, `partners`, `attachments` properties
-    init(title: String, note: String, date: Date, amount: Double = 0.0, currency: String? = nil, mood: Mood) {
+    init(title: String, note: String, date: Date, amount: Double = 0.0, currency: Currency, mood: Mood) {
         self.title = title
         self.note = note
         self.date = date
         self.amount = amount
-        self.currency = currency
+        self._currency = currency.rawValue
         self._mood = mood.rawValue
     }
 }
