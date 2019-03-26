@@ -7,12 +7,9 @@ final class Record: Codable {
         case title
         case note
         case date
+        case amount
+        case currency
         case _mood = "mood"
-    }
-    
-    enum Category {
-        case expense(Double) // TODO: Consider currency
-        case other(String)
     }
     
     enum Mood: String {
@@ -24,14 +21,12 @@ final class Record: Codable {
         // http://quantifiedself.com/2012/12/how-is-mood-measured-get-your-mood-on-part-2/
     }
     
-    // TODO: Add `category`back
-    // Consider `struct Category` or `PostgreSQLEnum` or 1:1 relationship
-    
     var id: UUID?
-//    var category: Category
     var title: String
     var note: String
     var date: Date
+    var amount: Double
+    var currency: String?
     private var _mood: String
     
     var mood: Mood {
@@ -44,11 +39,12 @@ final class Record: Codable {
     }
     
     // TODO: `creator`, `partners`, `attachments` properties
-    init(title: String, note: String, date: Date, mood: Mood) {
-//        self.category = category
+    init(title: String, note: String, date: Date, amount: Double = 0.0, currency: String? = nil, mood: Mood) {
         self.title = title
         self.note = note
         self.date = date
+        self.amount = amount
+        self.currency = currency
         self._mood = mood.rawValue
     }
 }
@@ -64,36 +60,3 @@ extension Record: Migration {}
 
 // MARK: - Parameter
 extension Record: Parameter {}
-
-// MARK: - Record Category Codable
-extension Record.Category: Codable {
-    /*
-     Examples: ["expense": 21.05], ["other": "whatever it is"]
-     */
-    
-    enum CodingKeys: String, CodingKey {
-        case expense
-        case other
-    }
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        if let amount = try container.decodeIfPresent(Double.self, forKey: .expense) {
-            self = .expense(amount)
-        } else if let name = try container.decodeIfPresent(String.self, forKey: .other) {
-            self = .other(name)
-        } else {
-            self = .other(try container.decode(String.self, forKey: .other))
-        }
-    }
-    
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        switch self {
-        case .expense(let amount):
-            try container.encode(amount, forKey: .expense)
-        case .other(let name):
-            try container.encode(name, forKey: .other)
-        }
-    }
-}

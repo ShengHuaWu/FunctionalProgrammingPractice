@@ -30,12 +30,11 @@ private extension RecordsController {
         return try flatMap(to: Record.self,
                            req.parameters.next(Record.self),
                            req.content.decode(json: Record.self, using: .custom(dates: .millisecondsSince1970))) { (record, updatedRecord) in
-            // TODO: Add `category` back
-            
-//            record.category = updatedRecord.category
             record.title = updatedRecord.title
             record.note = updatedRecord.note
             record.date = updatedRecord.date
+            record.amount = updatedRecord.amount
+            record.currency = updatedRecord.currency
             record.mood = updatedRecord.mood
             
             return record.save(on: req)
