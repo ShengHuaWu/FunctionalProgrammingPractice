@@ -11,29 +11,30 @@ final class UsersController: RouteCollection {
 }
 
 private extension UsersController {
-    // TODO: Should return a public `User` type
-    func getOneHandler(_ req: Request) throws -> Future<User> {
-        return try req.parameters.next(User.self)
+    func getOneHandler(_ req: Request) throws -> Future<User.Public> {
+        return try req.parameters.next(User.self).toPublic()
     }
     
-    func createHandler(_ req: Request) throws -> Future<User> {
+    func createHandler(_ req: Request) throws -> Future<User.Public> {
         return try req.content.decode(User.self).flatMap { user in
             user.password = try BCrypt.hash(user.password)
-            return user.save(on: req)
+            return user.save(on: req).toPublic()
         }
     }
     
-    func updateHandler(_ req: Request) throws -> Future<User> {
-        return try flatMap(to: User.self, req.parameters.next(User.self), req.content.decode(User.self)) { user, updatedUser in
-            user.firstName = updatedUser.firstName
-            user.lastName = updatedUser.lastName
-            user.email = updatedUser.email
+    func updateHandler(_ req: Request) throws -> Future<User.Public> {
+        return try flatMap(to: User.Public.self, req.parameters.next(User.self), req.content.decode(User.Public.self)) { user, updatedPublicUser in
+            // NOT update `password` & `username`
+            user.firstName = updatedPublicUser.firstName
+            user.lastName = updatedPublicUser.lastName
+            user.email = updatedPublicUser.email
             
-            // TODO: Should NOT be able to update `password` and `username`
-            user.password = updatedUser.password
-            user.username = updatedUser.username
-            
-            return user.save(on: req)
+            return user.save(on: req).toPublic()
         }
+    }
+    
+    // NOT expose this handler to router
+    func deleteHandler(_ req: Request) throws -> Future<HTTPStatus> {
+        return try req.parameters.next(User.self).delete(on: req).transform(to: .noContent)
     }
 }

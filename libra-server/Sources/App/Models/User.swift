@@ -46,3 +46,36 @@ extension User: Migration {
         }
     }
 }
+
+// MARK: - Public User
+extension User {
+    struct Public: Codable {
+        enum CodingKeys: String, CodingKey {
+            case id
+            case firstName = "first_name"
+            case lastName = "last_name"
+            case username
+            case email
+        }
+        
+        let id: UUID?
+        let firstName: String
+        let lastName: String
+        let username: String?
+        let email: String
+    }
+    
+    func toPublic() -> Public {
+        return Public(id: id, firstName: firstName, lastName: lastName, username: username, email: email)
+    }
+}
+
+// MARK: - Public User Content
+extension User.Public: Content {}
+
+// MARK: - Future Helpers
+extension Future where T: User {
+    func toPublic() -> Future<User.Public> {
+        return map(to: User.Public.self) { $0.toPublic() }
+    }
+}
