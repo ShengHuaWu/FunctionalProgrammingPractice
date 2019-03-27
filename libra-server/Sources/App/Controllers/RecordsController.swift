@@ -2,12 +2,12 @@ import Vapor
 
 final class RecordsController: RouteCollection {
     func boot(router: Router) throws {
-        let recordGroup = router.grouped("records")
-        recordGroup.get(use: getAllHandler)
-        recordGroup.get(Record.parameter, use: getOneHandler)
-        recordGroup.post(use: createHandler)
-        recordGroup.put(Record.parameter, use: updateHandler)
-        recordGroup.delete(Record.parameter, use: deleteHandler)
+        let recordsGroup = router.grouped("records")
+        recordsGroup.get(use: getAllHandler)
+        recordsGroup.get(Record.parameter, use: getOneHandler)
+        recordsGroup.post(use: createHandler)
+        recordsGroup.put(Record.parameter, use: updateHandler)
+        recordsGroup.delete(Record.parameter, use: deleteHandler)
     }
 }
 
@@ -21,9 +21,7 @@ private extension RecordsController {
     }
     
     func createHandler(_ req: Request) throws -> Future<Record> {
-        return try req.content.decode(json: Record.self, using: .custom(dates: .millisecondsSince1970)).flatMap { record in
-            return record.save(on: req)
-        }
+        return try req.content.decode(json: Record.self, using: .custom(dates: .millisecondsSince1970)).save(on: req)
     }
     
     func updateHandler(_ req: Request) throws -> Future<Record> {

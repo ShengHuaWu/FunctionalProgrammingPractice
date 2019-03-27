@@ -3,17 +3,28 @@ import Vapor
 import FluentPostgreSQL
 
 final class User: Codable {
+    enum CodingKeys: String, CodingKey {
+        case id
+        case firstName = "first_name"
+        case lastName = "last_name"
+        case username
+        case password
+        case email
+    }
+    
     var id: UUID?
     var firstName: String
     var lastName: String
     var username: String
     var password: String
+    var email: String
     
-    init(firstName: String, lastName: String, username: String, password: String) {
+    init(firstName: String, lastName: String, username: String, password: String, email: String) {
         self.firstName = firstName
         self.lastName = lastName
         self.username = username
         self.password = password
+        self.email = email
     }
 }
 
@@ -22,6 +33,9 @@ extension User: PostgreSQLUUIDModel {}
 
 // MARK: - Content
 extension User: Content {}
+
+// MARK: - Parameter
+extension User: Parameter {}
 
 // MARK: - Migration
 extension User: Migration {
