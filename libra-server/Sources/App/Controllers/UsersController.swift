@@ -7,6 +7,7 @@ final class UsersController: RouteCollection {
         usersGroup.get(User.parameter, use: getOneHandler)
         usersGroup.post(use: createHandler)
         usersGroup.put(User.parameter, use: updateHandler)
+        usersGroup.get(User.parameter, "records", use: getRecordsHandler)
     }
 }
 
@@ -30,6 +31,12 @@ private extension UsersController {
             user.email = updatedPublicUser.email
             
             return user.save(on: req).toPublic()
+        }
+    }
+    
+    func getRecordsHandler(_ req: Request) throws -> Future<[Record]> {
+        return try req.parameters.next(User.self).flatMap(to: [Record].self) { user in
+            return try user.records.query(on: req).all()
         }
     }
     

@@ -10,6 +10,7 @@ final class Record: Codable {
         case amount
         case _currency = "currency"
         case _mood = "mood"
+        case creatorID = "creator_id"
     }
     
     enum Currency: String {
@@ -35,6 +36,7 @@ final class Record: Codable {
     var amount: Double
     private var _currency: String
     private var _mood: String
+    var creatorID: User.ID // Create a parent-child relationship
     
     var mood: Mood {
         set {
@@ -55,14 +57,15 @@ final class Record: Codable {
         }
     }
     
-    // TODO: `creator`, `partners`, `attachments` properties
-    init(title: String, note: String, date: Date, amount: Double = 0.0, currency: Currency, mood: Mood) {
+    // TODO: `partners`, `attachments` properties
+    init(title: String, note: String, date: Date, amount: Double = 0.0, currency: Currency, mood: Mood, userID: User.ID) {
         self.title = title
         self.note = note
         self.date = date
         self.amount = amount
         self._currency = currency.rawValue
         self._mood = mood.rawValue
+        self.creatorID = userID
     }
 }
 
@@ -73,7 +76,21 @@ extension Record: PostgreSQLUUIDModel {}
 extension Record: Content {}
 
 // MARK: - Migration
-extension Record: Migration {}
+extension Record: Migration {
+    static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
+        return Database.create(self, on: conn) { builder in
+            try addProperties(to: builder)
+            builder.reference(from: \.creatorID, to: \User.id) // Set up a foreign key
+        }
+    }
+}
 
 // MARK: - Parameter
 extension Record: Parameter {}
+
+// MARK: - Helpers
+extension Record {
+    var creator: Parent<Record, User> {
+        return parent(\.creatorID)
+    }
+}

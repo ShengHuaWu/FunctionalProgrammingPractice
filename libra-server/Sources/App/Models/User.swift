@@ -79,3 +79,10 @@ extension Future where T: User {
         return map(to: User.Public.self) { $0.toPublic() }
     }
 }
+
+// MARK: - Helpers
+extension User {
+    var records: Children<User, Record> {
+        return children(\.creatorID)
+    }
+}

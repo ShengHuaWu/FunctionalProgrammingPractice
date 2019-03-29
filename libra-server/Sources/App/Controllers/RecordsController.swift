@@ -8,6 +8,7 @@ final class RecordsController: RouteCollection {
         recordsGroup.post(use: createHandler)
         recordsGroup.put(Record.parameter, use: updateHandler)
         recordsGroup.delete(Record.parameter, use: deleteHandler)
+        recordsGroup.get(Record.parameter, "creator", use: getCreatorHandler)
     }
 }
 
@@ -34,6 +35,7 @@ private extension RecordsController {
             record.amount = updatedRecord.amount
             record.currency = updatedRecord.currency
             record.mood = updatedRecord.mood
+            record.creatorID = updatedRecord.creatorID
             
             return record.save(on: req)
         }
@@ -41,5 +43,11 @@ private extension RecordsController {
     
     func deleteHandler(_ req: Request) throws -> Future<HTTPStatus> {
         return try req.parameters.next(Record.self).delete(on: req).transform(to: .noContent)
+    }
+    
+    func getCreatorHandler(_ req: Request) throws -> Future<User.Public> {
+        return try req.parameters.next(Record.self).flatMap(to: User.Public.self) { record in
+            return record.creator.get(on: req).toPublic()
+        }
     }
 }
