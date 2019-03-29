@@ -57,7 +57,7 @@ final class Record: Codable {
         }
     }
     
-    // TODO: `partners`, `attachments` properties
+    // TODO: `companions` (sibling relationship) and `attachments` properties
     init(title: String, note: String, date: Date, amount: Double = 0.0, currency: Currency, mood: Mood, userID: User.ID) {
         self.title = title
         self.note = note
