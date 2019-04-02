@@ -84,5 +84,5 @@ extension Future where T: User {
 extension User {
     var records: Children<User, Record> {
         return children(\.creatorID)
-    }
+    }    
 }

@@ -9,6 +9,10 @@ final class RecordsController: RouteCollection {
         recordsGroup.put(Record.parameter, use: updateHandler)
         recordsGroup.delete(Record.parameter, use: deleteHandler)
         recordsGroup.get(Record.parameter, "creator", use: getCreatorHandler)
+        
+        // TODO: To be removed
+        recordsGroup.post(Record.parameter, "companions", User.parameter, use: addCompanionsHandler)
+        recordsGroup.get(Record.parameter, "companions", use: getCompanionsHandler)
     }
 }
 
@@ -48,6 +52,22 @@ private extension RecordsController {
     func getCreatorHandler(_ req: Request) throws -> Future<User.Public> {
         return try req.parameters.next(Record.self).flatMap(to: User.Public.self) { record in
             return record.creator.get(on: req).toPublic()
+        }
+    }
+    
+    // TODO: Attach companions during `Record` creation
+    func addCompanionsHandler(_ req: Request) throws -> Future<HTTPStatus> {
+        return try flatMap(to: HTTPStatus.self, req.parameters.next(Record.self), req.parameters.next(User.self)) { record, user in
+            return record.companions.attach(user, on: req).transform(to: .created)
+        }
+    }
+    
+    // TODO: Append companions with getting `Record`(s)
+    func getCompanionsHandler(_ req: Request) throws -> Future<[User.Public]> {
+        return try req.parameters.next(Record.self).flatMap { record in
+            return try record.companions.query(on: req).all()
+        }.map { users in
+            return users.map { $0.toPublic() }
         }
     }
 }

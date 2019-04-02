@@ -36,7 +36,7 @@ final class Record: Codable {
     var amount: Double
     private var _currency: String
     private var _mood: String
-    var creatorID: User.ID // Create a parent-child relationship
+    var creatorID: User.ID // It creates a parent-child relationship
     
     var mood: Mood {
         set {
@@ -57,7 +57,7 @@ final class Record: Codable {
         }
     }
     
-    // TODO: `companions` (sibling relationship) and `attachments` properties
+    // TODO: `attachments` properties
     init(title: String, note: String, date: Date, amount: Double = 0.0, currency: Currency, mood: Mood, userID: User.ID) {
         self.title = title
         self.note = note
@@ -92,5 +92,9 @@ extension Record: Parameter {}
 extension Record {
     var creator: Parent<Record, User> {
         return parent(\.creatorID)
+    }
+    
+    var companions: Siblings<Record, User, CompanionRecordPivot> {
+        return siblings()
     }
 }
