@@ -88,6 +88,44 @@ extension Record: Migration {
 // MARK: - Parameter
 extension Record: Parameter {}
 
+// MARK: - Record Response
+extension Record {
+    struct FullResponse: Codable {
+        let id: UUID?
+        let title: String
+        let note: String
+        let date: Date
+        let amount: Double
+        let currency: String
+        let mood: String
+        let creator: User.Public
+        let companions: [User.Public]
+    }
+    
+    func toResponseFuture(on conn: DatabaseConnectable) throws -> Future<FullResponse> {
+        let creatorFuture = creator.get(on: conn).toPublic()
+        let companionsFuture = try companions.query(on: conn).all().map(to: [User.Public].self) { users in
+            return users.map { $0.toPublic() }
+        }
+        
+        return map(to: FullResponse.self, creatorFuture, companionsFuture) { creator, companions in
+            return FullResponse(id: self.id, title: self.title, note: self.note, date: self.date, amount: self.amount, currency: self._currency, mood: self._mood, creator: creator, companions: companions)
+        }
+    }
+}
+
+// MARK: - Record Response Content
+extension Record.FullResponse: Content {}
+
+// MARK: - Future Helpers
+extension Future where T: Record {
+    func toResponse(on conn: DatabaseConnectable) throws -> Future<Record.FullResponse> {
+        return flatMap { record in
+            return try record.toResponseFuture(on: conn)
+        }
+    }
+}
+
 // MARK: - Helpers
 extension Record {
     var creator: Parent<Record, User> {

@@ -3,7 +3,6 @@ import Vapor
 final class RecordsController: RouteCollection {
     func boot(router: Router) throws {
         let recordsGroup = router.grouped("records")
-        recordsGroup.get(use: getAllHandler)
         recordsGroup.get(Record.parameter, use: getOneHandler)
         recordsGroup.post(use: createHandler)
         recordsGroup.put(Record.parameter, use: updateHandler)
@@ -12,23 +11,25 @@ final class RecordsController: RouteCollection {
         
         // TODO: To be removed
         recordsGroup.post(Record.parameter, "companions", User.parameter, use: addCompanionsHandler)
-        recordsGroup.get(Record.parameter, "companions", use: getCompanionsHandler)
     }
 }
 
 private extension RecordsController {
+    // NOT expose this handler to router
     func getAllHandler(_ req: Request) throws -> Future<[Record]> {
         return Record.query(on: req).decode(Record.self).all()
     }
     
-    func getOneHandler(_ req: Request) throws -> Future<Record> {
-        return try req.parameters.next(Record.self)
+    func getOneHandler(_ req: Request) throws -> Future<Record.FullResponse> {
+        return try req.parameters.next(Record.self).toResponse(on: req)
     }
     
+    // TODO: Add creator & companions
     func createHandler(_ req: Request) throws -> Future<Record> {
         return try req.content.decode(json: Record.self, using: .custom(dates: .millisecondsSince1970)).save(on: req)
     }
     
+    // TODO: Update companions
     func updateHandler(_ req: Request) throws -> Future<Record> {
         return try flatMap(to: Record.self,
                            req.parameters.next(Record.self),
@@ -59,15 +60,6 @@ private extension RecordsController {
     func addCompanionsHandler(_ req: Request) throws -> Future<HTTPStatus> {
         return try flatMap(to: HTTPStatus.self, req.parameters.next(Record.self), req.parameters.next(User.self)) { record, user in
             return record.companions.attach(user, on: req).transform(to: .created)
-        }
-    }
-    
-    // TODO: Append companions with getting `Record`(s)
-    func getCompanionsHandler(_ req: Request) throws -> Future<[User.Public]> {
-        return try req.parameters.next(Record.self).flatMap { record in
-            return try record.companions.query(on: req).all()
-        }.map { users in
-            return users.map { $0.toPublic() }
         }
     }
 }
