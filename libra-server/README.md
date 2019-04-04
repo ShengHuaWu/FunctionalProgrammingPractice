@@ -5,3 +5,6 @@
 2. `PostgreSQL error column xxx of relation yyy does not exist`: try to run `vapor run revert --all` to revert all migrations, because they might be incomplete.
 3. Decode `Date` type with custom `JSONDecoder`: `req.content.decode(json: Record.self, using: .custom(dates: .millisecondsSince1970))`.
 4. Revert all of the migrations: `vapor run revert --all`.
+5. `[Future<A>]` has `map` and `flatMap` methods which are able to flatten the array.
+6. Consider using `FilterOperator` to make a complex filter on `Model` type.
+7. The `attach` method on `Siblings` will NOT handle duplications.

@@ -32,10 +32,10 @@ private extension RecordsController {
     }
     
     func updateHandler(_ req: Request) throws -> Future<Record.Intact> {
-        let recordParameterFuture = try req.parameters.next(Record.self)
+        let recordFuture = try req.parameters.next(Record.self)
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
         
-        return flatMap(to: Record.Intact.self, recordParameterFuture, bodyFuture) { (record, body) in
+        return flatMap(to: Record.Intact.self, recordFuture, bodyFuture) { (record, body) in
             let updateRecordFuture = record.update(from: body).save(on: req)
             let companionsFuture = User.queryFuture(in: body.companionIDs, on: req)
             
