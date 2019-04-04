@@ -20,7 +20,7 @@ private extension RecordsController {
         return Record.query(on: req).decode(Record.self).all()
     }
     
-    func getOneHandler(_ req: Request) throws -> Future<Record.FullResponse> {
+    func getOneHandler(_ req: Request) throws -> Future<Record.Intact> {
         return try req.parameters.next(Record.self).toResponse(on: req)
     }
     

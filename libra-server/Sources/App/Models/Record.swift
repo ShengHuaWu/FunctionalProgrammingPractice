@@ -90,7 +90,7 @@ extension Record: Parameter {}
 
 // MARK: - Record Response
 extension Record {
-    struct FullResponse: Codable {
+    struct Intact: Codable {
         let id: UUID?
         let title: String
         let note: String
@@ -102,24 +102,24 @@ extension Record {
         let companions: [User.Public]
     }
     
-    func toResponseFuture(on conn: DatabaseConnectable) throws -> Future<FullResponse> {
+    func toResponseFuture(on conn: DatabaseConnectable) throws -> Future<Intact> {
         let creatorFuture = creator.get(on: conn).toPublic()
         let companionsFuture = try companions.query(on: conn).all().map(to: [User.Public].self) { users in
             return users.map { $0.toPublic() }
         }
         
-        return map(to: FullResponse.self, creatorFuture, companionsFuture) { creator, companions in
-            return FullResponse(id: self.id, title: self.title, note: self.note, date: self.date, amount: self.amount, currency: self._currency, mood: self._mood, creator: creator, companions: companions)
+        return map(to: Intact.self, creatorFuture, companionsFuture) { creator, companions in
+            return Intact(id: self.id, title: self.title, note: self.note, date: self.date, amount: self.amount, currency: self._currency, mood: self._mood, creator: creator, companions: companions)
         }
     }
 }
 
-// MARK: - Record Response Content
-extension Record.FullResponse: Content {}
+// MARK: - Intact Record Content
+extension Record.Intact: Content {}
 
 // MARK: - Future Helpers
 extension Future where T: Record {
-    func toResponse(on conn: DatabaseConnectable) throws -> Future<Record.FullResponse> {
+    func toResponse(on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
         return flatMap { record in
             return try record.toResponseFuture(on: conn)
         }
