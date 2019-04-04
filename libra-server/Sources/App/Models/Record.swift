@@ -88,7 +88,7 @@ extension Record: Migration {
 // MARK: - Parameter
 extension Record: Parameter {}
 
-// MARK: - Record Response
+// MARK: - Intact Record
 extension Record {
     struct Intact: Codable {
         let id: UUID?
@@ -102,7 +102,7 @@ extension Record {
         let companions: [User.Public]
     }
     
-    func toResponseFuture(on conn: DatabaseConnectable) throws -> Future<Intact> {
+    func toIntactFuture(on conn: DatabaseConnectable) throws -> Future<Intact> {
         let creatorFuture = creator.get(on: conn).toPublic()
         let companionsFuture = try companions.query(on: conn).all().map(to: [User.Public].self) { users in
             return users.map { $0.toPublic() }
@@ -117,12 +117,55 @@ extension Record {
 // MARK: - Intact Record Content
 extension Record.Intact: Content {}
 
+// MARK: - Record Creation Body
+extension Record {
+    struct CreationBody: Codable {
+        enum CodingKeys: String, CodingKey {
+            case title
+            case note
+            case date
+            case amount
+            case currency
+            case mood
+            case creatorID = "creator_id"
+            case companionIDs = "companion_ids"
+        }
+        
+        let title: String
+        let note: String
+        let date: Date
+        let amount: Double
+        let currency: String
+        let mood: String
+        let creatorID: User.ID
+        let companionIDs: [User.ID]
+    }
+}
+
+// MARK: - Record Creation Body Content
+extension Record.CreationBody: Content {}
+
+// MARK: - Record Creation Helpers
+extension Record.CreationBody {
+    func toRecord() throws -> Record {
+        let currency = Record.Currency(rawValue: self.currency) ?? .none
+        let mood = Record.Mood(rawValue: self.mood) ?? .unknown
+        return Record(title: title, note: note, date: date, amount: amount, currency: currency, mood: mood, userID: creatorID)
+    }
+}
+
 // MARK: - Future Helpers
 extension Future where T: Record {
-    func toResponse(on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
+    func toIntact(on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
         return flatMap { record in
-            return try record.toResponseFuture(on: conn)
+            return try record.toIntactFuture(on: conn)
         }
+    }
+}
+
+extension Future where T == Record.CreationBody {
+    func toRecord() throws -> Future<Record> {
+        return map(to: Record.self) { try $0.toRecord() }
     }
 }
 
