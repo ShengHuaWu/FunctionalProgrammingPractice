@@ -117,9 +117,9 @@ extension Record {
 // MARK: - Intact Record Content
 extension Record.Intact: Content {}
 
-// MARK: - Record Creation Body
+// MARK: - Record Request Body
 extension Record {
-    struct CreationBody: Codable {
+    struct RequestBody: Codable {
         enum CodingKeys: String, CodingKey {
             case title
             case note
@@ -142,11 +142,11 @@ extension Record {
     }
 }
 
-// MARK: - Record Creation Body Content
-extension Record.CreationBody: Content {}
+// MARK: - Record Request Body Content
+extension Record.RequestBody: Content {}
 
-// MARK: - Record Creation Helpers
-extension Record.CreationBody {
+// MARK: - Record Request Body Helpers
+extension Record.RequestBody {
     func toRecord() throws -> Record {
         let currency = Record.Currency(rawValue: self.currency) ?? .none
         let mood = Record.Mood(rawValue: self.mood) ?? .unknown
@@ -163,9 +163,15 @@ extension Future where T: Record {
     }
 }
 
-extension Future where T == Record.CreationBody {
+extension Future where T == Record.RequestBody {
     func toRecord() throws -> Future<Record> {
         return map(to: Record.self) { try $0.toRecord() }
+    }
+    
+    func queuyCompanionsFuture(on conn: DatabaseConnectable) -> Future<[User]> {
+        return flatMap(to: [User].self) { body in
+            return User.queryFuture(in: body.companionIDs, on: conn)
+        }
     }
 }
 
@@ -177,5 +183,17 @@ extension Record {
     
     var companions: Siblings<Record, User, CompanionRecordPivot> {
         return siblings()
+    }
+    
+    func update(from body: RequestBody) -> Record {
+        title = body.title
+        note = body.note
+        date = body.date
+        amount = body.amount
+        currency = Record.Currency(rawValue: body.currency) ?? .none
+        mood = Record.Mood(rawValue: body.mood) ?? .unknown
+        creatorID = body.creatorID
+        
+        return self
     }
 }

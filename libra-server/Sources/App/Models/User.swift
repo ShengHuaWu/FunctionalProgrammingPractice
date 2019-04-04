@@ -84,5 +84,20 @@ extension Future where T: User {
 extension User {
     var records: Children<User, Record> {
         return children(\.creatorID)
-    }    
+    }
+    
+    static func queryFuture(in ids: [User.ID], on conn: DatabaseConnectable) -> Future<[User]> {
+        return User.query(on: conn).decode(User.self).filter(.make(\User.id, .in, ids)).all()
+    }
+}
+
+// MARK: - User Array Helpers
+extension Array where Element == User {
+    func attachCompanionsFuture(for record: Record, on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
+        return map { companion in
+            return record.companions.attach(companion, on: conn)
+        }.flatMap(to: Record.Intact.self, on: conn) { _ in
+            return try record.toIntactFuture(on: conn)
+        }
+    }
 }

@@ -1,5 +1,4 @@
 import Vapor
-import FluentPostgreSQL
 
 final class RecordsController: RouteCollection {
     func boot(router: Router) throws {
@@ -23,35 +22,28 @@ private extension RecordsController {
     }
     
     func createHandler(_ req: Request) throws -> Future<Record.Intact> {
-        let creationBodyFuture = try req.content.decode(json: Record.CreationBody.self, using: .custom(dates: .millisecondsSince1970))
-        let recordFuture = try creationBodyFuture.toRecord().save(on: req)
-        let companionsFuture = creationBodyFuture.flatMap(to: [User].self) { creation in
-            return User.query(on: req).decode(User.self).filter(.make(\User.id, .in, creation.companionIDs)).all()
-        }
+        let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
+        let recordFuture = try bodyFuture.toRecord().save(on: req)
+        let companionsFuture = bodyFuture.queuyCompanionsFuture(on: req)
         
         return flatMap(to: Record.Intact.self, recordFuture, companionsFuture) { record, companions in
-            return companions.map { companion in
-                return record.companions.attach(companion, on: req)
-            }.flatMap(to: Record.Intact.self, on: req) { _ in
-                return try record.toIntactFuture(on: req)
-            }
+            return try companions.attachCompanionsFuture(for: record, on: req)
         }
     }
     
-    // TODO: Update companions & return Record.Intact
-    func updateHandler(_ req: Request) throws -> Future<Record> {
-        return try flatMap(to: Record.self,
-                           req.parameters.next(Record.self),
-                           req.content.decode(json: Record.self, using: .custom(dates: .millisecondsSince1970))) { (record, updatedRecord) in
-            record.title = updatedRecord.title
-            record.note = updatedRecord.note
-            record.date = updatedRecord.date
-            record.amount = updatedRecord.amount
-            record.currency = updatedRecord.currency
-            record.mood = updatedRecord.mood
-            record.creatorID = updatedRecord.creatorID
+    func updateHandler(_ req: Request) throws -> Future<Record.Intact> {
+        let recordParameterFuture = try req.parameters.next(Record.self)
+        let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
+        
+        return flatMap(to: Record.Intact.self, recordParameterFuture, bodyFuture) { (record, body) in
+            let updateRecordFuture = record.update(from: body).save(on: req)
+            let companionsFuture = User.queryFuture(in: body.companionIDs, on: req)
             
-            return record.save(on: req)
+            return flatMap(to: Record.Intact.self, updateRecordFuture, companionsFuture) { record, companions in
+                return record.companions.detachAll(on: req).flatMap(to: Record.Intact.self) {
+                    return try companions.attachCompanionsFuture(for: record, on: req)
+                }
+            }
         }
     }
     
@@ -60,8 +52,11 @@ private extension RecordsController {
     }
     
     func addCompanionsHandler(_ req: Request) throws -> Future<HTTPStatus> {
+        // TODO: Find before attaching
         return try flatMap(to: HTTPStatus.self, req.parameters.next(Record.self), req.parameters.next(User.self)) { record, user in
             return record.companions.attach(user, on: req).transform(to: .created)
         }
     }
+    
+    // TODO: Remove companion
 }
