@@ -36,4 +36,15 @@ extension CompanionRecordPivot: PostgreSQLUUIDPivot {}
 extension CompanionRecordPivot: ModifiablePivot {}
 
 // MARK: - Migration
-extension CompanionRecordPivot: Migration {}
+extension CompanionRecordPivot: Migration {
+    static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
+        return Database.create(self, on: conn) { builder in
+            try addProperties(to: builder)
+            
+            // The pivot (relationship) will be automatically removed,
+            // when we delete the companion or record from the database
+            builder.reference(from: \.companionID, to: \User.id, onDelete: .cascade)
+            builder.reference(from: \.recordID, to: \Record.id, onDelete: .cascade)
+        }
+    }
+}
