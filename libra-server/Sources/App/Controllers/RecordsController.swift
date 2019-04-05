@@ -17,16 +17,16 @@ private extension RecordsController {
     }
     
     func getOneHandler(_ req: Request) throws -> Future<Record.Intact> {
-        return try req.parameters.next(Record.self).toIntact(on: req)
+        return try req.parameters.next(Record.self).makeIntact(on: req)
     }
     
     func createHandler(_ req: Request) throws -> Future<Record.Intact> {
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
-        let recordFuture = try bodyFuture.toRecord().save(on: req)
-        let companionsFuture = bodyFuture.queuyCompanionsFuture(on: req)
+        let recordFuture = bodyFuture.makeRecord().save(on: req)
+        let companionsFuture = bodyFuture.makeQueuyCompanions(on: req)
         
         return flatMap(to: Record.Intact.self, recordFuture, companionsFuture) { record, companions in
-            return try companions.attachCompanionsFuture(for: record, on: req)
+            return try record.makeAttachCompanionsFuture(companions, on: req)
         }
     }
     
@@ -34,14 +34,12 @@ private extension RecordsController {
         let recordFuture = try req.parameters.next(Record.self)
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
         
-        return flatMap(to: Record.Intact.self, recordFuture, bodyFuture) { (record, body) in
-            let updateRecordFuture = record.update(from: body).save(on: req)
-            let companionsFuture = User.queryFuture(in: body.companionIDs, on: req)
+        return flatMap(to: Record.Intact.self, recordFuture, bodyFuture) { record, body in
+            let updateRecordFuture = record.update(with: body).save(on: req).makeDetachAllCompanions(on: req)
+            let companionsFuture = User.makeQueryFuture(using: body.companionIDs, on: req)
             
-            return flatMap(to: Record.Intact.self, updateRecordFuture, companionsFuture) { record, companions in
-                return record.companions.detachAll(on: req).flatMap(to: Record.Intact.self) {
-                    return try companions.attachCompanionsFuture(for: record, on: req)
-                }
+            return flatMap(to: Record.Intact.self, updateRecordFuture, companionsFuture) { _, companions in
+                return try record.makeAttachCompanionsFuture(companions, on: req)
             }
         }
     }

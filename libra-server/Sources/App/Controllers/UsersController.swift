@@ -13,13 +13,13 @@ final class UsersController: RouteCollection {
 
 private extension UsersController {
     func getOneHandler(_ req: Request) throws -> Future<User.Public> {
-        return try req.parameters.next(User.self).toPublic()
+        return try req.parameters.next(User.self).makePublic()
     }
     
     func createHandler(_ req: Request) throws -> Future<User.Public> {
         return try req.content.decode(User.self).flatMap { user in
             user.password = try BCrypt.hash(user.password)
-            return user.save(on: req).toPublic()
+            return user.save(on: req).makePublic()
         }
     }
     
@@ -30,7 +30,7 @@ private extension UsersController {
             user.lastName = updatedPublicUser.lastName
             user.email = updatedPublicUser.email
             
-            return user.save(on: req).toPublic()
+            return user.save(on: req).makePublic()
         }
     }
     

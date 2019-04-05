@@ -8,26 +8,9 @@ final class Record: Codable {
         case note
         case date
         case amount
-        case _currency = "currency"
-        case _mood = "mood"
+        case currency
+        case mood
         case creatorID = "creator_id"
-    }
-    
-    // TODO: Do we need these two enums?
-    enum Currency: String {
-        case euro
-        case usd
-        case none
-        // TODO: Support more currencies
-    }
-    
-    enum Mood: String {
-        case good
-        case neutral
-        case bad
-        case unknown
-        // TODO: Maybe `upset`, `sad`, `clam`, etc...
-        // http://quantifiedself.com/2012/12/how-is-mood-measured-get-your-mood-on-part-2/
     }
     
     var id: UUID?
@@ -35,37 +18,18 @@ final class Record: Codable {
     var note: String
     var date: Date
     var amount: Double
-    private var _currency: String
-    private var _mood: String
+    var currency: String
+    var mood: String
     var creatorID: User.ID // It creates a parent-child relationship
     
-    var mood: Mood {
-        set {
-            _mood = newValue.rawValue
-        }
-        get {
-            return Mood(rawValue: _mood) ?? .unknown
-        }
-    }
-    
-    var currency: Currency {
-        set {
-            _currency = newValue.rawValue
-        }
-        
-        get {
-            return Currency(rawValue: _currency) ?? .none
-        }
-    }
-    
     // TODO: `attachments` properties
-    init(title: String, note: String, date: Date, amount: Double = 0.0, currency: Currency, mood: Mood, userID: User.ID) {
+    init(title: String, note: String, date: Date, amount: Double = 0.0, currency: String, mood: String, userID: User.ID) {
         self.title = title
         self.note = note
         self.date = date
         self.amount = amount
-        self._currency = currency.rawValue
-        self._mood = mood.rawValue
+        self.currency = currency
+        self.mood = mood
         self.creatorID = userID
     }
 }
@@ -89,93 +53,6 @@ extension Record: Migration {
 // MARK: - Parameter
 extension Record: Parameter {}
 
-// MARK: - Intact Record
-extension Record {
-    struct Intact: Codable {
-        let id: UUID?
-        let title: String
-        let note: String
-        let date: Date
-        let amount: Double
-        let currency: String
-        let mood: String
-        let creator: User.Public
-        let companions: [User.Public]
-    }
-    
-    func toIntactFuture(on conn: DatabaseConnectable) throws -> Future<Intact> {
-        let creatorFuture = creator.get(on: conn).toPublic()
-        let companionsFuture = try companions.query(on: conn).all().map(to: [User.Public].self) { users in
-            return users.map { $0.toPublic() }
-        }
-        
-        return map(to: Intact.self, creatorFuture, companionsFuture) { creator, companions in
-            return Intact(id: self.id, title: self.title, note: self.note, date: self.date, amount: self.amount, currency: self._currency, mood: self._mood, creator: creator, companions: companions)
-        }
-    }
-}
-
-// MARK: - Intact Record Content
-extension Record.Intact: Content {}
-
-// MARK: - Record Request Body
-extension Record {
-    struct RequestBody: Codable {
-        enum CodingKeys: String, CodingKey {
-            case title
-            case note
-            case date
-            case amount
-            case currency
-            case mood
-            case creatorID = "creator_id"
-            case companionIDs = "companion_ids"
-        }
-        
-        let title: String
-        let note: String
-        let date: Date
-        let amount: Double
-        let currency: String
-        let mood: String
-        let creatorID: User.ID
-        let companionIDs: [User.ID]
-    }
-}
-
-// MARK: - Record Request Body Content
-extension Record.RequestBody: Content {}
-
-// MARK: - Record Request Body Helpers
-extension Record.RequestBody {
-    func toRecord() throws -> Record {
-        let currency = Record.Currency(rawValue: self.currency) ?? .none
-        let mood = Record.Mood(rawValue: self.mood) ?? .unknown
-        return Record(title: title, note: note, date: date, amount: amount, currency: currency, mood: mood, userID: creatorID)
-    }
-}
-
-// MARK: - Future Helpers
-extension Future where T: Record {
-    func toIntact(on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
-        return flatMap { record in
-            return try record.toIntactFuture(on: conn)
-        }
-    }
-}
-
-extension Future where T == Record.RequestBody {
-    func toRecord() throws -> Future<Record> {
-        return map(to: Record.self) { try $0.toRecord() }
-    }
-    
-    func queuyCompanionsFuture(on conn: DatabaseConnectable) -> Future<[User]> {
-        return flatMap(to: [User].self) { body in
-            return User.queryFuture(in: body.companionIDs, on: conn)
-        }
-    }
-}
-
 // MARK: - Helpers
 extension Record {
     var creator: Parent<Record, User> {
@@ -186,15 +63,34 @@ extension Record {
         return siblings()
     }
     
-    func update(from body: RequestBody) -> Record {
+    func update(with body: RequestBody) -> Record {
         title = body.title
         note = body.note
         date = body.date
         amount = body.amount
-        currency = Record.Currency(rawValue: body.currency) ?? .none
-        mood = Record.Mood(rawValue: body.mood) ?? .unknown
+        currency = body.currency
+        mood = body.mood
         creatorID = body.creatorID
         
         return self
+    }
+    
+    func makeIntactFuture(on conn: DatabaseConnectable) throws -> Future<Intact> {
+        let creatorFuture = creator.get(on: conn).makePublic()
+        let companionsFuture = try companions.query(on: conn).all().map(to: [User.Public].self) { users in
+            return users.map { $0.makePublic() }
+        }
+        
+        return map(to: Intact.self, creatorFuture, companionsFuture) { creator, companions in
+            return Intact(id: self.id, title: self.title, note: self.note, date: self.date, amount: self.amount, currency: self.currency, mood: self.mood, creator: creator, companions: companions)
+        }
+    }
+    
+    func makeAttachCompanionsFuture(_ companions: [User], on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
+        return companions.map { companion in
+            return self.companions.attach(companion, on: conn)
+        }.flatMap(to: Record.Intact.self, on: conn) { _ in
+            return try self.makeIntactFuture(on: conn)
+        }
     }
 }
