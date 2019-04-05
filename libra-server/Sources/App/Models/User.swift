@@ -87,7 +87,7 @@ extension User {
     }
     
     static func queryFuture(in ids: [User.ID], on conn: DatabaseConnectable) -> Future<[User]> {
-        return User.query(on: conn).decode(User.self).filter(.make(\User.id, .in, ids)).all()
+        return User.query(on: conn).filter(.make(\User.id, .in, ids)).all()
     }
 }
 
