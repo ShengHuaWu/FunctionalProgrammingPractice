@@ -13,6 +13,7 @@ final class Record: Codable {
         case creatorID = "creator_id"
     }
     
+    // TODO: Do we need these two enums?
     enum Currency: String {
         case euro
         case usd
@@ -181,7 +182,7 @@ extension Record {
         return parent(\.creatorID)
     }
     
-    var companions: Siblings<Record, User, CompanionRecordPivot> {
+    var companions: Siblings<Record, User, RecordCompanionPivot> {
         return siblings()
     }
     

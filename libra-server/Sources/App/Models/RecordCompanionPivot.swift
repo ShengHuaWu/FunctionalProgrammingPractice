@@ -1,42 +1,41 @@
 import FluentPostgreSQL
 
-// TODO: Change to `RecordCompanionPivot`
-final class CompanionRecordPivot: Codable {
+final class RecordCompanionPivot: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case companionID = "companion_id"
         case recordID = "record_id"
     }
     
-    typealias Left = User
-    typealias Right = Record
+    typealias Left = Record
+    typealias Right = User
     
     var id: UUID?
     var companionID: User.ID
     var recordID: Record.ID
     
-    static var leftIDKey: WritableKeyPath<CompanionRecordPivot, UUID> {
-        return \.companionID
-    }
-    
-    static var rightIDKey: WritableKeyPath<CompanionRecordPivot, UUID> {
+    static var leftIDKey: WritableKeyPath<RecordCompanionPivot, UUID> {
         return \.recordID
     }
     
-    init(_ left: User, _ right: Record) throws {
-        self.companionID = try left.requireID()
-        self.recordID = try right.requireID()
+    static var rightIDKey: WritableKeyPath<RecordCompanionPivot, UUID> {
+        return \.companionID
+    }
+    
+    init(_ left: Record, _ right: User) throws {
+        self.recordID = try left.requireID()
+        self.companionID = try right.requireID()
     }
 }
 
 // MARK: - PostgreSQLUUIDPivot
-extension CompanionRecordPivot: PostgreSQLUUIDPivot {}
+extension RecordCompanionPivot: PostgreSQLUUIDPivot {}
 
 // MARK: ModifiablePivot
-extension CompanionRecordPivot: ModifiablePivot {}
+extension RecordCompanionPivot: ModifiablePivot {}
 
 // MARK: - Migration
-extension CompanionRecordPivot: Migration {
+extension RecordCompanionPivot: Migration {
     static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
         return Database.create(self, on: conn) { builder in
             try addProperties(to: builder)
@@ -48,3 +47,4 @@ extension CompanionRecordPivot: Migration {
         }
     }
 }
+
