@@ -8,3 +8,4 @@
 5. `[Future<A>]` has `map` and `flatMap` methods which are able to flatten the array.
 6. Consider using `FilterOperator` to make a complex filter on `Model` type.
 7. The `attach` method on `Siblings` will NOT handle duplications.
+8. It's important to set up environment variable for admin user or just not seeding the admin user in production.
