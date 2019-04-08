@@ -60,6 +60,11 @@ extension User: BasicAuthenticatable {
     }
 }
 
+// MARK: - Token Authenticatable
+extension User: TokenAuthenticatable {
+    typealias TokenType = Token
+}
+
 // MARK: - Helpers
 extension User {
     var records: Children<User, Record> {

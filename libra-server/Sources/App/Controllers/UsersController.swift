@@ -4,14 +4,18 @@ import Crypto
 final class UsersController: RouteCollection {
     func boot(router: Router) throws {
         let usersGroup = router.grouped("users")
+        usersGroup.post(use: createHandler)
+        
         let basicAuthMiddleware = User.basicAuthMiddleware(using: BCryptDigest())
         let guardMiddleware = User.guardAuthMiddleware()
         let basicProtected = usersGroup.grouped(basicAuthMiddleware, guardMiddleware)
+        basicProtected.post("login", use: loginHandler)
         
-        basicProtected.get(User.parameter, use: getOneHandler)
-        usersGroup.post(use: createHandler)
-        usersGroup.put(User.parameter, use: updateHandler)
-        usersGroup.get(User.parameter, "records", use: getRecordsHandler)
+        let tokenAuthMiddleware = User.tokenAuthMiddleware()
+        let tokenProtected = usersGroup.grouped(tokenAuthMiddleware, guardMiddleware)
+        tokenProtected.get(User.parameter, use: getOneHandler)
+        tokenProtected.put(User.parameter, use: updateHandler)
+        tokenProtected.get(User.parameter, "records", use: getRecordsHandler)
     }
 }
 
@@ -42,6 +46,13 @@ private extension UsersController {
         return try req.parameters.next(User.self).flatMap(to: [Record].self) { user in
             return try user.records.query(on: req).all()
         }
+    }
+    
+    // TODO: Return public user + token
+    func loginHandler(_ req: Request) throws -> Future<Token> {
+        let user = try req.requireAuthenticated(User.self)
+        let token = try Token.make(for: user)
+        return token.save(on: req)
     }
     
     // NOT expose this handler to router

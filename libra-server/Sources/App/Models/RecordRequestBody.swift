@@ -30,6 +30,6 @@ extension Record.RequestBody: Content {}
 // MARK: - Record Request Body Helpers
 extension Record.RequestBody {
     func makeRecord() -> Record {
-        return Record(title: title, note: note, date: date, amount: amount, currency: currency, mood: mood, userID: creatorID)
+        return Record(title: title, note: note, date: date, amount: amount, currency: currency, mood: mood, creatorID: creatorID)
     }
 }
