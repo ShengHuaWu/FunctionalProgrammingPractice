@@ -2,6 +2,7 @@ import Vapor
 
 final class RecordsController: RouteCollection {
     func boot(router: Router) throws {
+        // TODO: Modify the router path and protected by token
         let recordsGroup = router.grouped("records")
         recordsGroup.get(Record.parameter, use: getOneHandler)
         recordsGroup.post(use: createHandler)
