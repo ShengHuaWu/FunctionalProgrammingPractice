@@ -13,7 +13,7 @@ final class Record: Codable {
         case creatorID = "creator_id"
     }
     
-    var id: UUID?
+    var id: Int?
     var title: String
     var note: String
     var date: Date
@@ -34,9 +34,8 @@ final class Record: Codable {
     }
 }
 
-// MARK: - PostgreSQLUUIDModel
-// TODO: Remove UUID
-extension Record: PostgreSQLUUIDModel {}
+// MARK: - PostgreSQLModel
+extension Record: PostgreSQLModel {}
 
 // MARK: - Content
 extension Record: Content {}

@@ -26,7 +26,14 @@ extension Token: PostgreSQLModel {}
 extension Token: Content {}
 
 // MARK: - Migration
-extension Token: Migration {}
+extension Token: Migration {
+    static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
+        return Database.create(self, on: conn) { builder in
+            try addProperties(to: builder)
+            builder.reference(from: \.userID, to: \User.id) // Set up a foreign key
+        }
+    }
+}
 
 // MARK: - Authentication Token
 extension Token: Authentication.Token {

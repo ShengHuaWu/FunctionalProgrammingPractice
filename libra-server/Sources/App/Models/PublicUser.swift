@@ -10,7 +10,7 @@ extension User {
             case email
         }
         
-        let id: UUID?
+        let id: Int?
         let firstName: String
         let lastName: String
         let username: String?

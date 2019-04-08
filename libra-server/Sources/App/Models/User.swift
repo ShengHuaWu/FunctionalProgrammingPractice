@@ -13,7 +13,7 @@ final class User: Codable {
         case email
     }
     
-    var id: UUID?
+    var id: Int?
     var firstName: String
     var lastName: String
     var username: String
@@ -29,9 +29,8 @@ final class User: Codable {
     }
 }
 
-// MARK: - PostgreSQLUUIDModel
-// TODO: Remove UUID
-extension User: PostgreSQLUUIDModel {}
+// MARK: - PostgreSQLModel
+extension User: PostgreSQLModel {}
 
 // MARK: - Content
 extension User: Content {}

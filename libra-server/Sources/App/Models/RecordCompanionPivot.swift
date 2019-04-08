@@ -10,15 +10,15 @@ final class RecordCompanionPivot: Codable {
     typealias Left = Record
     typealias Right = User
     
-    var id: UUID?
+    var id: Int?
     var companionID: User.ID
     var recordID: Record.ID
     
-    static var leftIDKey: WritableKeyPath<RecordCompanionPivot, UUID> {
+    static var leftIDKey: WritableKeyPath<RecordCompanionPivot, Int> {
         return \.recordID
     }
     
-    static var rightIDKey: WritableKeyPath<RecordCompanionPivot, UUID> {
+    static var rightIDKey: WritableKeyPath<RecordCompanionPivot, Int> {
         return \.companionID
     }
     
@@ -28,8 +28,8 @@ final class RecordCompanionPivot: Codable {
     }
 }
 
-// MARK: - PostgreSQLUUIDPivot
-extension RecordCompanionPivot: PostgreSQLUUIDPivot {}
+// MARK: - PostgreSQLPivot
+extension RecordCompanionPivot: PostgreSQLPivot {}
 
 // MARK: ModifiablePivot
 extension RecordCompanionPivot: ModifiablePivot {}

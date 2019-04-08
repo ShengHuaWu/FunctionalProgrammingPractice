@@ -2,7 +2,7 @@ import Vapor
 
 extension Record {
     struct Intact: Codable {
-        let id: UUID?
+        let id: Int?
         let title: String
         let note: String
         let date: Date
