@@ -4,7 +4,11 @@ import Crypto
 final class UsersController: RouteCollection {
     func boot(router: Router) throws {
         let usersGroup = router.grouped("users")
-        usersGroup.get(User.parameter, use: getOneHandler)
+        let basicAuthMiddleware = User.basicAuthMiddleware(using: BCryptDigest())
+        let guardMiddleware = User.guardAuthMiddleware()
+        let basicProtected = usersGroup.grouped(basicAuthMiddleware, guardMiddleware)
+        
+        basicProtected.get(User.parameter, use: getOneHandler)
         usersGroup.post(use: createHandler)
         usersGroup.put(User.parameter, use: updateHandler)
         usersGroup.get(User.parameter, "records", use: getRecordsHandler)

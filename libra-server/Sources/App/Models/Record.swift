@@ -35,6 +35,7 @@ final class Record: Codable {
 }
 
 // MARK: - PostgreSQLUUIDModel
+// TODO: Remove UUID
 extension Record: PostgreSQLUUIDModel {}
 
 // MARK: - Content

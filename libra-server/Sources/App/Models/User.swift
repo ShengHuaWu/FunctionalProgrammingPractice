@@ -1,6 +1,7 @@
 import Foundation
 import Vapor
 import FluentPostgreSQL
+import Authentication
 
 final class User: Codable {
     enum CodingKeys: String, CodingKey {
@@ -29,6 +30,7 @@ final class User: Codable {
 }
 
 // MARK: - PostgreSQLUUIDModel
+// TODO: Remove UUID
 extension User: PostgreSQLUUIDModel {}
 
 // MARK: - Content
@@ -44,6 +46,17 @@ extension User: Migration {
             try addProperties(to: builder)
             builder.unique(on: \.username) // Add a unique index to username
         }
+    }
+}
+
+// MARK: - Basic Authenticatable
+extension User: BasicAuthenticatable {
+    static var usernameKey: WritableKeyPath<User, String> {
+        return \.username
+    }
+    
+    static var passwordKey: WritableKeyPath<User, String> {
+        return \.password
     }
 }
 
