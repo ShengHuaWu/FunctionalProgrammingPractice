@@ -47,11 +47,3 @@ extension Token: Authentication.Token {
         return \.token
     }
 }
-
-// MARK: - Helpers
-extension Token {
-    static func make(for user: User) throws -> Token {
-        let random = try CryptoRandom().generateData(count: 16)
-        return try Token(token: random.base64EncodedString(), userID: user.requireID())
-    }
-}

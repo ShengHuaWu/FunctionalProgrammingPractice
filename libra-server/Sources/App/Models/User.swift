@@ -70,8 +70,13 @@ extension User {
         return children(\.creatorID)
     }
     
-    func makePublic() -> Public {
-        return Public(id: id, firstName: firstName, lastName: lastName, username: username, email: email)
+    func encryptPassword() throws -> User {
+        password = try BCrypt.hash(password)
+        return self
+    }
+    
+    func makePublic(with token: Token? = nil) -> Public {
+        return Public(id: id, firstName: firstName, lastName: lastName, username: username, email: email, token: token?.token)
     }
     
     func update(with body: UpdateRequestBody) -> User {
@@ -80,6 +85,12 @@ extension User {
         email = body.email
         
         return self
+    }
+    
+    // TODO: Find token before creating a new one (`authTokens`)
+    func makeToken() throws -> Token {
+        let random = try CryptoRandom().generateData(count: 16)
+        return try Token(token: random.base64EncodedString(), userID: requireID())
     }
     
     static func makeQueryFuture(using ids: [User.ID], on conn: DatabaseConnectable) -> Future<[User]> {

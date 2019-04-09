@@ -1,5 +1,6 @@
 import Vapor
 
+// MARK: - Public User
 extension User {
     struct Public: Codable {
         enum CodingKeys: String, CodingKey {
@@ -8,6 +9,7 @@ extension User {
             case lastName = "last_name"
             case username
             case email
+            case token
         }
         
         let id: Int?
@@ -15,6 +17,7 @@ extension User {
         let lastName: String
         let username: String
         let email: String
+        let token: String?
     }
 }
 

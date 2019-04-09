@@ -2,8 +2,12 @@ import Vapor
 
 // MARK: - User Helpers
 extension Future where T: User {
+    func encryptPassword() throws -> Future<User> {
+        return map { try $0.encryptPassword() }
+    }
+    
     func makePublic() -> Future<User.Public> {
-        return map(to: User.Public.self) { $0.makePublic() }
+        return map { $0.makePublic() }
     }
 }
 
@@ -37,11 +41,9 @@ extension Future where T == Record.RequestBody {
 
 // MARK: - Token Helpers
 extension Future where T: Token {
-    func makeLoginResponse(on conn: DatabaseConnectable) -> Future<LoginResponse> {
-        return flatMap(to: LoginResponse.self) { token in
-            return token.authUser.get(on: conn).map(to: LoginResponse.self) { user in
-                return LoginResponse(id: user.id, firstName: user.firstName, lastName: user.lastName, username: user.username, email: user.email, token: token.token)
-            }
+    func makePublicUser(for user: User) -> Future<User.Public> {
+        return map { token in
+            return user.makePublic(with: token)
         }
     }
 }
