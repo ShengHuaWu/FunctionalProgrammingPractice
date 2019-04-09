@@ -2,19 +2,21 @@ import Vapor
 
 final class RecordsController: RouteCollection {
     func boot(router: Router) throws {
-        // TODO: Modify the router path and protected by token
         let recordsGroup = router.grouped("records")
-        recordsGroup.get(Record.parameter, use: getOneHandler)
-        recordsGroup.post(use: createHandler)
-        recordsGroup.put(Record.parameter, use: updateHandler)
-        recordsGroup.delete(Record.parameter, use: deleteHandler)
+        let tokenAuthMiddleware = User.tokenAuthMiddleware()
+        let guardMiddleware = User.guardAuthMiddleware()
+        let tokenProtected = recordsGroup.grouped(tokenAuthMiddleware, guardMiddleware)
+        tokenProtected.get(use: getAllFromUserHandler)
+        tokenProtected.get(Record.parameter, use: getOneHandler)
+        tokenProtected.post(use: createHandler)
+        tokenProtected.put(Record.parameter, use: updateHandler)
+        tokenProtected.delete(Record.parameter, use: deleteHandler)
     }
 }
 
 private extension RecordsController {
-    // NOT expose this handler to router
-    func getAllHandler(_ req: Request) throws -> Future<[Record]> {
-        return Record.query(on: req).decode(Record.self).all()
+    func getAllFromUserHandler(_ req: Request) throws -> Future<[Record]> {
+        return try req.requireAuthenticated(User.self).records.query(on: req).all()
     }
     
     func getOneHandler(_ req: Request) throws -> Future<Record.Intact> {

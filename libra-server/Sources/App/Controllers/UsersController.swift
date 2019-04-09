@@ -3,19 +3,21 @@ import Crypto
 
 final class UsersController: RouteCollection {
     func boot(router: Router) throws {
+        // Not protected: create user
         let usersGroup = router.grouped("users")
         usersGroup.post(use: createHandler)
         
+        // Basic protected: login
         let basicAuthMiddleware = User.basicAuthMiddleware(using: BCryptDigest())
         let guardMiddleware = User.guardAuthMiddleware()
         let basicProtected = usersGroup.grouped(basicAuthMiddleware, guardMiddleware)
         basicProtected.post("login", use: loginHandler)
         
+        // Token protected: get user, update user
         let tokenAuthMiddleware = User.tokenAuthMiddleware()
         let tokenProtected = usersGroup.grouped(tokenAuthMiddleware, guardMiddleware)
         tokenProtected.get(User.parameter, use: getOneHandler)
         tokenProtected.put(User.parameter, use: updateHandler)
-        tokenProtected.get(User.parameter, "records", use: getRecordsHandler)
     }
 }
 
@@ -34,12 +36,6 @@ private extension UsersController {
     func updateHandler(_ req: Request) throws -> Future<User.Public> {
         return try flatMap(to: User.Public.self, req.parameters.next(User.self), req.content.decode(User.UpdateRequestBody.self)) { user, body in
             return user.update(with: body).save(on: req).makePublic()
-        }
-    }
-    
-    func getRecordsHandler(_ req: Request) throws -> Future<[Record]> {
-        return try req.parameters.next(User.self).flatMap(to: [Record].self) { user in
-            return try user.records.query(on: req).all()
         }
     }
     
