@@ -32,14 +32,8 @@ private extension UsersController {
     }
     
     func updateHandler(_ req: Request) throws -> Future<User.Public> {
-        // TODO: Use requesr body instead 
-        return try flatMap(to: User.Public.self, req.parameters.next(User.self), req.content.decode(User.Public.self)) { user, updatedPublicUser in
-            // NOT update `password` & `username`
-            user.firstName = updatedPublicUser.firstName
-            user.lastName = updatedPublicUser.lastName
-            user.email = updatedPublicUser.email
-            
-            return user.save(on: req).makePublic()
+        return try flatMap(to: User.Public.self, req.parameters.next(User.self), req.content.decode(User.UpdateRequestBody.self)) { user, body in
+            return user.update(with: body).save(on: req).makePublic()
         }
     }
     

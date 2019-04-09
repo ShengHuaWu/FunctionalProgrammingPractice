@@ -74,6 +74,14 @@ extension User {
         return Public(id: id, firstName: firstName, lastName: lastName, username: username, email: email)
     }
     
+    func update(with body: UpdateRequestBody) -> User {
+        firstName = body.firstName
+        lastName = body.lastName
+        email = body.email
+        
+        return self
+    }
+    
     static func makeQueryFuture(using ids: [User.ID], on conn: DatabaseConnectable) -> Future<[User]> {
         return User.query(on: conn).filter(.make(\User.id, .in, ids)).all()
     }
