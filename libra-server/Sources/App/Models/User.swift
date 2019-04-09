@@ -87,10 +87,16 @@ extension User {
         return self
     }
     
-    // TODO: Find token before creating a new one (`authTokens`)
-    func makeToken() throws -> Token {
-        let random = try CryptoRandom().generateData(count: 16)
-        return try Token(token: random.base64EncodedString(), userID: requireID())
+    func makeTokenFuture(on conn: DatabaseConnectable) throws -> Future<Token> {
+        // TODO: Refresh token? Sorting is just a temporary
+        return try authTokens.query(on: conn).sort(\.token, .descending).first().map { token in
+            guard let unwrappedToken = token else {
+                let random = try CryptoRandom().generateData(count: 16)
+                return try Token(token: random.base64EncodedString(), userID: self.requireID())
+            }
+            
+            return unwrappedToken
+        }
     }
     
     static func makeQueryFuture(using ids: [User.ID], on conn: DatabaseConnectable) -> Future<[User]> {

@@ -34,13 +34,13 @@ private extension UsersController {
     
     func signupHandler(_ req: Request) throws -> Future<User.Public> {
         return try req.content.decode(User.self).encryptPassword().save(on: req).flatMap(to: User.Public.self) { user in
-            return try user.makeToken().save(on: req).makePublicUser(for: user)
+            return try user.makeTokenFuture(on: req).save(on: req).makePublicUser(for: user)
         }
     }
     
     func loginHandler(_ req: Request) throws -> Future<User.Public> {
         let user = try req.requireAuthenticated(User.self)
         
-        return try user.makeToken().save(on: req).makePublicUser(for: user)
+        return try user.makeTokenFuture(on: req).save(on: req).makePublicUser(for: user)
     }
 }
