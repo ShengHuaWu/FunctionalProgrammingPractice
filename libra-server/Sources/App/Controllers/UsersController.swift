@@ -43,11 +43,10 @@ private extension UsersController {
         }
     }
     
-    // TODO: Return public user + token
-    func loginHandler(_ req: Request) throws -> Future<Token> {
+    func loginHandler(_ req: Request) throws -> Future<LoginResponse> {
         let user = try req.requireAuthenticated(User.self)
         let token = try Token.make(for: user)
-        return token.save(on: req)
+        return token.save(on: req).makeLoginResponse(on: req)
     }
     
     // NOT expose this handler to router

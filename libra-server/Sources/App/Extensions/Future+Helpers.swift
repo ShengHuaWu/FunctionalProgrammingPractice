@@ -34,3 +34,14 @@ extension Future where T == Record.RequestBody {
         }
     }
 }
+
+// MARK: - Token Helpers
+extension Future where T: Token {
+    func makeLoginResponse(on conn: DatabaseConnectable) -> Future<LoginResponse> {
+        return flatMap(to: LoginResponse.self) { token in
+            return token.authUser.get(on: conn).map(to: LoginResponse.self) { user in
+                return LoginResponse(id: user.id, firstName: user.firstName, lastName: user.lastName, username: user.username, email: user.email, token: token.token)
+            }
+        }
+    }
+}
