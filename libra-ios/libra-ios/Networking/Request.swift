@@ -11,6 +11,8 @@ struct Request<Entity> where Entity: Decodable {
     init<Parameter>(url: URL, method: HTTPMethod, bodyParameter: Parameter, headers: [String: String]? = nil) throws where Parameter: Encodable {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
+        
+        // TODO: This is a temporary solution
         if !(bodyParameter is EmptyParameter) {
             urlRequest.httpBody = try JSONEncoder().encode(bodyParameter)
         }
