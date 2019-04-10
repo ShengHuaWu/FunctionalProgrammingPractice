@@ -19,9 +19,9 @@ private extension RecordsController {
         return try req.requireAuthenticated(User.self).records.query(on: req).all()
     }
     
-    // TODO: check user id & creator id
     func getOneHandler(_ req: Request) throws -> Future<Record.Intact> {
-        return try req.parameters.next(Record.self).makeIntact(on: req)
+        let user = try req.requireAuthenticated(User.self)
+        return try req.parameters.next(Record.self).validate(creator: user).makeIntact(on: req)
     }
     
     func createHandler(_ req: Request) throws -> Future<Record.Intact> {
@@ -35,9 +35,9 @@ private extension RecordsController {
         }
     }
     
-    // TODO: check user id & creator id
     func updateHandler(_ req: Request) throws -> Future<Record.Intact> {
-        let recordFuture = try req.parameters.next(Record.self)
+        let user = try req.requireAuthenticated(User.self)
+        let recordFuture = try req.parameters.next(Record.self).validate(creator: user)
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
         
         return flatMap(to: Record.Intact.self, recordFuture, bodyFuture) { record, body in
@@ -50,8 +50,8 @@ private extension RecordsController {
         }
     }
     
-    // TODO: check user id & creator id
     func deleteHandler(_ req: Request) throws -> Future<HTTPStatus> {
-        return try req.parameters.next(Record.self).delete(on: req).transform(to: .noContent)
+        let user = try req.requireAuthenticated(User.self)
+        return try req.parameters.next(Record.self).validate(creator: user).delete(on: req).transform(to: .noContent)
     }
 }

@@ -9,6 +9,16 @@ extension Future where T: User {
     func makePublic() -> Future<User.Public> {
         return map { $0.makePublic() }
     }
+    
+    func validate(authedUser: User) throws -> Future<T> {
+        return flatMap { user in
+            guard authedUser.id == user.id else {
+                throw Abort(.unauthorized)
+            }
+            
+            return self
+        }
+    }
 }
 
 // MARK: - Record Helpers
@@ -22,6 +32,16 @@ extension Future where T: Record {
     func makeDetachAllCompanions(on conn: DatabaseConnectable) -> Future<Void> {
         return flatMap { record in
             return record.companions.detachAll(on: conn)
+        }
+    }
+    
+    func validate(creator: User) throws -> Future<T> {
+        return flatMap { record in
+            guard creator.id == record.creatorID else {
+                throw Abort(.unauthorized)
+            }
+            
+            return self
         }
     }
 }

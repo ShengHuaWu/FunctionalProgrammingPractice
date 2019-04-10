@@ -23,11 +23,16 @@ final class UsersController: RouteCollection {
 
 private extension UsersController {
     func getOneHandler(_ req: Request) throws -> Future<User.Public> {
-        return try req.parameters.next(User.self).makePublic()
+        let authedUser = try req.requireAuthenticated(User.self)
+        
+        return try req.parameters.next(User.self).validate(authedUser: authedUser).makePublic()
     }
     
     func updateHandler(_ req: Request) throws -> Future<User.Public> {
-        return try flatMap(to: User.Public.self, req.parameters.next(User.self), req.content.decode(User.UpdateRequestBody.self)) { user, body in
+        let authedUser = try req.requireAuthenticated(User.self)
+        let userParametersFuture = try req.parameters.next(User.self).validate(authedUser: authedUser)
+        
+        return try flatMap(to: User.Public.self, userParametersFuture, req.content.decode(User.UpdateRequestBody.self)) { user, body in
             return user.update(with: body).save(on: req).makePublic()
         }
     }
