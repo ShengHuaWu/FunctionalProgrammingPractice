@@ -70,7 +70,6 @@ extension Record {
         amount = body.amount
         currency = body.currency
         mood = body.mood
-        creatorID = body.creatorID
         
         return self
     }

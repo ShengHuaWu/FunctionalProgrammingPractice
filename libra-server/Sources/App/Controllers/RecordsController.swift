@@ -19,13 +19,15 @@ private extension RecordsController {
         return try req.requireAuthenticated(User.self).records.query(on: req).all()
     }
     
+    // TODO: check user id & creator id
     func getOneHandler(_ req: Request) throws -> Future<Record.Intact> {
         return try req.parameters.next(Record.self).makeIntact(on: req)
     }
     
     func createHandler(_ req: Request) throws -> Future<Record.Intact> {
+        let user = try req.requireAuthenticated(User.self)
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
-        let recordFuture = bodyFuture.makeRecord().save(on: req)
+        let recordFuture = try bodyFuture.makeRecord(for: user).save(on: req)
         let companionsFuture = bodyFuture.makeQueuyCompanions(on: req)
         
         return flatMap(to: Record.Intact.self, recordFuture, companionsFuture) { record, companions in
@@ -33,6 +35,7 @@ private extension RecordsController {
         }
     }
     
+    // TODO: check user id & creator id
     func updateHandler(_ req: Request) throws -> Future<Record.Intact> {
         let recordFuture = try req.parameters.next(Record.self)
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
@@ -47,6 +50,7 @@ private extension RecordsController {
         }
     }
     
+    // TODO: check user id & creator id
     func deleteHandler(_ req: Request) throws -> Future<HTTPStatus> {
         return try req.parameters.next(Record.self).delete(on: req).transform(to: .noContent)
     }

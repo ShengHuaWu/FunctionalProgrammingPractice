@@ -9,7 +9,6 @@ extension Record {
             case amount
             case currency
             case mood
-            case creatorID = "creator_id"
             case companionIDs = "companion_ids"
         }
         
@@ -19,7 +18,6 @@ extension Record {
         let amount: Double
         let currency: String
         let mood: String
-        let creatorID: User.ID
         let companionIDs: [User.ID]
     }
 }
@@ -29,7 +27,7 @@ extension Record.RequestBody: Content {}
 
 // MARK: - Record Request Body Helpers
 extension Record.RequestBody {
-    func makeRecord() -> Record {
-        return Record(title: title, note: note, date: date, amount: amount, currency: currency, mood: mood, creatorID: creatorID)
+    func makeRecord(for user: User) throws -> Record {
+        return try Record(title: title, note: note, date: date, amount: amount, currency: currency, mood: mood, creatorID: user.requireID())
     }
 }

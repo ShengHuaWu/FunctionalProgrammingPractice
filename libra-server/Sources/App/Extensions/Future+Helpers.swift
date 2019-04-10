@@ -28,8 +28,8 @@ extension Future where T: Record {
 
 // MARK: - Record Request Body Helpers
 extension Future where T == Record.RequestBody {
-    func makeRecord() -> Future<Record> {
-        return map(to: Record.self) { $0.makeRecord() }
+    func makeRecord(for user: User) throws -> Future<Record> {
+        return map(to: Record.self) { try $0.makeRecord(for: user) }
     }
     
     func makeQueuyCompanions(on conn: DatabaseConnectable) -> Future<[User]> {
