@@ -11,6 +11,12 @@
 		9BAB474321BD86F400AD54CA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAB474221BD86F400AD54CA /* ViewController.swift */; };
 		9BAB474821BD86F600AD54CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9BAB474721BD86F600AD54CA /* Assets.xcassets */; };
 		9BAB474B21BD86F600AD54CA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9BAB474921BD86F600AD54CA /* LaunchScreen.storyboard */; };
+		D8205254225E10BB00936BF9 /* URLSession+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8205253225E10BB00936BF9 /* URLSession+Helpers.swift */; };
+		D8205256225E217000936BF9 /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8205255225E217000936BF9 /* RequestTests.swift */; };
+		D8205258225E22A300936BF9 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8205257225E22A300936BF9 /* Request.swift */; };
+		D820525A225E22D000936BF9 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8205259225E22D000936BF9 /* HTTPMethod.swift */; };
+		D820525C225E22F500936BF9 /* ResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D820525B225E22F500936BF9 /* ResponseHandler.swift */; };
+		D820525E225E231B00936BF9 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D820525D225E231B00936BF9 /* NetworkError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,6 +38,12 @@
 		9BAB474C21BD86F600AD54CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9BAB475121BD86F600AD54CA /* libra-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "libra-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BAB475721BD86F600AD54CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D8205253225E10BB00936BF9 /* URLSession+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLSession+Helpers.swift"; sourceTree = "<group>"; };
+		D8205255225E217000936BF9 /* RequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestTests.swift; sourceTree = "<group>"; };
+		D8205257225E22A300936BF9 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
+		D8205259225E22D000936BF9 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
+		D820525B225E22F500936BF9 /* ResponseHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseHandler.swift; sourceTree = "<group>"; };
+		D820525D225E231B00936BF9 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +85,7 @@
 		9BAB473F21BD86F400AD54CA /* libra-ios */ = {
 			isa = PBXGroup;
 			children = (
+				D820525F225E235100936BF9 /* Networking */,
 				9BAB474021BD86F400AD54CA /* AppDelegate.swift */,
 				9BAB474221BD86F400AD54CA /* ViewController.swift */,
 				9BAB474721BD86F600AD54CA /* Assets.xcassets */,
@@ -85,9 +98,22 @@
 		9BAB475421BD86F600AD54CA /* libra-iosTests */ = {
 			isa = PBXGroup;
 			children = (
+				D8205255225E217000936BF9 /* RequestTests.swift */,
 				9BAB475721BD86F600AD54CA /* Info.plist */,
 			);
 			path = "libra-iosTests";
+			sourceTree = "<group>";
+		};
+		D820525F225E235100936BF9 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				D8205253225E10BB00936BF9 /* URLSession+Helpers.swift */,
+				D820525D225E231B00936BF9 /* NetworkError.swift */,
+				D8205259225E22D000936BF9 /* HTTPMethod.swift */,
+				D820525B225E22F500936BF9 /* ResponseHandler.swift */,
+				D8205257225E22A300936BF9 /* Request.swift */,
+			);
+			path = Networking;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -140,9 +166,11 @@
 				TargetAttributes = {
 					9BAB473C21BD86F400AD54CA = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1020;
 					};
 					9BAB475021BD86F600AD54CA = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1020;
 						TestTargetID = 9BAB473C21BD86F400AD54CA;
 					};
 				};
@@ -190,8 +218,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8205254225E10BB00936BF9 /* URLSession+Helpers.swift in Sources */,
+				D820525E225E231B00936BF9 /* NetworkError.swift in Sources */,
+				D8205258225E22A300936BF9 /* Request.swift in Sources */,
 				9BAB474321BD86F400AD54CA /* ViewController.swift in Sources */,
+				D820525A225E22D000936BF9 /* HTTPMethod.swift in Sources */,
 				9BAB474121BD86F400AD54CA /* AppDelegate.swift in Sources */,
+				D820525C225E22F500936BF9 /* ResponseHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -199,6 +232,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8205256225E217000936BF9 /* RequestTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,7 +386,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.shenghuawu.libra-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -369,7 +403,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.shenghuawu.libra-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -379,6 +413,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "libra-iosTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -388,7 +423,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.shenghuawu.libra-iosTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/libra-ios.app/libra-ios";
 			};
@@ -399,6 +435,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "libra-iosTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -408,7 +445,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.shenghuawu.libra-iosTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/libra-ios.app/libra-ios";
 			};
