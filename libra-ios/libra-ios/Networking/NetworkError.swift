@@ -8,6 +8,6 @@ enum NetworkError: Error {
     case unauthorized
     case forbidden
     case notFound
-    case clientError
+    case clientError(reason: String?)
     case serverError
 }

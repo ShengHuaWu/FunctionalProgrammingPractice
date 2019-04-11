@@ -15,8 +15,10 @@
 		D8205256225E217000936BF9 /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8205255225E217000936BF9 /* RequestTests.swift */; };
 		D8205258225E22A300936BF9 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8205257225E22A300936BF9 /* Request.swift */; };
 		D820525A225E22D000936BF9 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8205259225E22D000936BF9 /* HTTPMethod.swift */; };
-		D820525C225E22F500936BF9 /* ResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D820525B225E22F500936BF9 /* ResponseHandler.swift */; };
+		D820525C225E22F500936BF9 /* DataTaskResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D820525B225E22F500936BF9 /* DataTaskResponse.swift */; };
 		D820525E225E231B00936BF9 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D820525D225E231B00936BF9 /* NetworkError.swift */; };
+		D8FBED99225F829D0099D688 /* ForwardComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED98225F829D0099D688 /* ForwardComposition.swift */; };
+		D8FBED9B225F86B10099D688 /* ForwardApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED9A225F86B10099D688 /* ForwardApplication.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,8 +44,10 @@
 		D8205255225E217000936BF9 /* RequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestTests.swift; sourceTree = "<group>"; };
 		D8205257225E22A300936BF9 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		D8205259225E22D000936BF9 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
-		D820525B225E22F500936BF9 /* ResponseHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseHandler.swift; sourceTree = "<group>"; };
+		D820525B225E22F500936BF9 /* DataTaskResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTaskResponse.swift; sourceTree = "<group>"; };
 		D820525D225E231B00936BF9 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		D8FBED98225F829D0099D688 /* ForwardComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardComposition.swift; sourceTree = "<group>"; };
+		D8FBED9A225F86B10099D688 /* ForwardApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardApplication.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +89,7 @@
 		9BAB473F21BD86F400AD54CA /* libra-ios */ = {
 			isa = PBXGroup;
 			children = (
+				D8FBED9C225F87920099D688 /* CutomOperators */,
 				D820525F225E235100936BF9 /* Networking */,
 				9BAB474021BD86F400AD54CA /* AppDelegate.swift */,
 				9BAB474221BD86F400AD54CA /* ViewController.swift */,
@@ -110,10 +115,19 @@
 				D8205253225E10BB00936BF9 /* URLSession+Helpers.swift */,
 				D820525D225E231B00936BF9 /* NetworkError.swift */,
 				D8205259225E22D000936BF9 /* HTTPMethod.swift */,
-				D820525B225E22F500936BF9 /* ResponseHandler.swift */,
+				D820525B225E22F500936BF9 /* DataTaskResponse.swift */,
 				D8205257225E22A300936BF9 /* Request.swift */,
 			);
 			path = Networking;
+			sourceTree = "<group>";
+		};
+		D8FBED9C225F87920099D688 /* CutomOperators */ = {
+			isa = PBXGroup;
+			children = (
+				D8FBED9A225F86B10099D688 /* ForwardApplication.swift */,
+				D8FBED98225F829D0099D688 /* ForwardComposition.swift */,
+			);
+			path = CutomOperators;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -219,12 +233,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				D8205254225E10BB00936BF9 /* URLSession+Helpers.swift in Sources */,
+				D8FBED9B225F86B10099D688 /* ForwardApplication.swift in Sources */,
 				D820525E225E231B00936BF9 /* NetworkError.swift in Sources */,
 				D8205258225E22A300936BF9 /* Request.swift in Sources */,
 				9BAB474321BD86F400AD54CA /* ViewController.swift in Sources */,
+				D8FBED99225F829D0099D688 /* ForwardComposition.swift in Sources */,
 				D820525A225E22D000936BF9 /* HTTPMethod.swift in Sources */,
 				9BAB474121BD86F400AD54CA /* AppDelegate.swift in Sources */,
-				D820525C225E22F500936BF9 /* ResponseHandler.swift in Sources */,
+				D820525C225E22F500936BF9 /* DataTaskResponse.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
