@@ -5,6 +5,12 @@ struct SuccessResponse: Codable {
     let success: Bool = true
 }
 
+// Use this type to parse error response & for unit testing
+struct ErrorResponse: Codable {
+    let error: Bool
+    let reason: String
+}
+
 struct DataTaskResponse {
     let data: Data?
     let urlResponse: URLResponse?
@@ -61,10 +67,4 @@ func unwrapDataAfterSanitizing(for response: DataTaskResponse) throws -> Data {
     }
     
     return unwrappedData
-}
-
-// MARK: - Private
-private struct ErrorResponse: Decodable {
-    let error: Bool
-    let reason: String
 }

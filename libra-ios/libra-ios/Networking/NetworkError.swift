@@ -1,7 +1,6 @@
 import Foundation
 
 enum NetworkError: Error {
-    // TODO: More cases are needed
     case failure(mesage: String)
     case unexpectedResponse
     case badRequest
@@ -11,3 +10,5 @@ enum NetworkError: Error {
     case clientError(reason: String?)
     case serverError
 }
+
+extension NetworkError: Equatable {}
