@@ -20,6 +20,7 @@
 		D8FBED99225F829D0099D688 /* ForwardComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED98225F829D0099D688 /* ForwardComposition.swift */; };
 		D8FBED9B225F86B10099D688 /* ForwardApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED9A225F86B10099D688 /* ForwardApplication.swift */; };
 		D8FBEDA0225F90B40099D688 /* DataResponseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED9F225F90B40099D688 /* DataResponseTests.swift */; };
+		D8FBEDA2225F985B0099D688 /* URLSessionHelpersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBEDA1225F985B0099D688 /* URLSessionHelpersTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +51,7 @@
 		D8FBED98225F829D0099D688 /* ForwardComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardComposition.swift; sourceTree = "<group>"; };
 		D8FBED9A225F86B10099D688 /* ForwardApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardApplication.swift; sourceTree = "<group>"; };
 		D8FBED9F225F90B40099D688 /* DataResponseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataResponseTests.swift; sourceTree = "<group>"; };
+		D8FBEDA1225F985B0099D688 /* URLSessionHelpersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionHelpersTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +109,7 @@
 			children = (
 				D8205255225E217000936BF9 /* RequestTests.swift */,
 				D8FBED9F225F90B40099D688 /* DataResponseTests.swift */,
+				D8FBEDA1225F985B0099D688 /* URLSessionHelpersTests.swift */,
 				9BAB475721BD86F600AD54CA /* Info.plist */,
 			);
 			path = "libra-iosTests";
@@ -251,6 +254,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8FBEDA2225F985B0099D688 /* URLSessionHelpersTests.swift in Sources */,
 				D8FBEDA0225F90B40099D688 /* DataResponseTests.swift in Sources */,
 				D8205256225E217000936BF9 /* RequestTests.swift in Sources */,
 			);
