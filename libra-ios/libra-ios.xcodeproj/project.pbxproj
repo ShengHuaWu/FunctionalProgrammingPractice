@@ -17,6 +17,7 @@
 		D820525A225E22D000936BF9 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8205259225E22D000936BF9 /* HTTPMethod.swift */; };
 		D820525C225E22F500936BF9 /* DataTaskResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D820525B225E22F500936BF9 /* DataTaskResponse.swift */; };
 		D820525E225E231B00936BF9 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D820525D225E231B00936BF9 /* NetworkError.swift */; };
+		D8FBBE812260DA0D001AFB6A /* Future.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBBE802260DA0D001AFB6A /* Future.swift */; };
 		D8FBED99225F829D0099D688 /* ForwardComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED98225F829D0099D688 /* ForwardComposition.swift */; };
 		D8FBED9B225F86B10099D688 /* ForwardApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED9A225F86B10099D688 /* ForwardApplication.swift */; };
 		D8FBEDA0225F90B40099D688 /* DataResponseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED9F225F90B40099D688 /* DataResponseTests.swift */; };
@@ -48,6 +49,7 @@
 		D8205259225E22D000936BF9 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
 		D820525B225E22F500936BF9 /* DataTaskResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTaskResponse.swift; sourceTree = "<group>"; };
 		D820525D225E231B00936BF9 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		D8FBBE802260DA0D001AFB6A /* Future.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Future.swift; sourceTree = "<group>"; };
 		D8FBED98225F829D0099D688 /* ForwardComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardComposition.swift; sourceTree = "<group>"; };
 		D8FBED9A225F86B10099D688 /* ForwardApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardApplication.swift; sourceTree = "<group>"; };
 		D8FBED9F225F90B40099D688 /* DataResponseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataResponseTests.swift; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 		9BAB473F21BD86F400AD54CA /* libra-ios */ = {
 			isa = PBXGroup;
 			children = (
+				D8FBBE802260DA0D001AFB6A /* Future.swift */,
 				D8FBED9C225F87920099D688 /* CutomOperators */,
 				D820525F225E235100936BF9 /* Networking */,
 				9BAB474021BD86F400AD54CA /* AppDelegate.swift */,
@@ -246,6 +249,7 @@
 				D8FBED99225F829D0099D688 /* ForwardComposition.swift in Sources */,
 				D820525A225E22D000936BF9 /* HTTPMethod.swift in Sources */,
 				9BAB474121BD86F400AD54CA /* AppDelegate.swift in Sources */,
+				D8FBBE812260DA0D001AFB6A /* Future.swift in Sources */,
 				D820525C225E22F500936BF9 /* DataTaskResponse.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
