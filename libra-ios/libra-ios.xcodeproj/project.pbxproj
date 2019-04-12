@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B168465226141B000DCE4E9 /* Future+TestUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B168464226141B000DCE4E9 /* Future+TestUtility.swift */; };
 		9BAB474121BD86F400AD54CA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAB474021BD86F400AD54CA /* AppDelegate.swift */; };
 		9BAB474321BD86F400AD54CA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAB474221BD86F400AD54CA /* ViewController.swift */; };
 		9BAB474821BD86F600AD54CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9BAB474721BD86F600AD54CA /* Assets.xcassets */; };
@@ -35,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9B168464226141B000DCE4E9 /* Future+TestUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+TestUtility.swift"; sourceTree = "<group>"; };
 		9BAB473D21BD86F400AD54CA /* libra-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "libra-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BAB474021BD86F400AD54CA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9BAB474221BD86F400AD54CA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 		9BAB475421BD86F600AD54CA /* libra-iosTests */ = {
 			isa = PBXGroup;
 			children = (
+				9B168464226141B000DCE4E9 /* Future+TestUtility.swift */,
 				D8205255225E217000936BF9 /* RequestTests.swift */,
 				D8FBED9F225F90B40099D688 /* DataResponseTests.swift */,
 				D8FBEDA1225F985B0099D688 /* URLSessionHelpersTests.swift */,
@@ -259,6 +262,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D8FBEDA2225F985B0099D688 /* URLSessionHelpersTests.swift in Sources */,
+				9B168465226141B000DCE4E9 /* Future+TestUtility.swift in Sources */,
 				D8FBEDA0225F90B40099D688 /* DataResponseTests.swift in Sources */,
 				D8205256225E217000936BF9 /* RequestTests.swift in Sources */,
 			);
