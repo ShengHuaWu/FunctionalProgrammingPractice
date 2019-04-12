@@ -16,13 +16,13 @@ class RequestTests: XCTestCase {
     
     func testThatMakeGetRequest() {
         let method = HTTPMethod.get
+        let request = Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader)
+        XCTAssertEqual(request.urlRequest.url, baseURL)
+        XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
+        XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
+        XCTAssertNil(request.urlRequest.httpBody)
+        
         do {
-            let request = try Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader)
-            XCTAssertEqual(request.urlRequest.url, baseURL)
-            XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
-            XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
-            XCTAssertNil(request.urlRequest.httpBody)
-            
             let data = try JSONEncoder().encode(model)
             let result = try request.parse(data)
             XCTAssertEqual(result.name, model.name)
@@ -34,6 +34,7 @@ class RequestTests: XCTestCase {
     func testThatMakePostRequest() {
         let method = HTTPMethod.post
         let parameter = FakeParameter(value: "libra-ios")
+        
         do {
             let request = try Request<FakeModel>(url: baseURL, method: method, bodyParameter: parameter, headers: generalHeader)
             XCTAssertEqual(request.urlRequest.url, baseURL)
@@ -52,6 +53,7 @@ class RequestTests: XCTestCase {
     func testThatMakePutRequest() {
         let method = HTTPMethod.put
         let parameter = FakeParameter(value: "libra-ios")
+        
         do {
             let request = try Request<FakeModel>(url: baseURL, method: method, bodyParameter: parameter, headers: generalHeader)
             XCTAssertEqual(request.urlRequest.url, baseURL)
@@ -69,13 +71,13 @@ class RequestTests: XCTestCase {
     
     func testThatMakeDeleteRequest() {
         let method = HTTPMethod.delete
+        let request = Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader)
+        XCTAssertEqual(request.urlRequest.url, baseURL)
+        XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
+        XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
+        XCTAssertNil(request.urlRequest.httpBody)
+        
         do {
-            let request = try Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader)
-            XCTAssertEqual(request.urlRequest.url, baseURL)
-            XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
-            XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
-            XCTAssertNil(request.urlRequest.httpBody)
-            
             let data = try JSONEncoder().encode(model)
             let result = try request.parse(data)
             XCTAssertEqual(result.name, model.name)

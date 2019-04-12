@@ -34,7 +34,7 @@ class URLSessionHelpersTests: XCTestCase {
         super.setUp()
         
         session = MockURLSession()
-        request = try! Request<SuccessResponse>.init(url: URL(string: "https://libra.co")!, method: .get)
+        request = Request<SuccessResponse>(url: URL(string: "https://libra.co")!, method: .get)
     }
     
     override func tearDown() {
