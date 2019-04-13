@@ -3,10 +3,15 @@ import XCTest
 
 final class MockURLSession: URLSession {
     private(set) var dataTaskCallCount = 0
+    private(set) var finishTasksAndInvalidateCallCount = 0
     var expectedData: Data?
     var expectedURLResponse: URLResponse?
     var expectedError: Error?
-    var dataTask = MockURLSessionDataTask()
+    let dataTask = MockURLSessionDataTask()
+    
+    override func finishTasksAndInvalidate() {
+        finishTasksAndInvalidateCallCount += 1
+    }
     
     override func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         dataTaskCallCount += 1
@@ -52,11 +57,13 @@ class URLSessionHelpersTests: XCTestCase {
         session.expectedURLResponse = HTTPURLResponse.makeFake(with: 200)
         session.expectedData = try! JSONEncoder().encode(errorResponse)
         
-        session.send(request).wait(on: self) { result in
+        session.send(request).assertAndWait(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Result should be failure")
             case .failure(let error):
+                XCTAssertEqual(self.session.finishTasksAndInvalidateCallCount, 1)
+                XCTAssertEqual(self.session.dataTask.resumeCallCount, 1)
                 XCTAssertEqual(error, .failure(mesage: fakeError.localizedDescription))
             }
         }
@@ -66,11 +73,13 @@ class URLSessionHelpersTests: XCTestCase {
         session.expectedURLResponse = HTTPURLResponse.makeFake(with: 200)
         session.expectedData = try! JSONEncoder().encode(errorResponse)
         
-        session.send(request).wait(on: self) { result in
+        session.send(request).assertAndWait(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Result should be failure")
             case .failure(let error):
+                XCTAssertEqual(self.session.finishTasksAndInvalidateCallCount, 1)
+                XCTAssertEqual(self.session.dataTask.resumeCallCount, 1)
                 XCTAssertEqual(error, .clientError(reason: self.errorResponse.reason))
             }
         }
@@ -81,11 +90,13 @@ class URLSessionHelpersTests: XCTestCase {
         session.expectedURLResponse = httpURLResponse
         session.expectedData = try! JSONEncoder().encode(successResponse)
         
-        session.send(request).wait(on: self) { result in
+        session.send(request).assertAndWait(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Result should be failure")
             case .failure(let error):
+                XCTAssertEqual(self.session.finishTasksAndInvalidateCallCount, 1)
+                XCTAssertEqual(self.session.dataTask.resumeCallCount, 1)
                 XCTAssertEqual(error, .badRequest)
             }
         }
@@ -96,9 +107,11 @@ class URLSessionHelpersTests: XCTestCase {
         session.expectedURLResponse = httpURLResponse
         session.expectedData = try! JSONEncoder().encode(successResponse)
         
-        session.send(request).wait(on: self) { result in
+        session.send(request).assertAndWait(on: self) { result in
             switch result {
             case .success(let entity):
+                XCTAssertEqual(self.session.finishTasksAndInvalidateCallCount, 1)
+                XCTAssertEqual(self.session.dataTask.resumeCallCount, 1)
                 XCTAssertEqual(entity.success, true)
             case .failure:
                 XCTFail("Result should be success")

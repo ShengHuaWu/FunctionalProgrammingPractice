@@ -3,6 +3,8 @@ import Foundation
 extension URLSession {
     func send<Entity>(_ request: Request<Entity>) -> Future<Result<Entity, NetworkError>> where Entity: Decodable {
         return Future { callback in
+            defer { self.finishTasksAndInvalidate() }
+            
             let task = self.dataTask(with: request.urlRequest) { data, urlResponse, error in
                 do {
                     // The order of composition:
