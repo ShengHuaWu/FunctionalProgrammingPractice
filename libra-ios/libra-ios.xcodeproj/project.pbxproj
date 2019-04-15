@@ -24,6 +24,7 @@
 		D821FA132264AE68003A3B63 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D821FA122264AE68003A3B63 /* Endpoint.swift */; };
 		D821FA172264AEB3003A3B63 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = D821FA162264AEB3003A3B63 /* User.swift */; };
 		D821FA192264AECE003A3B63 /* SignUpParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = D821FA182264AECE003A3B63 /* SignUpParameters.swift */; };
+		D89075032264C9C700724B89 /* LoginParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89075022264C9C700724B89 /* LoginParameters.swift */; };
 		D8FBBE812260DA0D001AFB6A /* Future.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBBE802260DA0D001AFB6A /* Future.swift */; };
 		D8FBED99225F829D0099D688 /* ForwardComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED98225F829D0099D688 /* ForwardComposition.swift */; };
 		D8FBED9B225F86B10099D688 /* ForwardApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED9A225F86B10099D688 /* ForwardApplication.swift */; };
@@ -63,6 +64,7 @@
 		D821FA122264AE68003A3B63 /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
 		D821FA162264AEB3003A3B63 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		D821FA182264AECE003A3B63 /* SignUpParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpParameters.swift; sourceTree = "<group>"; };
+		D89075022264C9C700724B89 /* LoginParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginParameters.swift; sourceTree = "<group>"; };
 		D8FBBE802260DA0D001AFB6A /* Future.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Future.swift; sourceTree = "<group>"; };
 		D8FBED98225F829D0099D688 /* ForwardComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardComposition.swift; sourceTree = "<group>"; };
 		D8FBED9A225F86B10099D688 /* ForwardApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardApplication.swift; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				D821FA182264AECE003A3B63 /* SignUpParameters.swift */,
+				D89075022264C9C700724B89 /* LoginParameters.swift */,
 			);
 			path = Parameters;
 			sourceTree = "<group>";
@@ -299,6 +302,7 @@
 				D8FBED99225F829D0099D688 /* ForwardComposition.swift in Sources */,
 				D821FA112264A878003A3B63 /* Environment.swift in Sources */,
 				D820525A225E22D000936BF9 /* HTTPMethod.swift in Sources */,
+				D89075032264C9C700724B89 /* LoginParameters.swift in Sources */,
 				9BAB474121BD86F400AD54CA /* AppDelegate.swift in Sources */,
 				D8FBBE812260DA0D001AFB6A /* Future.swift in Sources */,
 				D820525C225E22F500936BF9 /* DataTaskResponse.swift in Sources */,

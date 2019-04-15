@@ -2,6 +2,7 @@ import Foundation
 
 enum Endpoint {
     case signUp
+    case login
 }
 
 extension Endpoint {
@@ -13,6 +14,7 @@ extension Endpoint {
         
         switch self {
         case .signUp: return baseURL.appendingPathComponent("users/signup")
+        case .login: return  baseURL.appendingPathComponent("users/login")
         }
     }
 }
