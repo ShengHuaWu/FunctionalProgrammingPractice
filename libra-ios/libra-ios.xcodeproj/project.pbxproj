@@ -98,7 +98,7 @@
 			isa = PBXGroup;
 			children = (
 				D8FBBE802260DA0D001AFB6A /* Future.swift */,
-				D8FBED9C225F87920099D688 /* CutomOperators */,
+				D8FBED9C225F87920099D688 /* CustomOperators */,
 				D820525F225E235100936BF9 /* Networking */,
 				9BAB474021BD86F400AD54CA /* AppDelegate.swift */,
 				9BAB474221BD86F400AD54CA /* ViewController.swift */,
@@ -133,13 +133,13 @@
 			path = Networking;
 			sourceTree = "<group>";
 		};
-		D8FBED9C225F87920099D688 /* CutomOperators */ = {
+		D8FBED9C225F87920099D688 /* CustomOperators */ = {
 			isa = PBXGroup;
 			children = (
 				D8FBED9A225F86B10099D688 /* ForwardApplication.swift */,
 				D8FBED98225F829D0099D688 /* ForwardComposition.swift */,
 			);
-			path = CutomOperators;
+			path = CustomOperators;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
