@@ -5,9 +5,8 @@ struct WebService {
 }
 
 private func signUp(with parameters: SignUpParameters) -> Future<Result<User, NetworkError>> {
-    let url = URL.base.appendingPathComponent(for: .signUp)
-    let request = Request<User>(url: url, method: .post, bodyParameters: parameters)
+    let request = Request<User>(url: Endpoint.signUp.url, method: .post, bodyParameters: parameters)
     let session = URLSession(configuration: .base)
     
-    return session.send(request)
+    return request |> session.send
 }
