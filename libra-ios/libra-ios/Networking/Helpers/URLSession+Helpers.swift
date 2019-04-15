@@ -3,9 +3,9 @@ import Foundation
 extension URLSession {
     func send<Entity>(_ request: Request<Entity>) -> Future<Result<Entity, NetworkError>> where Entity: Decodable {
         return Future { callback in
-            defer { self.finishTasksAndInvalidate() }
-            
             let task = self.dataTask(with: request.urlRequest) { data, urlResponse, error in
+                defer { self.finishTasksAndInvalidate() }
+
                 do {
                     // The order of composition:
                     // sanitize error >>> sanitize data >>> sanitize url response >>> unwrap data >>> parse

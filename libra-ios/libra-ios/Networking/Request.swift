@@ -15,10 +15,15 @@ struct Request<Entity> where Entity: Decodable {
     }
     
     // This is used for POST & PUT requests
-    init<Parameter>(url: URL, method: HTTPMethod, bodyParameter: Parameter, headers: [String: String]? = nil) throws where Parameter: Encodable {
+    init<Parameter>(url: URL, method: HTTPMethod, bodyParameters: Parameter, headers: [String: String]? = nil) where Parameter: Encodable {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
-        urlRequest.httpBody = try JSONEncoder().encode(bodyParameter)
+        
+        guard let body = try? JSONEncoder().encode(bodyParameters) else {
+            preconditionFailure("Unable to encode \(Parameter.self) to JSON")
+        }
+        urlRequest.httpBody = body
+        
         urlRequest.allHTTPHeaderFields = headers
         
         self.urlRequest = urlRequest

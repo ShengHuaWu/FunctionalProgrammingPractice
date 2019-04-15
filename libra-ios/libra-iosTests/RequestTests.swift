@@ -34,12 +34,12 @@ class RequestTests: XCTestCase {
     func testThatMakePostRequest() {
         let method = HTTPMethod.post
         let parameter = FakeParameter(value: "libra-ios")
+        let request = Request<FakeModel>(url: baseURL, method: method, bodyParameters: parameter, headers: generalHeader)
+        XCTAssertEqual(request.urlRequest.url, baseURL)
+        XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
+        XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
         
         do {
-            let request = try Request<FakeModel>(url: baseURL, method: method, bodyParameter: parameter, headers: generalHeader)
-            XCTAssertEqual(request.urlRequest.url, baseURL)
-            XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
-            XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
             XCTAssertEqual(request.urlRequest.httpBody, try JSONEncoder().encode(parameter))
             
             let data = try JSONEncoder().encode(model)
@@ -53,12 +53,12 @@ class RequestTests: XCTestCase {
     func testThatMakePutRequest() {
         let method = HTTPMethod.put
         let parameter = FakeParameter(value: "libra-ios")
+        let request = Request<FakeModel>(url: baseURL, method: method, bodyParameters: parameter, headers: generalHeader)
+        XCTAssertEqual(request.urlRequest.url, baseURL)
+        XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
+        XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
         
         do {
-            let request = try Request<FakeModel>(url: baseURL, method: method, bodyParameter: parameter, headers: generalHeader)
-            XCTAssertEqual(request.urlRequest.url, baseURL)
-            XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
-            XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
             XCTAssertEqual(request.urlRequest.httpBody, try JSONEncoder().encode(parameter))
             
             let data = try JSONEncoder().encode(model)
