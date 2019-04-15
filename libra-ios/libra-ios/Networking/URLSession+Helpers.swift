@@ -8,9 +8,14 @@ extension URLSession {
             let task = self.dataTask(with: request.urlRequest) { data, urlResponse, error in
                 do {
                     // The order of composition:
-                    // sanitize error >>> sanitize data >>> sanitize url response >>> unwrap data
-                    let unwrappedData = try (data, urlResponse, error) |> DataTaskResponse.init |> sanitizeError(for:) >>> sanitizeData(for:) >>> sanitizeURLResponse(for:) >>> unwrapDataAfterSanitizing(for:)
-                    let entity = try request.parse(unwrappedData)
+                    // sanitize error >>> sanitize data >>> sanitize url response >>> unwrap data >>> parse
+                    let entity = try (data, urlResponse, error)
+                        |> DataTaskResponse.init
+                        |> sanitizeError(for:)
+                        >>> sanitizeData(for:)
+                        >>> sanitizeURLResponse(for:)
+                        >>> unwrapDataAfterSanitizing(for:)
+                        >>> request.parse
                     callback(.success(entity))
                 } catch let error as NetworkError {
                     callback(.failure(error))
