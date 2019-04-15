@@ -57,7 +57,7 @@ class URLSessionHelpersTests: XCTestCase {
         session.expectedURLResponse = HTTPURLResponse.makeFake(with: 200)
         session.expectedData = try! JSONEncoder().encode(errorResponse)
         
-        session.send(request).assertAndWait(on: self) { result in
+        session.send(request).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Result should be failure")
@@ -73,7 +73,7 @@ class URLSessionHelpersTests: XCTestCase {
         session.expectedURLResponse = HTTPURLResponse.makeFake(with: 200)
         session.expectedData = try! JSONEncoder().encode(errorResponse)
         
-        session.send(request).assertAndWait(on: self) { result in
+        session.send(request).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Result should be failure")
@@ -90,7 +90,7 @@ class URLSessionHelpersTests: XCTestCase {
         session.expectedURLResponse = httpURLResponse
         session.expectedData = try! JSONEncoder().encode(successResponse)
         
-        session.send(request).assertAndWait(on: self) { result in
+        session.send(request).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Result should be failure")
@@ -107,7 +107,7 @@ class URLSessionHelpersTests: XCTestCase {
         session.expectedURLResponse = httpURLResponse
         session.expectedData = try! JSONEncoder().encode(successResponse)
         
-        session.send(request).assertAndWait(on: self) { result in
+        session.send(request).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.session.finishTasksAndInvalidateCallCount, 1)
