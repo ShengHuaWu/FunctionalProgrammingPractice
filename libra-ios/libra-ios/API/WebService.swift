@@ -8,11 +8,15 @@ struct WebService {
 private func signUp(with parameters: SignUpParameters) -> Future<Result<User, NetworkError>> {
     return (Endpoint.signUp.url, HTTPMethod.post, parameters, nil)
         |> Request<User>.init
-        |> Current.urlSession().send
+        |> send
 }
 
 private func logIn(with parameters: LoginParameters) -> Future<Result<User, NetworkError>> {
     return (Endpoint.login.url, HTTPMethod.post, ["Authorization": "Basic \(parameters.makeBase64String())"])
         |> Request<User>.init
-        |> Current.urlSession().send
+        |> send
+}
+
+private func send<Entity>(_ request: Request<Entity>) -> Future<Result<Entity, NetworkError>> {
+    return Current.urlSession().send(request, unwrapData: Current.dataTaskResponseHandler.unwrapData)
 }
