@@ -6,15 +6,13 @@ struct WebService {
 }
 
 private func signUp(with parameters: SignUpParameters) -> Future<Result<User, NetworkError>> {
-    let request = Request<User>(url: Endpoint.signUp.url, method: .post, bodyParameters: parameters)
-    let session = URLSession(configuration: .base)
-    
-    return request |> session.send
+    return (Endpoint.signUp.url, HTTPMethod.post, parameters, nil)
+        |> Request<User>.init
+        |> Current.urlSession().send
 }
 
 private func logIn(with parameters: LoginParameters) -> Future<Result<User, NetworkError>> {
-    let request = Request<User>(url: Endpoint.login.url, method: .post, headers: ["Authorization": "Basic \(parameters.makeBase64String())"])
-    let session = URLSession(configuration: .base)
-    
-    return request |> session.send
+    return (Endpoint.login.url, HTTPMethod.post, ["Authorization": "Basic \(parameters.makeBase64String())"])
+        |> Request<User>.init
+        |> Current.urlSession().send
 }
