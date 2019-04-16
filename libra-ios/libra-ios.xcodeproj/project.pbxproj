@@ -117,11 +117,12 @@
 		9BAB473F21BD86F400AD54CA /* libra-ios */ = {
 			isa = PBXGroup;
 			children = (
-				D821FA102264A878003A3B63 /* Environment.swift */,
-				D8FBBE802260DA0D001AFB6A /* Future.swift */,
+				D821FA1A2264AF22003A3B63 /* Models */,
 				D8FBED9C225F87920099D688 /* CustomOperators */,
 				D820525F225E235100936BF9 /* Networking */,
 				9BAB474021BD86F400AD54CA /* AppDelegate.swift */,
+				D821FA102264A878003A3B63 /* Environment.swift */,
+				D8FBBE802260DA0D001AFB6A /* Future.swift */,
 				9BAB474221BD86F400AD54CA /* ViewController.swift */,
 				9BAB474721BD86F600AD54CA /* Assets.xcassets */,
 				9BAB474921BD86F600AD54CA /* LaunchScreen.storyboard */,
@@ -148,7 +149,6 @@
 			isa = PBXGroup;
 			children = (
 				D821FA1B2264AF30003A3B63 /* Parameters */,
-				D821FA1A2264AF22003A3B63 /* Models */,
 				D821FA1C2264AF41003A3B63 /* Helpers */,
 				D820525D225E231B00936BF9 /* NetworkError.swift */,
 				D8205259225E22D000936BF9 /* HTTPMethod.swift */,

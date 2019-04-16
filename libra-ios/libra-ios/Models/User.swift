@@ -7,6 +7,7 @@ struct User: Decodable {
         case firstName = "first_name"
         case lastName = "last_name"
         case email
+        case token
     }
     
     let id: Int
@@ -14,6 +15,7 @@ struct User: Decodable {
     let firstName: String
     let lastName: String
     let email: String
+    let token: String
 }
 
 extension User: Equatable {
