@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B0862012267AF0000721936 /* DataResponseHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0862002267AF0000721936 /* DataResponseHandlerTests.swift */; };
 		9B168465226141B000DCE4E9 /* Future+TestUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B168464226141B000DCE4E9 /* Future+TestUtility.swift */; };
 		9BAB474121BD86F400AD54CA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAB474021BD86F400AD54CA /* AppDelegate.swift */; };
 		9BAB474321BD86F400AD54CA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAB474221BD86F400AD54CA /* ViewController.swift */; };
@@ -33,7 +34,6 @@
 		D8FBBE812260DA0D001AFB6A /* Future.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBBE802260DA0D001AFB6A /* Future.swift */; };
 		D8FBED99225F829D0099D688 /* ForwardComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED98225F829D0099D688 /* ForwardComposition.swift */; };
 		D8FBED9B225F86B10099D688 /* ForwardApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED9A225F86B10099D688 /* ForwardApplication.swift */; };
-		D8FBEDA0225F90B40099D688 /* DataResponseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBED9F225F90B40099D688 /* DataResponseTests.swift */; };
 		D8FBEDA2225F985B0099D688 /* URLSessionHelpersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBEDA1225F985B0099D688 /* URLSessionHelpersTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -48,6 +48,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9B0862002267AF0000721936 /* DataResponseHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataResponseHandlerTests.swift; sourceTree = "<group>"; };
 		9B168464226141B000DCE4E9 /* Future+TestUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+TestUtility.swift"; sourceTree = "<group>"; };
 		9BAB473D21BD86F400AD54CA /* libra-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "libra-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BAB474021BD86F400AD54CA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -78,7 +79,6 @@
 		D8FBBE802260DA0D001AFB6A /* Future.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Future.swift; sourceTree = "<group>"; };
 		D8FBED98225F829D0099D688 /* ForwardComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardComposition.swift; sourceTree = "<group>"; };
 		D8FBED9A225F86B10099D688 /* ForwardApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardApplication.swift; sourceTree = "<group>"; };
-		D8FBED9F225F90B40099D688 /* DataResponseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataResponseTests.swift; sourceTree = "<group>"; };
 		D8FBEDA1225F985B0099D688 /* URLSessionHelpersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionHelpersTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -142,7 +142,7 @@
 				D8498C712265DBE000FACD2E /* TestUtilities */,
 				D8498C722265DBF100FACD2E /* Mocks */,
 				D8205255225E217000936BF9 /* RequestTests.swift */,
-				D8FBED9F225F90B40099D688 /* DataResponseTests.swift */,
+				9B0862002267AF0000721936 /* DataResponseHandlerTests.swift */,
 				D8FBEDA1225F985B0099D688 /* URLSessionHelpersTests.swift */,
 				D8498C6D2265D22600FACD2E /* WebServiceTests.swift */,
 				9BAB475721BD86F600AD54CA /* Info.plist */,
@@ -356,7 +356,7 @@
 			files = (
 				D8FBEDA2225F985B0099D688 /* URLSessionHelpersTests.swift in Sources */,
 				9B168465226141B000DCE4E9 /* Future+TestUtility.swift in Sources */,
-				D8FBEDA0225F90B40099D688 /* DataResponseTests.swift in Sources */,
+				9B0862012267AF0000721936 /* DataResponseHandlerTests.swift in Sources */,
 				D8498C6C2265CCE200FACD2E /* MockURLSession.swift in Sources */,
 				D8498C6E2265D22600FACD2E /* WebServiceTests.swift in Sources */,
 				D8498C702265D24F00FACD2E /* Environment+TestUtility.swift in Sources */,

@@ -10,12 +10,9 @@ final class MockURLSessionDataTask: URLSessionDataTask {
 }
 
 // This class is used for testing the `send` method of `URLSession`
-final class MockURLSession: URLSession {
+final class PartialMockURLSession: URLSession {
     private(set) var dataTaskCallCount = 0
     private(set) var finishTasksAndInvalidateCallCount = 0
-    var expectedData: Data?
-    var expectedURLResponse: URLResponse?
-    var expectedError: Error?
     let dataTask = MockURLSessionDataTask()
     
     override func finishTasksAndInvalidate() {
@@ -24,7 +21,7 @@ final class MockURLSession: URLSession {
     
     override func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         dataTaskCallCount += 1
-        completionHandler(expectedData, expectedURLResponse, expectedError)
+        completionHandler(nil, nil, nil)
         
         return dataTask
     }
@@ -42,7 +39,7 @@ final class MockURLSessionInterface: URLSessionInterface {
         return MockURLSessionDataTask()
     }
     
-    func send<Entity>(_ request: Request<Entity>) -> Future<Result<Entity, NetworkError>> where Entity: Decodable {
+    func send<Entity>(_ request: Request<Entity>, unwrapData: @escaping (DataTaskResponse) throws -> Data) -> Future<Result<Entity, NetworkError>> where Entity : Decodable {
         sendCallCount += 1
         
         return Future { callback in

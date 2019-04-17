@@ -4,7 +4,7 @@ import XCTest
 class WebServiceTests: XCTestCase {
     var webService: WebService!
     var urlSessionInterface: MockURLSessionInterface!
-    let user = User(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co")
+    let user = User(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co", token: "987654321")
 
     override func setUp() {
         super.setUp()
