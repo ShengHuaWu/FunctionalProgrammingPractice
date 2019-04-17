@@ -14,7 +14,10 @@ struct ErrorResponse: Codable {
 struct DataTaskResponseHandler {
     // The order of composition:
     // sanitize error >>> sanitize data >>> sanitize url response >>> unwrap data
-    var unwrapData = sanitizeError(for:) >>> sanitizeData(for:) >>> sanitizeURLResponse(for:) >>> unwrapDataAfterSanitizing(for:)
+    var unwrapData = sanitizeError(for:)
+        >>> sanitizeData(for:)
+        >>> sanitizeURLResponse(for:)
+        >>> unwrapDataAfterSanitizing(for:)
 }
 
 private func sanitizeError(for response: DataTaskResponse) throws -> DataTaskResponse {

@@ -31,7 +31,7 @@ class WebServiceTests: XCTestCase {
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
-                XCTAssertEqual(entity, self.user)
+                XCTAssertEqual(entity.id, self.user.id)
             case .failure:
                 XCTFail("Signup should succeed")
             }
@@ -63,7 +63,7 @@ class WebServiceTests: XCTestCase {
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
-                XCTAssertEqual(entity, self.user)
+                XCTAssertEqual(entity.id, self.user.id)
             case .failure:
                 XCTFail("Signup should succeed")
             }

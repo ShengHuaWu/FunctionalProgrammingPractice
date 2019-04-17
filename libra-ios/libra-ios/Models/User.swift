@@ -15,11 +15,5 @@ struct User: Decodable {
     let firstName: String
     let lastName: String
     let email: String
-    let token: String
-}
-
-extension User: Equatable {
-    static func == (lhs: User, rhs: User) -> Bool {
-        return lhs.id == rhs.id && lhs.username == rhs.username && lhs.firstName == rhs.firstName && lhs.lastName == rhs.lastName && lhs.email == rhs.email
-    }
+    let token: String?
 }

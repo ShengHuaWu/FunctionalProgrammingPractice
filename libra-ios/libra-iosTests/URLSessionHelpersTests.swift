@@ -1,11 +1,10 @@
 import XCTest
 @testable import libra_ios
 
+// This test case checks the `send` method
 class URLSessionHelpersTests: XCTestCase {
     var session: PartialMockURLSession!
     var request: Request<SuccessResponse>!
-    let errorResponse = ErrorResponse(error: true, reason: "An error occurs")
-    let successResponse = SuccessResponse()
 
     override func setUp() {
         super.setUp()

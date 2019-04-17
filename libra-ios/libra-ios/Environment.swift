@@ -1,7 +1,7 @@
 import Foundation
 
 struct Environment {
-    var urlSession: () -> URLSessionInterface = { return URLSession(configuration: .base) }
+    var urlSession: () -> URLSessionInterface = { return URLSession(configuration: .json) }
     var dataTaskResponseHandler = DataTaskResponseHandler()
     var webService = WebService()
 }

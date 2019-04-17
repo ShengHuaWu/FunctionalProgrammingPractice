@@ -1,7 +1,7 @@
 import Foundation
 
 extension URLSessionConfiguration {
-    static var base: URLSessionConfiguration {
+    static var json: URLSessionConfiguration {
         let config = URLSessionConfiguration.default
         config.httpAdditionalHeaders = ["Content-Type": "application/json"]
         

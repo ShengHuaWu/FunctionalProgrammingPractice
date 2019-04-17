@@ -17,6 +17,7 @@ extension HTTPURLResponse {
     }
 }
 
+// This test case ensures the order of function composition
 class DataResponseHandlerTests: XCTestCase {
     var handler: DataTaskResponseHandler!
     let errorResponse = ErrorResponse(error: true, reason: "An error occurs")
@@ -39,7 +40,6 @@ class DataResponseHandlerTests: XCTestCase {
         let response = DataTaskResponse(data: try! JSONEncoder().encode(errorResponse),
                                         urlResponse: HTTPURLResponse.makeFake(with: 200),
                                         error: fakeError)
-        
         do {
             _ = try handler.unwrapData(response)
             XCTFail("Error should be thrown")
@@ -54,7 +54,6 @@ class DataResponseHandlerTests: XCTestCase {
         let response = DataTaskResponse(data: try! JSONEncoder().encode(errorResponse),
                                         urlResponse: HTTPURLResponse.makeFake(with: 200),
                                         error: nil)
-        
         do {
             _ = try handler.unwrapData(response)
             XCTFail("Error should be thrown")
@@ -69,7 +68,6 @@ class DataResponseHandlerTests: XCTestCase {
         let response = DataTaskResponse(data: try! JSONEncoder().encode(successResponse),
                                         urlResponse: URLResponse.makeFake(),
                                         error: nil)
-        
         do {
             _ = try handler.unwrapData(response)
             XCTFail("Error should be thrown")
@@ -125,7 +123,9 @@ class DataResponseHandlerTests: XCTestCase {
     }
     
     func testThatUnwrapDataReturnsSuccessResponseIfDataIsEmpty() {
-        let response = DataTaskResponse(data: nil, urlResponse: HTTPURLResponse.makeFake(with: 200), error: nil)
+        let response = DataTaskResponse(data: nil,
+                                        urlResponse: HTTPURLResponse.makeFake(with: 200),
+                                        error: nil)
         do {
             let data = try handler.unwrapData(response)
             let successResponse = try JSONDecoder().decode(SuccessResponse.self, from: data)
