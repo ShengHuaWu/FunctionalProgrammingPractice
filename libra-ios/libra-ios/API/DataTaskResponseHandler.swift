@@ -1,23 +1,33 @@
 import Foundation
 
-// Use this type to ignore the response in success case
+// Use this type to ignore the response in a success case
 struct SuccessResponse: Codable {
     let success: Bool = true
 }
 
-// Use this type to parse error response & for unit testing
+// Use this type to parse error response
 struct ErrorResponse: Codable {
     let error: Bool
     let reason: String
 }
 
+fileprivate struct DataTaskResponse {
+    let data: Data?
+    let urlResponse: URLResponse?
+    let error: Error?
+}
+
 struct DataTaskResponseHandler {
     // The order of composition:
-    // sanitize error >>> sanitize data >>> sanitize url response >>> unwrap data
-    var unwrapData = sanitizeError(for:)
-        >>> sanitizeData(for:)
-        >>> sanitizeURLResponse(for:)
-        >>> unwrapDataAfterSanitizing(for:)
+    // create data task response >>> sanitize error >>> sanitize data >>> sanitize url response >>> unwrap data
+    var unwrapData: UnwrapDataHandler = { data, response, error in
+        return try (data, response, error)
+            |> DataTaskResponse.init
+            >>> sanitizeError(for:)
+            >>> sanitizeData(for:)
+            >>> sanitizeURLResponse(for:)
+            >>> unwrapDataAfterSanitizing(for:)
+    }
 }
 
 private func sanitizeError(for response: DataTaskResponse) throws -> DataTaskResponse {

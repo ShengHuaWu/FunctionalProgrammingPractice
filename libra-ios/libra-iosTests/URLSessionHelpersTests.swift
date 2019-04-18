@@ -22,7 +22,7 @@ class URLSessionHelpersTests: XCTestCase {
         
     func testThatSendReturnsFailureIfUnwrapDataFails() {
         let fakeError = FakeError.fake
-        let unwrapData: (DataTaskResponse) throws -> Data = { _ in
+        let unwrapData: UnwrapDataHandler = { _, _, _ in
             throw fakeError
         }
         
@@ -40,7 +40,7 @@ class URLSessionHelpersTests: XCTestCase {
     }
     
     func testThatSendReturnsSuccessIfUnwrapDataSucceeds() {
-        let unwrapData: (DataTaskResponse) throws -> Data = { _ in
+        let unwrapData: UnwrapDataHandler = { _, _, _ in
             return try JSONEncoder().encode(SuccessResponse())
         }
         

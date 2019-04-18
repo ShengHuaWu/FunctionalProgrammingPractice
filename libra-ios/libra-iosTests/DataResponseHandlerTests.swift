@@ -37,11 +37,8 @@ class DataResponseHandlerTests: XCTestCase {
     
     func testThatUnwrapDataThrowsFailureIfErrorExists() {
         let fakeError = FakeError.fake
-        let response = DataTaskResponse(data: try! JSONEncoder().encode(errorResponse),
-                                        urlResponse: HTTPURLResponse.makeFake(with: 200),
-                                        error: fakeError)
         do {
-            _ = try handler.unwrapData(response)
+            _ = try handler.unwrapData(try! JSONEncoder().encode(errorResponse), HTTPURLResponse.makeFake(with: 200), fakeError)
             XCTFail("Error should be thrown")
         } catch let error as NetworkError {
             XCTAssertEqual(error, .failure(mesage: fakeError.localizedDescription))
@@ -51,11 +48,8 @@ class DataResponseHandlerTests: XCTestCase {
     }
     
     func testThatUnwrapDataThrowsClientErrorIfErrorResponseExists() {
-        let response = DataTaskResponse(data: try! JSONEncoder().encode(errorResponse),
-                                        urlResponse: HTTPURLResponse.makeFake(with: 200),
-                                        error: nil)
         do {
-            _ = try handler.unwrapData(response)
+            _ = try handler.unwrapData(try! JSONEncoder().encode(errorResponse), HTTPURLResponse.makeFake(with: 200), nil)
             XCTFail("Error should be thrown")
         } catch let error as NetworkError {
             XCTAssertEqual(error, .clientError(reason: errorResponse.reason))
@@ -65,11 +59,8 @@ class DataResponseHandlerTests: XCTestCase {
     }
     
     func testThatUnwrapDataThrowsUnexpectedResponseIfURLResponseIsNotHTTPURLResponse() {
-        let response = DataTaskResponse(data: try! JSONEncoder().encode(successResponse),
-                                        urlResponse: URLResponse.makeFake(),
-                                        error: nil)
         do {
-            _ = try handler.unwrapData(response)
+            _ = try handler.unwrapData(try! JSONEncoder().encode(successResponse), URLResponse.makeFake(), nil)
             XCTFail("Error should be thrown")
         } catch let error as NetworkError {
             XCTAssertEqual(error, .unexpectedResponse)
@@ -80,11 +71,8 @@ class DataResponseHandlerTests: XCTestCase {
     
     func testThatUnwrapDataThrowsDifferentErrorsIfStatusCodeIsInBetween400And499() {
         (400 ... 499).forEach { code in
-            let response = DataTaskResponse(data: try! JSONEncoder().encode(successResponse),
-                                            urlResponse: HTTPURLResponse.makeFake(with: code),
-                                            error: nil)
             do {
-                _ = try handler.unwrapData(response)
+                _ = try handler.unwrapData(try! JSONEncoder().encode(successResponse), HTTPURLResponse.makeFake(with: code), nil)
                 XCTFail("Error should be thrown")
             } catch let error as NetworkError {
                 switch code {
@@ -108,11 +96,8 @@ class DataResponseHandlerTests: XCTestCase {
     
     func testThatUnwrapDataThrowsServerErrorIfStatusCodeIsInBetween500And599() {
         (500 ... 599).forEach { code in
-            let response = DataTaskResponse(data: try! JSONEncoder().encode(successResponse),
-                                            urlResponse: HTTPURLResponse.makeFake(with: code),
-                                            error: nil)
             do {
-                _ = try handler.unwrapData(response)
+                _ = try handler.unwrapData(try! JSONEncoder().encode(successResponse), HTTPURLResponse.makeFake(with: code), nil)
                 XCTFail("Error should be thrown")
             } catch let error as NetworkError {
                 XCTAssertEqual(error, .serverError)
@@ -123,11 +108,8 @@ class DataResponseHandlerTests: XCTestCase {
     }
     
     func testThatUnwrapDataReturnsSuccessResponseIfDataIsEmpty() {
-        let response = DataTaskResponse(data: nil,
-                                        urlResponse: HTTPURLResponse.makeFake(with: 200),
-                                        error: nil)
         do {
-            let data = try handler.unwrapData(response)
+            let data = try handler.unwrapData(nil, HTTPURLResponse.makeFake(with: 200), nil)
             let successResponse = try JSONDecoder().decode(SuccessResponse.self, from: data)
             XCTAssertTrue(successResponse.success)
         } catch {

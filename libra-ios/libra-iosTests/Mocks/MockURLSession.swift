@@ -39,7 +39,7 @@ final class MockURLSessionInterface: URLSessionInterface {
         return MockURLSessionDataTask()
     }
     
-    func send<Entity>(_ request: Request<Entity>, unwrapData: @escaping (DataTaskResponse) throws -> Data) -> Future<Result<Entity, NetworkError>> where Entity : Decodable {
+    func send<Entity>(_ request: Request<Entity>, unwrapData: @escaping UnwrapDataHandler) -> Future<Result<Entity, NetworkError>> where Entity : Decodable {
         sendCallCount += 1
         
         return Future { callback in

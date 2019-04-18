@@ -2,7 +2,7 @@ import Foundation
 @testable import libra_ios
 
 extension DataTaskResponseHandler {
-    static let mock = DataTaskResponseHandler(unwrapData: { _ in
+    static let mock = DataTaskResponseHandler(unwrapData: { _, _, _ in
         return try JSONEncoder().encode(SuccessResponse())
     })
 }

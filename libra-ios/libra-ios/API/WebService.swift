@@ -18,5 +18,5 @@ private func logIn(with parameters: LoginParameters) -> Future<Result<User, Netw
 }
 
 private func send<Entity>(_ request: Request<Entity>) -> Future<Result<Entity, NetworkError>> {
-    return Current.urlSession().send(request, unwrapData: Current.dataTaskResponseHandler.unwrapData)
+    return Current.dataTaskResponseHandler.unwrapData |> curry(Current.urlSession().send)(request)
 }
