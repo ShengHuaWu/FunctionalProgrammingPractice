@@ -14,7 +14,7 @@ class RequestTests: XCTestCase {
     let generalHeader = ["Content-Type": "application/json"]
     let model = FakeModel(name: "libra")
     
-    func testThatMakeGetRequest() {
+    func testThatMakeGetRequest() throws {
         let method = HTTPMethod.get
         let request = Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader)
         XCTAssertEqual(request.urlRequest.url, baseURL)
@@ -22,54 +22,40 @@ class RequestTests: XCTestCase {
         XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
         XCTAssertNil(request.urlRequest.httpBody)
         
-        do {
-            let data = try JSONEncoder().encode(model)
-            let result = try request.parse(data)
-            XCTAssertEqual(result.name, model.name)
-        } catch {
-            XCTFail("Everything should succeed")
-        }
+        let data = try JSONEncoder().encode(model)
+        let result = try request.parse(data)
+        XCTAssertEqual(result.name, model.name)
     }
     
-    func testThatMakePostRequest() {
+    func testThatMakePostRequest() throws {
         let method = HTTPMethod.post
         let parameter = FakeParameter(value: "libra-ios")
         let request = Request<FakeModel>(url: baseURL, method: method, bodyParameters: parameter, headers: generalHeader)
         XCTAssertEqual(request.urlRequest.url, baseURL)
         XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
         XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
+        XCTAssertEqual(request.urlRequest.httpBody, try JSONEncoder().encode(parameter))
         
-        do {
-            XCTAssertEqual(request.urlRequest.httpBody, try JSONEncoder().encode(parameter))
-            
-            let data = try JSONEncoder().encode(model)
-            let result = try request.parse(data)
-            XCTAssertEqual(result.name, model.name)
-        } catch {
-            XCTFail("Everything should succeed")
-        }
+        let data = try JSONEncoder().encode(model)
+        let result = try request.parse(data)
+        XCTAssertEqual(result.name, model.name)
     }
     
-    func testThatMakePutRequest() {
+    func testThatMakePutRequest() throws {
         let method = HTTPMethod.put
         let parameter = FakeParameter(value: "libra-ios")
         let request = Request<FakeModel>(url: baseURL, method: method, bodyParameters: parameter, headers: generalHeader)
         XCTAssertEqual(request.urlRequest.url, baseURL)
         XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
         XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
+        XCTAssertEqual(request.urlRequest.httpBody, try JSONEncoder().encode(parameter))
         
-        do {
-            XCTAssertEqual(request.urlRequest.httpBody, try JSONEncoder().encode(parameter))
-            
-            let data = try JSONEncoder().encode(model)
-            let result = try request.parse(data)
-            XCTAssertEqual(result.name, model.name)
-        } catch {
-            XCTFail("Everything should succeed")
-        }
+        let data = try JSONEncoder().encode(model)
+        let result = try request.parse(data)
+        XCTAssertEqual(result.name, model.name)
     }
     
-    func testThatMakeDeleteRequest() {
+    func testThatMakeDeleteRequest() throws {
         let method = HTTPMethod.delete
         let request = Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader)
         XCTAssertEqual(request.urlRequest.url, baseURL)
@@ -77,12 +63,8 @@ class RequestTests: XCTestCase {
         XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
         XCTAssertNil(request.urlRequest.httpBody)
         
-        do {
-            let data = try JSONEncoder().encode(model)
-            let result = try request.parse(data)
-            XCTAssertEqual(result.name, model.name)
-        } catch {
-            XCTFail("Everything should succeed")
-        }
+        let data = try JSONEncoder().encode(model)
+        let result = try request.parse(data)
+        XCTAssertEqual(result.name, model.name)
     }
 }
