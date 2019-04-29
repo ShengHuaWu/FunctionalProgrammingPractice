@@ -13,8 +13,17 @@ extension WebService {
         logIn: { _ in return Future.empty })
 }
 
+extension Storage {
+    static let mock = Storage(
+        saveToken: { _ in },
+        fetchToken: { return "" },
+        deleteToken: {})
+}
+
 extension Environment {
-    static let mock = Environment(urlSession: { return MockURLSessionInterface() },
-                                  dataTaskResponseHandler: .mock,
-                                  webService: .mock)
+    static let mock = Environment(
+        urlSession: { return MockURLSessionInterface() },
+        dataTaskResponseHandler: .mock,
+        webService: .mock,
+        storage: .mock)
 }

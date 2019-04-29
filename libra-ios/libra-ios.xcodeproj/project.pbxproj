@@ -212,9 +212,8 @@
 		D88A0F542271F17200C959DD /* Storage */ = {
 			isa = PBXGroup;
 			children = (
+				D8DD0BE622771EA300CAC829 /* Cache */,
 				D88A0F522271F16300C959DD /* Storage.swift */,
-				D808A92122733B9200172FF4 /* Persisting.swift */,
-				D808A92322733C0500172FF4 /* Caching.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -228,6 +227,15 @@
 				D821FA0E2264A33F003A3B63 /* WebService.swift */,
 			);
 			path = API;
+			sourceTree = "<group>";
+		};
+		D8DD0BE622771EA300CAC829 /* Cache */ = {
+			isa = PBXGroup;
+			children = (
+				D808A92122733B9200172FF4 /* Persisting.swift */,
+				D808A92322733C0500172FF4 /* Caching.swift */,
+			);
+			path = Cache;
 			sourceTree = "<group>";
 		};
 		D8FBED9C225F87920099D688 /* CustomOperators */ = {
@@ -291,6 +299,11 @@
 					9BAB473C21BD86F400AD54CA = {
 						CreatedOnToolsVersion = 10.1;
 						LastSwiftMigration = 1020;
+						SystemCapabilities = {
+							com.apple.Keychain = {
+								enabled = 0;
+							};
+						};
 					};
 					9BAB475021BD86F600AD54CA = {
 						CreatedOnToolsVersion = 10.1;
@@ -524,6 +537,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BASE_URL = "http://localhost:8080/api/v1";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 7466UF56YW;
 				INFOPLIST_FILE = "libra-ios/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -542,6 +556,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BASE_URL = "";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 7466UF56YW;
 				INFOPLIST_FILE = "libra-ios/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

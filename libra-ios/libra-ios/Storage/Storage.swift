@@ -1,7 +1,7 @@
 import Foundation
 
 struct Storage {
-    let saveToken = { try save($0, as: .token) }
-    let fetchToken = { try fetchEntity(as: .token) }
-    let deleteToken = { try deleteEntity(as: .token) }
+    var saveToken = { try save($0, as: .token) }
+    var fetchToken = { try fetchEntity(as: .token) }
+    var deleteToken = { try deleteEntity(as: .token) }
 }

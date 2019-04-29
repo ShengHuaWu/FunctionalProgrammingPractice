@@ -19,5 +19,6 @@ struct Caching<Key, Entity> where Key: Hashable {
 }
 
 extension Caching where Key == String, Entity == String {
-    static let token = Caching(persisting: .keychain, key: "co.libra-ios.token")
+    // Use `userDefaults` for now, because there is no certificate for Apple developer
+    static let token = Caching(persisting: .userDefaults, key: "co.libra-ios.token")
 }
