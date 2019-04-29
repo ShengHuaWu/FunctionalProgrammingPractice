@@ -7,8 +7,6 @@ class ViewController: UIViewController {
         
         view.backgroundColor = .yellow
         
-        print(try! Current.storage.fetchToken())
-        
         // TODO: To be removed
         /*
         let parameters = LoginParameters(username: "shenghuawu5", password: "12345678")
@@ -29,5 +27,12 @@ class ViewController: UIViewController {
                 print(result)
             }
         }*/
+        
+        let parameters = UpdateUserParameters(userID: 7, firstName: "ShengHua7", lastName: "Wu7", email: "shenghua7@libra.co")
+        Current.webService.updateUser(parameters).run { result in
+            DispatchQueue.main.async {
+                print(result)
+            }
+        }
     }
 }
