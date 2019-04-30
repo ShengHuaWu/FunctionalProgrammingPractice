@@ -9,8 +9,10 @@ extension DataTaskResponseHandler {
 
 extension WebService {
     static let mock = WebService(
-        signUp: { _ in return Future.empty },
-        logIn: { _ in return Future.empty })
+        signUp: { _ in return .empty },
+        logIn: { _ in return .empty },
+        getUser: { _ in return .empty },
+        updateUser: { _ in return .empty })
 }
 
 extension Storage {

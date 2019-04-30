@@ -85,4 +85,94 @@ class WebServiceTests: XCTestCase {
             }
         }
     }
+    
+    func testThatGetUserReturnsUserIfSucceess() {
+        urlSessionInterface.expectedEntity = user
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        webService.getUser(user.id).waitAndAssert(on: self) { result in
+            switch result {
+            case .success(let entity):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(entity.id, self.user.id)
+            case .failure:
+                XCTFail("Get user should succeed")
+            }
+        }
+    }
+    
+    func testThatGetUserReturnsNetworkErrorIfFailure() {
+        urlSessionInterface.expectedError = .badRequest
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        webService.getUser(user.id).waitAndAssert(on: self) { result in
+            switch result {
+            case .success:
+                XCTFail("Get user should fail")
+            case .failure(let error):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(error, .badRequest)
+            }
+        }
+    }
+    
+    func testThatUpdateUserReturnsUserIfSuccess() {
+        urlSessionInterface.expectedEntity = user
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        let parameter = UpdateUserParameters(userID: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email)
+        webService.updateUser(parameter).waitAndAssert(on: self) { result in
+            switch result {
+            case .success(let entity):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(entity.id, self.user.id)
+            case .failure:
+                XCTFail("Update user should succeed")
+            }
+        }
+    }
+    
+    func testThatUpdateUserReturnsNetworkErrorIfFailure() {
+        urlSessionInterface.expectedError = .badRequest
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        let parameter = UpdateUserParameters(userID: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email)
+        webService.updateUser(parameter).waitAndAssert(on: self) { result in
+            switch result {
+            case .success:
+                XCTFail("Update user should fail")
+            case .failure(let error):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(error, .badRequest)
+            }
+        }
+    }
 }
