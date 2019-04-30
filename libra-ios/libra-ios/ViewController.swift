@@ -9,7 +9,7 @@ class ViewController: UIViewController {
         
         // TODO: To be removed
         /*
-        let parameters = LoginParameters(username: "shenghuawu5", password: "12345678")
+        let parameters = LoginParameters(username: "shengwu", password: "12345678")
         Current.webService.logIn(parameters).map { result -> Result<Void, Error> in
             do {
                 let user = try result.get()
@@ -28,8 +28,7 @@ class ViewController: UIViewController {
             }
         }*/
         
-        let parameters = UpdateUserParameters(userID: 7, firstName: "ShengHua7", lastName: "Wu7", email: "shenghua7@libra.co")
-        Current.webService.updateUser(parameters).run { result in
+        Current.webService.getRecords().run { result in
             DispatchQueue.main.async {
                 print(result)
             }

@@ -4,6 +4,7 @@ enum Endpoint {
     case signUp
     case login
     case user(id: Int)
+    case records
 }
 
 extension Endpoint {
@@ -17,6 +18,7 @@ extension Endpoint {
         case .signUp: return baseURL.appendingPathComponent("users/signup")
         case .login: return  baseURL.appendingPathComponent("users/login")
         case .user(let id): return baseURL.appendingPathComponent("users/\(id)")
+        case .records: return baseURL.appendingPathComponent("records")
         }
     }
 }

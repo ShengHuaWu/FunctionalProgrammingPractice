@@ -10,7 +10,11 @@ struct Request<Entity> where Entity: Decodable {
         urlRequest.allHTTPHeaderFields = headers
         
         self.urlRequest = urlRequest
-        self.parse = { data in try JSONDecoder().decode(Entity.self, from: data) }
+        self.parse = { data in
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            return try decoder.decode(Entity.self, from: data)
+        }
     }
     
     init<Parameter>(url: URL, method: HTTPMethod, bodyParameters: Parameter, headers: [String: String]? = nil) where Parameter: Encodable {
@@ -25,6 +29,10 @@ struct Request<Entity> where Entity: Decodable {
         urlRequest.allHTTPHeaderFields = headers
         
         self.urlRequest = urlRequest
-        self.parse = { data in try JSONDecoder().decode(Entity.self, from: data) }
+        self.parse = { data in
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            return try decoder.decode(Entity.self, from: data)
+        }
     }
 }

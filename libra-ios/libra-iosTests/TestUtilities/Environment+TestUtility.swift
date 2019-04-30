@@ -3,7 +3,7 @@ import Foundation
 
 extension DataTaskResponseHandler {
     static let mock = DataTaskResponseHandler(unwrapData: { _, _, _ in
-        return try JSONEncoder().encode(SuccessResponse())
+        return try JSONEncoder().encode(ErrorResponse(error: true, reason: "This is an error response"))
     })
 }
 
@@ -12,14 +12,15 @@ extension WebService {
         signUp: { _ in return .empty },
         logIn: { _ in return .empty },
         getUser: { _ in return .empty },
-        updateUser: { _ in return .empty })
+        updateUser: { _ in return .empty },
+        getRecords: { return .empty })
 }
 
 extension Storage {
     static let mock = Storage(
-        saveToken: { _ in },
-        fetchToken: { return "" },
-        deleteToken: {})
+        saveToken: { _ in throw PersistingError.noEntity },
+        fetchToken: { throw PersistingError.noEntity },
+        deleteToken: { throw PersistingError.noEntity })
 }
 
 extension Environment {
