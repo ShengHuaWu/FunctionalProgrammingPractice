@@ -265,4 +265,50 @@ class WebServiceTests: XCTestCase {
             }
         }
     }
+    
+    func testThatCreateRecordReturnsRecordIfSuccess() {
+        urlSessionInterface.expectedEntity = record
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        let parameters = CreateRecordParamters(title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
+        webService.createRecord(parameters).waitAndAssert(on: self) { result in
+            switch result {
+            case .success(let entity):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(entity.id, self.record.id)
+            case .failure:
+                XCTFail("Get record should succeed")
+            }
+        }
+    }
+    
+    func testThatCreateRecordReturnsNetworkErrorIfFailure() {
+        urlSessionInterface.expectedError = .badRequest
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        let parameters = CreateRecordParamters(title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
+        webService.createRecord(parameters).waitAndAssert(on: self) { result in
+            switch result {
+            case .success:
+                XCTFail("Get records should fail")
+            case .failure(let error):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(error, .badRequest)
+            }
+        }
+    }
 }

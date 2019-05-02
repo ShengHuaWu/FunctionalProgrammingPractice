@@ -21,7 +21,9 @@ struct Request<Entity> where Entity: Decodable {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
         
-        guard let body = try? JSONEncoder().encode(bodyParameters) else {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .millisecondsSince1970
+        guard let body = try? encoder.encode(bodyParameters) else {
             preconditionFailure("Unable to encode \(Parameter.self) to JSON")
         }
         urlRequest.httpBody = body

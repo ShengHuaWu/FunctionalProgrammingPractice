@@ -48,4 +48,6 @@ private extension UsersController {
         
         return try user.makeTokenFuture(on: req).save(on: req).makePublicUser(for: user)
     }
+    
+    // TODO: Friends CRUD (sibling relationship)
 }
