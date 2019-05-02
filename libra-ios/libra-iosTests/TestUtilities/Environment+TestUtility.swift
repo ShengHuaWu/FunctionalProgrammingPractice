@@ -13,7 +13,8 @@ extension WebService {
         logIn: { _ in return .empty },
         getUser: { _ in return .empty },
         updateUser: { _ in return .empty },
-        getRecords: { return .empty })
+        getRecords: { return .empty },
+        getRecord: { _ in return .empty })
 }
 
 extension Storage {

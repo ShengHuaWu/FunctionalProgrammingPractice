@@ -1,11 +1,11 @@
-struct User: Decodable {
+// TODO: Replace this type by `User` 
+struct Companion: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case username
         case firstName = "first_name"
         case lastName = "last_name"
         case email
-        case token
     }
     
     let id: Int
@@ -13,5 +13,4 @@ struct User: Decodable {
     let firstName: String
     let lastName: String
     let email: String
-    let token: String?
 }

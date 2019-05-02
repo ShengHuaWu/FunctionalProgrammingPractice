@@ -6,6 +6,7 @@ struct WebService {
     var getUser = getUser(with:)
     var updateUser = updateUser(with:)
     var getRecords = getAllRecords
+    var getRecord = getRecords(with:)
 }
 
 // MARK: - Private
@@ -21,8 +22,8 @@ private func logIn(with parameters: LoginParameters) -> Future<Result<User, Netw
         >>> send
 }
 
-private func getUser(with userID: Int) -> Future<Result<User, NetworkError>> {
-    return sendTokenAuthenticatedRequest(to: .user(id: userID), method: .get)
+private func getUser(with id: Int) -> Future<Result<User, NetworkError>> {
+    return sendTokenAuthenticatedRequest(to: .user(id: id), method: .get)
 }
 
 private func updateUser(with parameters: UpdateUserParameters) -> Future<Result<User, NetworkError>> {
@@ -31,6 +32,10 @@ private func updateUser(with parameters: UpdateUserParameters) -> Future<Result<
 
 private func getAllRecords() -> Future<Result<[Record], NetworkError>> {
     return sendTokenAuthenticatedRequest(to: .records, method: .get)
+}
+
+private func getRecords(with id: Int) -> Future<Result<Record, NetworkError>> {
+    return sendTokenAuthenticatedRequest(to: .record(id: id), method: .get)
 }
 
 // MARK: - Helpers

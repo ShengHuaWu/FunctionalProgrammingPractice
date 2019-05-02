@@ -5,7 +5,7 @@ class WebServiceTests: XCTestCase {
     var webService: WebService!
     var urlSessionInterface: MockURLSessionInterface!
     let user = User(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co", token: "987654321")
-    let record = Record(id: 999, title: "Libra Record", note: "This is just one record", date: Date(), amount: 100, currency: .usd, mood: .good)
+    let record = Record(id: 999, title: "Libra Record", note: "This is just one record", date: Date(), amount: 100, currency: .usd, mood: .good, companions: [Companion(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co")])
 
     override func setUp() {
         super.setUp()
@@ -211,6 +211,50 @@ class WebServiceTests: XCTestCase {
         }
         
         webService.getRecords().waitAndAssert(on: self) { result in
+            switch result {
+            case .success:
+                XCTFail("Get records should fail")
+            case .failure(let error):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(error, .badRequest)
+            }
+        }
+    }
+    
+    func testThatGetRecordReturnsRecordIfSuccess() {
+        urlSessionInterface.expectedEntity = record
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        webService.getRecord(999).waitAndAssert(on: self) { result in
+            switch result {
+            case .success(let entity):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(entity.id, self.record.id)
+            case .failure:
+                XCTFail("Get record should succeed")
+            }
+        }
+    }
+    
+    func testThatGetRecordReturnsNetworkErrorIfFailure() {
+        urlSessionInterface.expectedError = .badRequest
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        webService.getRecord(999).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Get records should fail")

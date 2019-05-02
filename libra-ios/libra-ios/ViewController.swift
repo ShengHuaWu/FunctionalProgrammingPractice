@@ -26,9 +26,15 @@ class ViewController: UIViewController {
             DispatchQueue.main.async {
                 print(result)
             }
-        }*/
+        }
         
         Current.webService.getRecords().run { result in
+            DispatchQueue.main.async {
+                print(result)
+            }
+        }*/
+        
+        Current.webService.getRecord(1).run { result in
             DispatchQueue.main.async {
                 print(result)
             }
