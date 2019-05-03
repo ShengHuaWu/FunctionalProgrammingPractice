@@ -5,7 +5,7 @@ struct UpdateUserParameters: Encodable {
         case email
     }
     
-    let userID: Int
+    let id: Int
     let firstName: String
     let lastName: String
     let email: String

@@ -1,6 +1,7 @@
 import XCTest
 @testable import libra_ios
 
+// TODO: Separate user & record tests into different files
 class WebServiceTests: XCTestCase {
     var webService: WebService!
     var urlSessionInterface: MockURLSessionInterface!
@@ -141,7 +142,7 @@ class WebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameter = UpdateUserParameters(userID: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email)
+        let parameter = UpdateUserParameters(id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email)
         webService.updateUser(parameter).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
@@ -164,7 +165,7 @@ class WebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameter = UpdateUserParameters(userID: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email)
+        let parameter = UpdateUserParameters(id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email)
         webService.updateUser(parameter).waitAndAssert(on: self) { result in
             switch result {
             case .success:
@@ -301,6 +302,52 @@ class WebServiceTests: XCTestCase {
         
         let parameters = CreateRecordParamters(title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
         webService.createRecord(parameters).waitAndAssert(on: self) { result in
+            switch result {
+            case .success:
+                XCTFail("Get records should fail")
+            case .failure(let error):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(error, .badRequest)
+            }
+        }
+    }
+    
+    func testThatUpdateRecordReturnsRecordIfSuccess() {
+        urlSessionInterface.expectedEntity = record
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        let parameters = UpdateRecordParameters(id: 999, title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
+        webService.updateRecord(parameters).waitAndAssert(on: self) { result in
+            switch result {
+            case .success(let entity):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(entity.id, self.record.id)
+            case .failure:
+                XCTFail("Get record should succeed")
+            }
+        }
+    }
+    
+    func testThatUpdateRecordReturnsNetworkErrorIfFailure() {
+        urlSessionInterface.expectedError = .badRequest
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        let parameters = UpdateRecordParameters(id: 999, title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
+        webService.updateRecord(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Get records should fail")
