@@ -4,6 +4,7 @@ struct Request<Entity> where Entity: Decodable {
     let urlRequest: URLRequest
     let parse: (Data) throws -> Entity
     
+    // TODO: Extract date strategy
     init(url: URL, method: HTTPMethod, headers: [String: String]? = nil) {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
@@ -17,6 +18,7 @@ struct Request<Entity> where Entity: Decodable {
         }
     }
     
+    // TODO: Extract date strategy
     init<Parameter>(url: URL, method: HTTPMethod, bodyParameters: Parameter, headers: [String: String]? = nil) where Parameter: Encodable {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue

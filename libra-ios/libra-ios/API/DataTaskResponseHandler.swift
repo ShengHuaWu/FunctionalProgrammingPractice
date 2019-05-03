@@ -75,7 +75,7 @@ private func sanitizeURLResponse(for response: DataTaskResponse) throws -> DataT
 }
 
 private func unwrapDataAfterSanitizing(for response: DataTaskResponse) throws -> Data {
-    guard let unwrappedData = response.data else {
+    guard let unwrappedData = response.data, !unwrappedData.isEmpty else {
         return try JSONEncoder().encode(SuccessResponse())
     }
     

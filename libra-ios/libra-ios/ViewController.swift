@@ -33,12 +33,5 @@ class ViewController: UIViewController {
                 print(result)
             }
         }*/
-        
-        let parameters = UpdateRecordParameters(id: 6, title: "Nice time", note: "Best time ever", date: Date(), mood: .good, amount: 0, currency: .unknown, companions: [Companion(id: 2, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co")])
-        Current.webService.updateRecord(parameters).run { result in
-            DispatchQueue.main.async {
-                print(result)
-            }
-        }
     }
 }

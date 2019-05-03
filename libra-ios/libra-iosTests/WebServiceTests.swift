@@ -258,7 +258,7 @@ class WebServiceTests: XCTestCase {
         webService.getRecord(999).waitAndAssert(on: self) { result in
             switch result {
             case .success:
-                XCTFail("Get records should fail")
+                XCTFail("Get record should fail")
             case .failure(let error):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
                 XCTAssertEqual(fetchTokenCallCount, 1)
@@ -285,7 +285,7 @@ class WebServiceTests: XCTestCase {
                 XCTAssertEqual(fetchTokenCallCount, 1)
                 XCTAssertEqual(entity.id, self.record.id)
             case .failure:
-                XCTFail("Get record should succeed")
+                XCTFail("Create record should succeed")
             }
         }
     }
@@ -304,7 +304,7 @@ class WebServiceTests: XCTestCase {
         webService.createRecord(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:
-                XCTFail("Get records should fail")
+                XCTFail("Create record should fail")
             case .failure(let error):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
                 XCTAssertEqual(fetchTokenCallCount, 1)
@@ -331,7 +331,7 @@ class WebServiceTests: XCTestCase {
                 XCTAssertEqual(fetchTokenCallCount, 1)
                 XCTAssertEqual(entity.id, self.record.id)
             case .failure:
-                XCTFail("Get record should succeed")
+                XCTFail("Update record should succeed")
             }
         }
     }
@@ -350,7 +350,51 @@ class WebServiceTests: XCTestCase {
         webService.updateRecord(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:
-                XCTFail("Get records should fail")
+                XCTFail("Update record should fail")
+            case .failure(let error):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(error, .badRequest)
+            }
+        }
+    }
+    
+    func testThatDeleteRecordReturnsSuccessResponseIfSuccess() {
+        urlSessionInterface.expectedEntity = SuccessResponse()
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        webService.deleteRecord(999).waitAndAssert(on: self) { result in
+            switch result {
+            case .success(let entity):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertTrue(entity.success)
+            case .failure:
+                XCTFail("Delete record should succeed")
+            }
+        }
+    }
+    
+    func testThatDeleteRecordReturnsNetworkErrorIfFailure() {
+        urlSessionInterface.expectedError = .badRequest
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        webService.deleteRecord(999).waitAndAssert(on: self) { result in
+            switch result {
+            case .success:
+                XCTFail("Delete record should fail")
             case .failure(let error):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
                 XCTAssertEqual(fetchTokenCallCount, 1)

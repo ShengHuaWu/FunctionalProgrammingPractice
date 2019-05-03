@@ -107,8 +107,14 @@ class DataResponseHandlerTests: XCTestCase {
         }
     }
     
-    func testThatUnwrapDataReturnsSuccessResponseIfDataIsEmpty() throws {
+    func testThatUnwrapDataReturnsSuccessResponseIfDataIsNil() throws {
         let data = try handler.unwrapData(nil, HTTPURLResponse.makeFake(with: 200), nil)
+        let successResponse = try JSONDecoder().decode(SuccessResponse.self, from: data)
+        XCTAssertTrue(successResponse.success)
+    }
+    
+    func testThatUnwrapDataReturnsSuccessResponseIfDataIsEmpty() throws {
+        let data = try handler.unwrapData(Data(), HTTPURLResponse.makeFake(with: 200), nil)
         let successResponse = try JSONDecoder().decode(SuccessResponse.self, from: data)
         XCTAssertTrue(successResponse.success)
     }

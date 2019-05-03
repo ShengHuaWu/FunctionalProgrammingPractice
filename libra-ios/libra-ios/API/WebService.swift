@@ -9,6 +9,7 @@ struct WebService {
     var getRecord = getRecords(with:)
     var createRecord = createRecord(with:)
     var updateRecord = updateRecord(with:)
+    var deleteRecord = deleteRecord(with:)
 }
 
 // MARK: - Private
@@ -46,6 +47,10 @@ private func createRecord(with parameters: CreateRecordParamters) -> Future<Resu
 
 private func updateRecord(with parameters: UpdateRecordParameters) -> Future<Result<Record, NetworkError>> {
     return sendTokenAuthenticatdRequest(to: .record(id: parameters.id), method: .put, parameters: parameters)
+}
+
+private func deleteRecord(with id: Int) -> Future<Result<SuccessResponse, NetworkError>> {
+    return sendTokenAuthenticatedRequest(to: .record(id: id), method: .delete)
 }
 
 // MARK: - Helpers
