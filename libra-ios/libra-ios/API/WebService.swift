@@ -41,12 +41,18 @@ private func getRecords(with id: Int) -> Future<Result<Record, NetworkError>> {
     return sendTokenAuthenticatedRequest(to: .record(id: id), method: .get)
 }
 
-private func createRecord(with parameters: CreateRecordParamters) -> Future<Result<Record, NetworkError>> {
+private func createRecord(with parameters: CreateOrUpdateRecordParameters) -> Future<Result<Record, NetworkError>> {
     return sendTokenAuthenticatdRequest(to: .records, method: .post, parameters: parameters)
 }
 
-private func updateRecord(with parameters: UpdateRecordParameters) -> Future<Result<Record, NetworkError>> {
-    return sendTokenAuthenticatdRequest(to: .record(id: parameters.id), method: .put, parameters: parameters)
+private func updateRecord(with parameters: CreateOrUpdateRecordParameters) -> Future<Result<Record, NetworkError>> {
+    guard let id = parameters.id else {
+        return Future { callback in
+            callback(.failure(.badRequest))
+        }
+    }
+    
+    return sendTokenAuthenticatdRequest(to: .record(id: id), method: .put, parameters: parameters)
 }
 
 private func deleteRecord(with id: Int) -> Future<Result<SuccessResponse, NetworkError>> {

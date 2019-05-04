@@ -277,7 +277,7 @@ class WebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameters = CreateRecordParamters(title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
+        let parameters = CreateOrUpdateRecordParameters(id: nil, title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
         webService.createRecord(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
@@ -300,7 +300,7 @@ class WebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameters = CreateRecordParamters(title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
+        let parameters = CreateOrUpdateRecordParameters(id: nil, title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
         webService.createRecord(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:
@@ -323,7 +323,7 @@ class WebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameters = UpdateRecordParameters(id: 999, title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
+        let parameters = CreateOrUpdateRecordParameters(id: 999, title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
         webService.updateRecord(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
@@ -346,7 +346,7 @@ class WebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameters = UpdateRecordParameters(id: 999, title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
+        let parameters = CreateOrUpdateRecordParameters(id: 999, title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions ?? [])
         webService.updateRecord(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:
