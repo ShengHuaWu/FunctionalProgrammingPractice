@@ -1,6 +1,6 @@
 import Foundation
 
-struct CreateRecordParamters: Encodable {
+struct CreateOrUpdateRecordParameters: Encodable {
     enum CodingKeys: String, CodingKey {
         case title
         case note
@@ -11,6 +11,7 @@ struct CreateRecordParamters: Encodable {
         case companionIDs = "companion_ids"
     }
     
+    let id: Int?
     let title: String
     let note: String
     let date: Date
@@ -19,7 +20,8 @@ struct CreateRecordParamters: Encodable {
     let currency: String
     let companionIDs: [Int]
     
-    init(title: String, note: String, date: Date, mood: Record.Mood, amount: Double, currency: Record.Currency, companions: [Companion]) {
+    init(id: Int?, title: String, note: String, date: Date, mood: Record.Mood, amount: Double, currency: Record.Currency, companions: [Companion]) {
+        self.id = id
         self.title = title
         self.note = note
         self.date = date
