@@ -47,4 +47,3 @@ extension RecordCompanionPivot: Migration {
         }
     }
 }
-

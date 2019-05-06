@@ -13,11 +13,20 @@ final class UsersController: RouteCollection {
         let basicProtected = usersGroup.grouped(basicAuthMiddleware, guardMiddleware)
         basicProtected.post("login", use: loginHandler)
         
-        // Token protected: get user, update user
+        // Token protected: get user, update user, search and friends group
         let tokenAuthMiddleware = User.tokenAuthMiddleware()
         let tokenProtected = usersGroup.grouped(tokenAuthMiddleware, guardMiddleware)
         tokenProtected.get(User.parameter, use: getOneHandler)
         tokenProtected.put(User.parameter, use: updateHandler)
+        
+        let searchGroup = tokenProtected.grouped("search")
+        searchGroup.get(use: searchHandler)
+        
+        let friendsGroup = tokenProtected.grouped(User.parameter, "friends")
+        friendsGroup.get(use: getAllFriendsHandler)
+        friendsGroup.get(User.parameter, use: getOneFriendHandler)
+        friendsGroup.post(User.parameter, use: addFriendHandler)
+        friendsGroup.delete(User.parameter, use: removeFriendHandler)
     }
 }
 
@@ -48,6 +57,66 @@ private extension UsersController {
         
         return try user.makeTokenFuture(on: req).save(on: req).makePublicUser(for: user)
     }
+
+    func searchHandler(_ req: Request) throws -> Future<[User.Public]> {
+        let key = try req.query.get(String.self, at: "search")
+        
+        // TODO: Create a function ([User]) -> [User.Public]
+        return User.query(on: req).group(.or) { orGroup in
+            orGroup.filter(.make(\.firstName, .like, [key]))
+            orGroup.filter(.make(\.lastName, .like, [key]))
+            orGroup.filter(.make(\.email, .like, [key]))
+        }.all().map { $0.map { $0.makePublic() } }
+    }
     
-    // TODO: Friends CRUD (sibling relationship)
+    // TODO: Verify authenticated user and user parameter
+    func getAllFriendsHandler(_ req: Request) throws -> Future<[User.Public]> {
+        let user = try req.requireAuthenticated(User.self)
+        
+        // TODO: Create a function ([User]) -> [User.Public]
+        return try user.friends.query(on: req).all().map { $0.map { $0.makePublic() } }
+    }
+    
+    func getOneFriendHandler(_ req: Request) throws -> Future<User.Public> {
+        let user = try req.requireAuthenticated(User.self)
+        
+        // TODO: Rewrite this return statement as a method
+        return try req.parameters.next(User.self).flatMap(to: User?.self) { friend in
+            return try user.friends.query(on: req).filter(.make(\User.id, .in, [friend.requireID()])).first()
+        }.map(to: User.Public.self) { result in
+            guard let unwrappedResult = result else { throw Abort(.notFound) }
+            
+            return unwrappedResult.makePublic()
+        }
+    }
+    
+    func addFriendHandler(_ req: Request) throws -> Future<HTTPStatus> {
+        let user = try req.requireAuthenticated(User.self)
+        
+        // TODO: Rewrite this return statement as a method
+        return try req.parameters.next(User.self).flatMap(to: HTTPStatus.self) { friend in
+            return try user.friends.query(on: req).filter(.make(\User.id, .in, [friend.requireID()])).first().flatMap(to: HTTPStatus.self) { result in
+                if result == nil {
+                    return user.friends.attachSameType(friend, on: req).transform(to: .created)
+                } else {
+                    throw Abort(.created)
+                }
+            }
+        }
+    }
+    
+    func removeFriendHandler(_ req: Request) throws -> Future<HTTPStatus> {
+        let user = try req.requireAuthenticated(User.self)
+        
+        // TODO: Rewrite this return statement as a method
+        return try req.parameters.next(User.self).flatMap(to: User?.self) { friend in
+            return try user.friends.query(on: req).filter(.make(\User.id, .in, [friend.requireID()])).first()
+        }.flatMap(to: HTTPStatus.self) { result in
+            guard let unwrappedResult = result else {
+                throw Abort(.noContent)
+            }
+            
+            return user.friends.detach(unwrappedResult, on: req).transform(to: .noContent)
+        }
+    }
 }

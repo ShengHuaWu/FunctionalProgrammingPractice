@@ -70,6 +70,10 @@ extension User {
         return children(\.creatorID)
     }
     
+    var friends: Siblings<User, User, FriendshipPivot> {
+        return siblings(FriendshipPivot.leftIDKey, FriendshipPivot.rightIDKey)
+    }
+    
     func encryptPassword() throws -> User {
         password = try BCrypt.hash(password)
         return self
@@ -101,5 +105,17 @@ extension User {
     
     static func makeQueryFuture(using ids: [User.ID], on conn: DatabaseConnectable) -> Future<[User]> {
         return User.query(on: conn).filter(.make(\User.id, .in, ids)).all()
+    }
+}
+
+// TODO: To be removed (Only used for attaching friends because they are the same type)
+extension Siblings
+    where Through: ModifiablePivot, Through.Left == Base, Through.Right == Related, Through.Left == Through.Right, Through.Database: QuerySupporting
+{
+    func attachSameType(_ model: Related, on conn: DatabaseConnectable) -> Future<Through> {
+        return Future.flatMap(on: conn) {
+            let pivot = try Through(self.base, model)
+            return pivot.save(on: conn)
+        }
     }
 }
