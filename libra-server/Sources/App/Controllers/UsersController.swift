@@ -25,7 +25,7 @@ final class UsersController: RouteCollection {
         let friendsGroup = tokenProtected.grouped(User.parameter, "friends")
         friendsGroup.get(use: getAllFriendsHandler)
         friendsGroup.get(User.parameter, use: getOneFriendHandler)
-        friendsGroup.post(User.parameter, use: addFriendHandler)
+        friendsGroup.post(use: addFriendHandler)
         friendsGroup.delete(User.parameter, use: removeFriendHandler)
     }
 }
@@ -62,6 +62,7 @@ private extension UsersController {
         let key = try req.query.get(String.self, at: "search")
         
         // TODO: Create a function ([User]) -> [User.Public]
+        // TODO: Improve filters
         return User.query(on: req).group(.or) { orGroup in
             orGroup.filter(.make(\.firstName, .like, [key]))
             orGroup.filter(.make(\.lastName, .like, [key]))
@@ -79,25 +80,40 @@ private extension UsersController {
     
     func getOneFriendHandler(_ req: Request) throws -> Future<User.Public> {
         let user = try req.requireAuthenticated(User.self)
+        _ = try req.parameters.next(User.self) // TODO: Use this for verify authenticated user
         
         // TODO: Rewrite this return statement as a method
-        return try req.parameters.next(User.self).flatMap(to: User?.self) { friend in
-            return try user.friends.query(on: req).filter(.make(\User.id, .in, [friend.requireID()])).first()
-        }.map(to: User.Public.self) { result in
-            guard let unwrappedResult = result else { throw Abort(.notFound) }
-            
-            return unwrappedResult.makePublic()
+        return try req.parameters.next(User.self).flatMap(to: User.Public.self) { friend in
+            return user.friends.isAttached(friend, on: req).map(to: User.Public.self) { isFriend in
+                guard isFriend else {
+                    throw Abort(.notFound)
+                }
+                
+                return friend.makePublic()
+            }
         }
     }
     
     func addFriendHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let user = try req.requireAuthenticated(User.self)
         
+        // TODO: Move it to other file
+        struct AddFriendBody: Decodable {
+            let friendID: User.ID
+        }
+        
         // TODO: Rewrite this return statement as a method
-        return try req.parameters.next(User.self).flatMap(to: HTTPStatus.self) { friend in
-            return try user.friends.query(on: req).filter(.make(\User.id, .in, [friend.requireID()])).first().flatMap(to: HTTPStatus.self) { result in
+        // TODO: Use `isAttached`
+        return try req.content.decode(AddFriendBody.self).flatMap(to: HTTPStatus.self) { body in
+            return try user.friends.query(on: req).filter(.make(\User.id, .in, [body.friendID])).first().flatMap(to: HTTPStatus.self) { result in
                 if result == nil {
-                    return user.friends.attachSameType(friend, on: req).transform(to: .created)
+                    return User.query(on: req).filter(.make(\.id, .in, [body.friendID])).first().flatMap(to: HTTPStatus.self) { friend in
+                        guard let unwrappedFriend = friend else {
+                            throw Abort(.badRequest)
+                        }
+                        
+                        return user.friends.attachSameType(unwrappedFriend, on: req).transform(to: .created)
+                    }
                 } else {
                     throw Abort(.created)
                 }
@@ -107,8 +123,10 @@ private extension UsersController {
     
     func removeFriendHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let user = try req.requireAuthenticated(User.self)
+        _ = try req.parameters.next(User.self) // TODO: Use this for verify authenticated user
         
         // TODO: Rewrite this return statement as a method
+        // TODO: Use `isAttached`
         return try req.parameters.next(User.self).flatMap(to: User?.self) { friend in
             return try user.friends.query(on: req).filter(.make(\User.id, .in, [friend.requireID()])).first()
         }.flatMap(to: HTTPStatus.self) { result in
