@@ -19,6 +19,12 @@ extension Future where T: User {
             return self
         }
     }
+    
+    func makeAllFriends(on conn: DatabaseConnectable) throws -> Future<[User]> {
+        return flatMap { user in
+            return try user.makeAllFriendsFuture(on: conn)
+        }
+    }
 }
 
 extension Future where T == [User] {
@@ -37,7 +43,7 @@ extension Future where T: Record {
     
     func makeDetachAllCompanions(on conn: DatabaseConnectable) -> Future<Void> {
         return flatMap { record in
-            return record.companions.detachAll(on: conn)
+            return record.makeDetachAllCompanionsFuture(on: conn)
         }
     }
     

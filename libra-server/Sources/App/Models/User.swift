@@ -66,12 +66,20 @@ extension User: TokenAuthenticatable {
 
 // MARK: - Helpers
 extension User {
-    var records: Children<User, Record> {
+    private var records: Children<User, Record> {
         return children(\.creatorID)
     }
     
-    var friends: Siblings<User, User, FriendshipPivot> {
+    private var friends: Siblings<User, User, FriendshipPivot> {
         return siblings(FriendshipPivot.leftIDKey, FriendshipPivot.rightIDKey)
+    }
+    
+    static func makeQueryFuture(using ids: [User.ID], on conn: DatabaseConnectable) -> Future<[User]> {
+        return User.query(on: conn).filter(.make(\.id, .in, ids)).all()
+    }
+    
+    static func makeSingleQueryFuture(using id: User.ID, on conn: DatabaseConnectable) -> Future<User?> {
+        return User.query(on: conn).filter(.make(\.id, .in, [id])).first()
     }
     
     func encryptPassword() throws -> User {
@@ -103,8 +111,24 @@ extension User {
         }
     }
     
-    static func makeQueryFuture(using ids: [User.ID], on conn: DatabaseConnectable) -> Future<[User]> {
-        return User.query(on: conn).filter(.make(\User.id, .in, ids)).all()
+    func makeAllRecordsFuture(on conn: DatabaseConnectable) throws -> Future<[Record]> {
+        return try records.query(on: conn).all()
+    }
+    
+    func makeAllFriendsFuture(on conn: DatabaseConnectable) throws -> Future<[User]> {
+        return try friends.query(on: conn).all()
+    }
+    
+    func makeHasFriendshipFuture(with person: User, on conn: DatabaseConnectable) -> Future<Bool> {
+        return friends.isAttached(person, on: conn)
+    }
+    
+    func makeAddFriendshipFuture(to person: User, on conn: DatabaseConnectable) -> Future<HTTPStatus> {
+        return friends.attachSameType(person, on: conn).transform(to: .created)
+    }
+    
+    func makeRemoveFriendshipFuture(to person: User, on conn: DatabaseConnectable) -> Future<HTTPStatus> {
+        return friends.detach(person, on: conn).transform(to: .noContent)
     }
 }
 

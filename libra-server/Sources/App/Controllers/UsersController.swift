@@ -60,7 +60,7 @@ private extension UsersController {
 
     func searchHandler(_ req: Request) throws -> Future<[User.Public]> {
         let key = try req.query.get(String.self, at: "q")
-        let keyWithWildcard = "%\(key)%"
+        let keyWithWildcard = "%\(key)%" // https://www.tutorialspoint.com/postgresql/postgresql_like_clause.htm
         
         return User.query(on: req).group(.or) { orGroup in
             orGroup.filter(.make(\.firstName, .like, [keyWithWildcard]))
@@ -72,22 +72,19 @@ private extension UsersController {
     func getAllFriendsHandler(_ req: Request) throws -> Future<[User.Public]> {
         let authedUser = try req.requireAuthenticated(User.self)
         
-        return try req.parameters.next(User.self).validate(authedUser: authedUser).flatMap(to: [User.Public].self) { user in
-            return try user.friends.query(on: req).all().makePublics()
-        }
+        return try req.parameters.next(User.self).validate(authedUser: authedUser).makeAllFriends(on: req).makePublics()
     }
     
     func getOneFriendHandler(_ req: Request) throws -> Future<User.Public> {
         let authedUser = try req.requireAuthenticated(User.self)
         let userParametersFuture = try req.parameters.next(User.self).validate(authedUser: authedUser)
-        let friendParametersFuture = try req.parameters.next(User.self)
+        let personParametersFuture = try req.parameters.next(User.self)
         
-        // TODO: Rewrite this return statement as a method
-        return flatMap(to: User.Public.self, userParametersFuture, friendParametersFuture) { user, friend in
-            return user.friends.isAttached(friend, on: req).map(to: User.Public.self) { isFriend in
+        return flatMap(to: User.Public.self, userParametersFuture, personParametersFuture) { user, person in
+            return user.makeHasFriendshipFuture(with: person, on: req).map(to: User.Public.self) { isFriend in
                 guard isFriend else { throw Abort(.notFound) }
                 
-                return friend.makePublic()
+                return person.makePublic()
             }
         }
     }
@@ -95,25 +92,15 @@ private extension UsersController {
     func addFriendHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let authedUser = try req.requireAuthenticated(User.self)
         let userParametersFuture = try req.parameters.next(User.self).validate(authedUser: authedUser)
-        
-        // TODO: Move it to other file
-        struct AddFriendBody: Decodable {
-            enum CodingKeys: String, CodingKey {
-                case friendID = "friend_id"
-            }
-            
-            let friendID: User.ID
+        let queryPersonFuture = try req.content.decode(AddFriendBody.self).flatMap(to: User?.self) { body in
+            return User.makeSingleQueryFuture(using: body.userID, on: req)
         }
         
-        let queryFriendFuture = try req.content.decode(AddFriendBody.self).flatMap(to: User?.self) { body in
-            return User.query(on: req).filter(.make(\.id, .in, [body.friendID])).first()
-        }
-        
-        return flatMap(to: HTTPStatus.self, userParametersFuture, queryFriendFuture) { user, friend in
-            guard let unwrappedFriend = friend else { throw Abort(.badRequest) }
+        return flatMap(to: HTTPStatus.self, userParametersFuture, queryPersonFuture) { user, person in
+            guard let unwrappedPerson = person else { throw Abort(.badRequest) }
             
-            return user.friends.isAttached(unwrappedFriend, on: req).flatMap(to: HTTPStatus.self) { isFriend in
-                guard isFriend else { return user.friends.attachSameType(unwrappedFriend, on: req).transform(to: .created) }
+            return user.makeHasFriendshipFuture(with: unwrappedPerson, on: req).flatMap(to: HTTPStatus.self) { isFriend in
+                guard isFriend else { return user.makeAddFriendshipFuture(to: unwrappedPerson, on: req) }
                 
                 throw Abort(.created)
             }
@@ -123,13 +110,13 @@ private extension UsersController {
     func removeFriendHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let authedUser = try req.requireAuthenticated(User.self)
         let userParametersFuture = try req.parameters.next(User.self).validate(authedUser: authedUser)
-        let friendParametersFuture = try req.parameters.next(User.self)
+        let personParametersFuture = try req.parameters.next(User.self)
         
-        return flatMap(to: HTTPStatus.self, userParametersFuture, friendParametersFuture) { user, friend in
-            return user.friends.isAttached(friend, on: req).flatMap(to: HTTPStatus.self) { isFriend in
+        return flatMap(to: HTTPStatus.self, userParametersFuture, personParametersFuture) { user, person in
+            return user.makeHasFriendshipFuture(with: person, on: req).flatMap(to: HTTPStatus.self) { isFriend in
                 guard isFriend else { throw Abort(.noContent) }
                 
-                return user.friends.detach(friend, on: req).transform(to: .noContent)
+                return user.makeRemoveFriendshipFuture(to: person, on: req)
             }
         }
     }

@@ -55,11 +55,11 @@ extension Record: Parameter {}
 
 // MARK: - Helpers
 extension Record {
-    var creator: Parent<Record, User> {
+    private var creator: Parent<Record, User> {
         return parent(\.creatorID)
     }
     
-    var companions: Siblings<Record, User, RecordCompanionPivot> {
+    private var companions: Siblings<Record, User, RecordCompanionPivot> {
         return siblings()
     }
     
@@ -91,5 +91,9 @@ extension Record {
         }.flatMap(to: Record.Intact.self, on: conn) { _ in
             return try self.makeIntactFuture(on: conn)
         }
+    }
+    
+    func makeDetachAllCompanionsFuture(on conn: DatabaseConnectable) -> Future<Void> {
+        return companions.detachAll(on: conn)
     }
 }

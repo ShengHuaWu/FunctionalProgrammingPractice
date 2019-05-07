@@ -17,7 +17,7 @@ final class RecordsController: RouteCollection {
 private extension RecordsController {
     func getAllFromUserHandler(_ req: Request) throws -> Future<[Record]> {
         // TODO: Return intact records
-        return try req.requireAuthenticated(User.self).records.query(on: req).all()
+        return try req.requireAuthenticated(User.self).makeAllRecordsFuture(on: req)
     }
     
     func getOneHandler(_ req: Request) throws -> Future<Record.Intact> {
