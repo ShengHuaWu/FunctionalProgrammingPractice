@@ -21,6 +21,12 @@ extension Future where T: User {
     }
 }
 
+extension Future where T == [User] {
+    func makePublics() -> Future<[User.Public]> {
+        return map { $0.map { $0.makePublic() } }
+    }
+}
+
 // MARK: - Record Helpers
 extension Future where T: Record {
     func makeIntact(on conn: DatabaseConnectable) throws -> Future<Record.Intact> {

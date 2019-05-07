@@ -59,35 +59,33 @@ private extension UsersController {
     }
 
     func searchHandler(_ req: Request) throws -> Future<[User.Public]> {
-        let key = try req.query.get(String.self, at: "search")
+        let key = try req.query.get(String.self, at: "q")
+        let keyWithWildcard = "%\(key)%"
         
-        // TODO: Create a function ([User]) -> [User.Public]
-        // TODO: Improve filters
         return User.query(on: req).group(.or) { orGroup in
-            orGroup.filter(.make(\.firstName, .like, [key]))
-            orGroup.filter(.make(\.lastName, .like, [key]))
-            orGroup.filter(.make(\.email, .like, [key]))
-        }.all().map { $0.map { $0.makePublic() } }
+            orGroup.filter(.make(\.firstName, .like, [keyWithWildcard]))
+            orGroup.filter(.make(\.lastName, .like, [keyWithWildcard]))
+            orGroup.filter(.make(\.email, .like, [keyWithWildcard]))
+        }.all().makePublics()
     }
     
-    // TODO: Verify authenticated user and user parameter
     func getAllFriendsHandler(_ req: Request) throws -> Future<[User.Public]> {
-        let user = try req.requireAuthenticated(User.self)
+        let authedUser = try req.requireAuthenticated(User.self)
         
-        // TODO: Create a function ([User]) -> [User.Public]
-        return try user.friends.query(on: req).all().map { $0.map { $0.makePublic() } }
+        return try req.parameters.next(User.self).validate(authedUser: authedUser).flatMap(to: [User.Public].self) { user in
+            return try user.friends.query(on: req).all().makePublics()
+        }
     }
     
     func getOneFriendHandler(_ req: Request) throws -> Future<User.Public> {
-        let user = try req.requireAuthenticated(User.self)
-        _ = try req.parameters.next(User.self) // TODO: Use this for verify authenticated user
+        let authedUser = try req.requireAuthenticated(User.self)
+        let userParametersFuture = try req.parameters.next(User.self).validate(authedUser: authedUser)
+        let friendParametersFuture = try req.parameters.next(User.self)
         
         // TODO: Rewrite this return statement as a method
-        return try req.parameters.next(User.self).flatMap(to: User.Public.self) { friend in
+        return flatMap(to: User.Public.self, userParametersFuture, friendParametersFuture) { user, friend in
             return user.friends.isAttached(friend, on: req).map(to: User.Public.self) { isFriend in
-                guard isFriend else {
-                    throw Abort(.notFound)
-                }
+                guard isFriend else { throw Abort(.notFound) }
                 
                 return friend.makePublic()
             }
@@ -95,46 +93,44 @@ private extension UsersController {
     }
     
     func addFriendHandler(_ req: Request) throws -> Future<HTTPStatus> {
-        let user = try req.requireAuthenticated(User.self)
+        let authedUser = try req.requireAuthenticated(User.self)
+        let userParametersFuture = try req.parameters.next(User.self).validate(authedUser: authedUser)
         
         // TODO: Move it to other file
         struct AddFriendBody: Decodable {
+            enum CodingKeys: String, CodingKey {
+                case friendID = "friend_id"
+            }
+            
             let friendID: User.ID
         }
         
-        // TODO: Rewrite this return statement as a method
-        // TODO: Use `isAttached`
-        return try req.content.decode(AddFriendBody.self).flatMap(to: HTTPStatus.self) { body in
-            return try user.friends.query(on: req).filter(.make(\User.id, .in, [body.friendID])).first().flatMap(to: HTTPStatus.self) { result in
-                if result == nil {
-                    return User.query(on: req).filter(.make(\.id, .in, [body.friendID])).first().flatMap(to: HTTPStatus.self) { friend in
-                        guard let unwrappedFriend = friend else {
-                            throw Abort(.badRequest)
-                        }
-                        
-                        return user.friends.attachSameType(unwrappedFriend, on: req).transform(to: .created)
-                    }
-                } else {
-                    throw Abort(.created)
-                }
+        let queryFriendFuture = try req.content.decode(AddFriendBody.self).flatMap(to: User?.self) { body in
+            return User.query(on: req).filter(.make(\.id, .in, [body.friendID])).first()
+        }
+        
+        return flatMap(to: HTTPStatus.self, userParametersFuture, queryFriendFuture) { user, friend in
+            guard let unwrappedFriend = friend else { throw Abort(.badRequest) }
+            
+            return user.friends.isAttached(unwrappedFriend, on: req).flatMap(to: HTTPStatus.self) { isFriend in
+                guard isFriend else { return user.friends.attachSameType(unwrappedFriend, on: req).transform(to: .created) }
+                
+                throw Abort(.created)
             }
         }
     }
     
     func removeFriendHandler(_ req: Request) throws -> Future<HTTPStatus> {
-        let user = try req.requireAuthenticated(User.self)
-        _ = try req.parameters.next(User.self) // TODO: Use this for verify authenticated user
+        let authedUser = try req.requireAuthenticated(User.self)
+        let userParametersFuture = try req.parameters.next(User.self).validate(authedUser: authedUser)
+        let friendParametersFuture = try req.parameters.next(User.self)
         
-        // TODO: Rewrite this return statement as a method
-        // TODO: Use `isAttached`
-        return try req.parameters.next(User.self).flatMap(to: User?.self) { friend in
-            return try user.friends.query(on: req).filter(.make(\User.id, .in, [friend.requireID()])).first()
-        }.flatMap(to: HTTPStatus.self) { result in
-            guard let unwrappedResult = result else {
-                throw Abort(.noContent)
+        return flatMap(to: HTTPStatus.self, userParametersFuture, friendParametersFuture) { user, friend in
+            return user.friends.isAttached(friend, on: req).flatMap(to: HTTPStatus.self) { isFriend in
+                guard isFriend else { throw Abort(.noContent) }
+                
+                return user.friends.detach(friend, on: req).transform(to: .noContent)
             }
-            
-            return user.friends.detach(unwrappedResult, on: req).transform(to: .noContent)
         }
     }
 }
