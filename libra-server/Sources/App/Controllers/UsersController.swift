@@ -60,13 +60,9 @@ private extension UsersController {
 
     func searchHandler(_ req: Request) throws -> Future<[User.Public]> {
         let key = try req.query.get(String.self, at: "q")
-        let keyWithWildcard = "%\(key)%" // https://www.tutorialspoint.com/postgresql/postgresql_like_clause.htm
-        
-        return User.query(on: req).group(.or) { orGroup in
-            orGroup.filter(.make(\.firstName, .like, [keyWithWildcard]))
-            orGroup.filter(.make(\.lastName, .like, [keyWithWildcard]))
-            orGroup.filter(.make(\.email, .like, [keyWithWildcard]))
-        }.all().makePublics()
+
+        // Wildcards: https://www.tutorialspoint.com/postgresql/postgresql_like_clause.htm
+        return User.makeSearchQueryFuture(using: "%\(key)%", on: req).makePublics()
     }
     
     func getAllFriendsHandler(_ req: Request) throws -> Future<[User.Public]> {

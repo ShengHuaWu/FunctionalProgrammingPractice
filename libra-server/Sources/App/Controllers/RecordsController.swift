@@ -15,9 +15,8 @@ final class RecordsController: RouteCollection {
 }
 
 private extension RecordsController {
-    func getAllFromUserHandler(_ req: Request) throws -> Future<[Record]> {
-        // TODO: Return intact records
-        return try req.requireAuthenticated(User.self).makeAllRecordsFuture(on: req)
+    func getAllFromUserHandler(_ req: Request) throws -> Future<[Record.Intact]> {
+        return try req.requireAuthenticated(User.self).makeAllRecordsFuture(on: req).makeIntacts(on: req)
     }
     
     func getOneHandler(_ req: Request) throws -> Future<Record.Intact> {
@@ -32,7 +31,7 @@ private extension RecordsController {
         let companionsFuture = bodyFuture.makeQueuyCompanions(on: req)
         
         return flatMap(to: Record.Intact.self, recordFuture, companionsFuture) { record, companions in
-            return try record.makeAttachCompanionsFuture(companions, on: req)
+            return try record.makeAddCompanionsFuture(companions, on: req)
         }
     }
     
@@ -42,11 +41,11 @@ private extension RecordsController {
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
         
         return flatMap(to: Record.Intact.self, recordFuture, bodyFuture) { record, body in
-            let updateRecordFuture = record.update(with: body).save(on: req).makeDetachAllCompanions(on: req)
+            let updateRecordFuture = record.update(with: body).save(on: req).makeRemoveAllCompanions(on: req)
             let companionsFuture = User.makeQueryFuture(using: body.companionIDs, on: req)
             
             return flatMap(to: Record.Intact.self, updateRecordFuture, companionsFuture) { _, companions in
-                return try record.makeAttachCompanionsFuture(companions, on: req)
+                return try record.makeAddCompanionsFuture(companions, on: req)
             }
         }
     }

@@ -82,6 +82,14 @@ extension User {
         return User.query(on: conn).filter(.make(\.id, .in, [id])).first()
     }
     
+    static func makeSearchQueryFuture(using key: String, on conn: DatabaseConnectable) -> Future<[User]> {
+        return User.query(on: conn).group(.or) { orGroup in
+            orGroup.filter(.make(\.firstName, .like, [key]))
+            orGroup.filter(.make(\.lastName, .like, [key]))
+            orGroup.filter(.make(\.email, .like, [key]))
+        }.all()
+    }
+    
     func encryptPassword() throws -> User {
         password = try BCrypt.hash(password)
         return self

@@ -85,7 +85,7 @@ extension Record {
         }
     }
     
-    func makeAttachCompanionsFuture(_ companions: [User], on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
+    func makeAddCompanionsFuture(_ companions: [User], on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
         return companions.map { companion in
             return self.companions.attach(companion, on: conn)
         }.flatMap(to: Record.Intact.self, on: conn) { _ in
@@ -93,7 +93,7 @@ extension Record {
         }
     }
     
-    func makeDetachAllCompanionsFuture(on conn: DatabaseConnectable) -> Future<Void> {
+    func makeRemoveAllCompanionsFuture(on conn: DatabaseConnectable) -> Future<Void> {
         return companions.detachAll(on: conn)
     }
 }

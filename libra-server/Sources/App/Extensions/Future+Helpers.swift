@@ -41,9 +41,9 @@ extension Future where T: Record {
         }
     }
     
-    func makeDetachAllCompanions(on conn: DatabaseConnectable) -> Future<Void> {
+    func makeRemoveAllCompanions(on conn: DatabaseConnectable) -> Future<Void> {
         return flatMap { record in
-            return record.makeDetachAllCompanionsFuture(on: conn)
+            return record.makeRemoveAllCompanionsFuture(on: conn)
         }
     }
     
@@ -54,6 +54,14 @@ extension Future where T: Record {
             }
             
             return self
+        }
+    }
+}
+
+extension Future where T == [Record] {
+    func makeIntacts(on conn: DatabaseConnectable) throws -> Future<[Record.Intact]> {
+        return flatMap { records in
+            return try records.map { try $0.makeIntactFuture(on: conn) }.flatten(on: conn)
         }
     }
 }
