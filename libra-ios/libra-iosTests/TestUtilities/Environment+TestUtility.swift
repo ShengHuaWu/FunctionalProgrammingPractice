@@ -17,7 +17,8 @@ extension WebService {
         getRecord: { _ in return .empty },
         createRecord: { _ in return .empty },
         updateRecord: { _ in return .empty },
-        deleteRecord: { _ in return .empty })
+        deleteRecord: { _ in return .empty },
+        searchUsers: { _ in return .empty })
 }
 
 extension Storage {

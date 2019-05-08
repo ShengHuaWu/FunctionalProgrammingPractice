@@ -402,4 +402,49 @@ class WebServiceTests: XCTestCase {
             }
         }
     }
+    
+    func testThatSearchUsersReturnsUsersIfSuccess() {
+        urlSessionInterface.expectedEntity = [user]
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        webService.searchUsers("sh").waitAndAssert(on: self) { result in
+            switch result {
+            case .success(let entity):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(entity.count, 1)
+                XCTAssertEqual(entity.first?.id, self.user.id)
+            case .failure:
+                XCTFail("Search users should succeed")
+            }
+        }
+    }
+    
+    func testThatSearchUsersReturnsNetworkErrorIfFailure() {
+        urlSessionInterface.expectedError = .badRequest
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        webService.searchUsers("sh").waitAndAssert(on: self) { result in
+            switch result {
+            case .success:
+                XCTFail("Search users should fail")
+            case .failure(let error):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(error, .badRequest)
+            }
+        }
+    }
 }

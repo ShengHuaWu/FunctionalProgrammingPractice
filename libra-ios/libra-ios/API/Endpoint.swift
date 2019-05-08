@@ -6,6 +6,7 @@ enum Endpoint {
     case user(id: Int)
     case records
     case record(id: Int)
+    case search(key: String)
 }
 
 extension Endpoint {
@@ -21,6 +22,24 @@ extension Endpoint {
         case .user(let id): return baseURL.appendingPathComponent("users/\(id)")
         case .records: return baseURL.appendingPathComponent("records")
         case .record(let id): return baseURL.appendingPathComponent("records/\(id)")
+        case .search(let key): return baseURL.appendingPathComponent("users/search").appending(queryItems: [URLQueryItem(name: "q", value: key)])
         }
+    }
+}
+
+// MARK: - Helpers
+private extension URL {
+    func appending(queryItems: [URLQueryItem]) -> URL {
+        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+            preconditionFailure("Unable to create url components from \(absoluteString)")
+        }
+        
+        components.queryItems = queryItems
+        
+        guard let url = components.url else {
+            preconditionFailure("Unable to generate url from query items")
+        }
+        
+        return url
     }
 }
