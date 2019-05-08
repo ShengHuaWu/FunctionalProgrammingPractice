@@ -1,6 +1,6 @@
 import Foundation
 
-struct CreateOrUpdateRecordParameters: Encodable {
+struct RecordParameters: Encodable {
     enum CodingKeys: String, CodingKey {
         case title
         case note
@@ -11,7 +11,7 @@ struct CreateOrUpdateRecordParameters: Encodable {
         case companionIDs = "companion_ids"
     }
     
-    let id: Int?
+    let id: Int? // For create record, this property is ignored so just set it to `nil`
     let title: String
     let note: String
     let date: Date

@@ -9,6 +9,7 @@ enum NetworkError: Error {
     case notFound
     case clientError(reason: String?)
     case serverError
+    case missingToken
 }
 
 extension NetworkError: Equatable {}

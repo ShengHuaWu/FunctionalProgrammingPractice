@@ -19,7 +19,7 @@ struct Record: Decodable {
     let amount: Double
     private let _currency: String
     private let _mood: String
-    let companions: [Companion]? // TODO: Remove optional after server update
+    let companions: [Companion]
     
     var currency: Currency {
         return Currency(rawValue: _currency) ?? .unknown
@@ -29,7 +29,7 @@ struct Record: Decodable {
         return Mood(rawValue: _mood) ?? .unknown
     }
     
-    init(id: Int, title: String, note: String, date: Date, amount: Double, currency: Currency, mood: Mood, companions: [Companion]? = nil) {
+    init(id: Int, title: String, note: String, date: Date, amount: Double, currency: Currency, mood: Mood, companions: [Companion]) {
         self.id = id
         self.title = title
         self.note = note

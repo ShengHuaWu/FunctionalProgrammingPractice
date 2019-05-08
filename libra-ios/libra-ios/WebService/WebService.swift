@@ -46,11 +46,11 @@ private func getRecord(with id: Int) -> Future<Result<Record, NetworkError>> {
     return sendTokenAuthenticatedRequest(to: .record(id: id), method: .get)
 }
 
-private func createRecord(with parameters: CreateOrUpdateRecordParameters) -> Future<Result<Record, NetworkError>> {
+private func createRecord(with parameters: RecordParameters) -> Future<Result<Record, NetworkError>> {
     return sendTokenAuthenticatdRequest(to: .records, method: .post, parameters: parameters)
 }
 
-private func updateRecord(with parameters: CreateOrUpdateRecordParameters) -> Future<Result<Record, NetworkError>> {
+private func updateRecord(with parameters: RecordParameters) -> Future<Result<Record, NetworkError>> {
     guard let id = parameters.id else {
         return Future { callback in
             callback(.failure(.badRequest))
@@ -72,16 +72,16 @@ private func getAllFriends(for userID: Int) -> Future<Result<[User], NetworkErro
     return sendTokenAuthenticatedRequest(to: .friends(userID: userID), method: .get)
 }
 
-private func addFriendship(with parameters: AddFriendshipParameters) -> Future<Result<SuccessResponse, NetworkError>> {
+private func addFriendship(with parameters: FriendshipParameters) -> Future<Result<SuccessResponse, NetworkError>> {
     return sendTokenAuthenticatdRequest(to: .friends(userID: parameters.userID), method: .post, parameters: parameters)
 }
 
-private func getFriend(with parameters: GetFriendParameters) -> Future<Result<User, NetworkError>> {
-    return sendTokenAuthenticatedRequest(to: .friend(userID: parameters.userID, friendID: parameters.friendID), method: .get)
+private func getFriend(with parameters: FriendshipParameters) -> Future<Result<User, NetworkError>> {
+    return sendTokenAuthenticatedRequest(to: .friend(userID: parameters.userID, friendID: parameters.personID), method: .get)
 }
 
-private func removeFriendship(with parameters: RemoveFriendshipParameters) -> Future<Result<SuccessResponse, NetworkError>> {
-    return sendTokenAuthenticatedRequest(to: .friend(userID: parameters.userID, friendID: parameters.friendID), method: .delete)
+private func removeFriendship(with parameters: FriendshipParameters) -> Future<Result<SuccessResponse, NetworkError>> {
+    return sendTokenAuthenticatedRequest(to: .friend(userID: parameters.userID, friendID: parameters.personID), method: .delete)
 }
 
 // MARK: - Helpers
@@ -98,7 +98,7 @@ private func sendTokenAuthenticatedRequest<Entity>(to endpoint: Endpoint, method
             >>> send
     } catch {
         return Future { callback in
-            callback(.failure(.failure(mesage: "Unable to fetch token")))
+            callback(.failure(.missingToken))
         }
     }
 }
@@ -112,7 +112,7 @@ private func sendTokenAuthenticatdRequest<Entity, Parameters>(to endpoint: Endpo
             >>> send
     } catch {
         return Future { callback in
-            callback(.failure(.failure(mesage: "Unable to fetch token")))
+            callback(.failure(.missingToken))
         }
     }
 }
