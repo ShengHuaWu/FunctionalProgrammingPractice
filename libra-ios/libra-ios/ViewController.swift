@@ -27,11 +27,5 @@ class ViewController: UIViewController {
                 print(result)
             }
         }*/
-        
-        Current.webService.searchUsers("sh").run { result in
-            DispatchQueue.main.async {
-                print(result)
-            }
-        }
     }
 }

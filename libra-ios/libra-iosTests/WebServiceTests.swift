@@ -447,4 +447,187 @@ class WebServiceTests: XCTestCase {
             }
         }
     }
+    
+    func testThatGetAllFriendsReturnsUsersIfSuccess() {
+        urlSessionInterface.expectedEntity = [user]
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        webService.getAllFriends(999).waitAndAssert(on: self) { result in
+            switch result {
+            case .success(let entity):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(entity.count, 1)
+                XCTAssertEqual(entity.first?.id, self.user.id)
+            case .failure:
+                XCTFail("Get all friends should succeed")
+            }
+        }
+    }
+    
+    func testThatGetAllFriendsReturnsNetworkErrorIfFailure() {
+        urlSessionInterface.expectedError = .badRequest
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        webService.getAllFriends(999).waitAndAssert(on: self) { result in
+            switch result {
+            case .success:
+                XCTFail("Get all friends should fail")
+            case .failure(let error):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(error, .badRequest)
+            }
+        }
+    }
+    
+    func testThatAddFriendshipReturnsSuccessRepsonseIfSuccess() {
+        urlSessionInterface.expectedEntity = SuccessResponse()
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        let parameters = AddFriendshipParameters(userID: user.id, personID: user.id)
+        webService.addFriendship(parameters).waitAndAssert(on: self) { result in
+            switch result {
+            case .success(let entity):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertTrue(entity.success)
+            case .failure:
+                XCTFail("Add friendship should succeed")
+            }
+        }
+    }
+    
+    func testThatAddFriendshipReturnsNetworkErrorIfFailure() {
+        urlSessionInterface.expectedError = .badRequest
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        let parameters = AddFriendshipParameters(userID: user.id, personID: user.id)
+        webService.addFriendship(parameters).waitAndAssert(on: self) { result in
+            switch result {
+            case .success:
+                XCTFail("Add friendship should fail")
+            case .failure(let error):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(error, .badRequest)
+            }
+        }
+    }
+    
+    func testThatGetFriendReturnsUserIfSuccess() {
+        urlSessionInterface.expectedEntity = user
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        let parameters = GetFriendParameters(userID: user.id, friendID: user.id)
+        webService.getFriend(parameters).waitAndAssert(on: self) { result in
+            switch result {
+            case .success(let entity):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(entity.id, self.user.id)
+            case .failure:
+                XCTFail("Get friend should succeed")
+            }
+        }
+    }
+    
+    func testThatGetFriendReturnsNetworkIfFailure() {
+        urlSessionInterface.expectedError = .badRequest
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        let parameters = GetFriendParameters(userID: user.id, friendID: user.id)
+        webService.getFriend(parameters).waitAndAssert(on: self) { result in
+            switch result {
+            case .success:
+                XCTFail("Get friend should fail")
+            case .failure(let error):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(error, .badRequest)
+            }
+        }
+    }
+    
+    func testThatRemoveFriendshipReturnsSuccessResponseIfSuccess() {
+        urlSessionInterface.expectedEntity = SuccessResponse()
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        let parameters = RemoveFriendshipParameters(userID: user.id, friendID: user.id)
+        webService.removeFriendship(parameters).waitAndAssert(on: self) { result in
+            switch result {
+            case .success(let entity):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertTrue(entity.success)
+            case .failure:
+                XCTFail("Remove friendship should succeed")
+            }
+        }
+    }
+    
+    func testThatRemoveFriendshipReturnsNetworkErrorIfFailure() {
+        urlSessionInterface.expectedError = .badRequest
+        Current.urlSession = { return self.urlSessionInterface }
+        
+        var fetchTokenCallCount = 0
+        Current.storage.fetchToken = {
+            fetchTokenCallCount += 1
+            return "This is a token"
+        }
+        
+        let parameters = RemoveFriendshipParameters(userID: user.id, friendID: user.id)
+        webService.removeFriendship(parameters).waitAndAssert(on: self) { result in
+            switch result {
+            case .success:
+                XCTFail("Remove friendship should fail")
+            case .failure(let error):
+                XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
+                XCTAssertEqual(fetchTokenCallCount, 1)
+                XCTAssertEqual(error, .badRequest)
+            }
+        }
+    }
 }

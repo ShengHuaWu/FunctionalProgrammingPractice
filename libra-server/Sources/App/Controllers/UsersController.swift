@@ -89,7 +89,7 @@ private extension UsersController {
         let authedUser = try req.requireAuthenticated(User.self)
         let userParametersFuture = try req.parameters.next(User.self).validate(authedUser: authedUser)
         let queryPersonFuture = try req.content.decode(AddFriendBody.self).flatMap(to: User?.self) { body in
-            return User.makeSingleQueryFuture(using: body.userID, on: req)
+            return User.makeSingleQueryFuture(using: body.personID, on: req)
         }
         
         return flatMap(to: HTTPStatus.self, userParametersFuture, queryPersonFuture) { user, person in
@@ -98,7 +98,7 @@ private extension UsersController {
             return user.makeHasFriendshipFuture(with: unwrappedPerson, on: req).flatMap(to: HTTPStatus.self) { isFriend in
                 guard isFriend else { return user.makeAddFriendshipFuture(to: unwrappedPerson, on: req) }
                 
-                throw Abort(.created)
+                return Future.done(on: req).transform(to: .created)
             }
         }
     }
@@ -110,7 +110,7 @@ private extension UsersController {
         
         return flatMap(to: HTTPStatus.self, userParametersFuture, personParametersFuture) { user, person in
             return user.makeHasFriendshipFuture(with: person, on: req).flatMap(to: HTTPStatus.self) { isFriend in
-                guard isFriend else { throw Abort(.noContent) }
+                guard isFriend else { return Future.done(on: req).transform(to: .noContent) }
                 
                 return user.makeRemoveFriendshipFuture(to: person, on: req)
             }

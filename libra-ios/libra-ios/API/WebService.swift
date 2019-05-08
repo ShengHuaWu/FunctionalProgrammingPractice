@@ -6,11 +6,15 @@ struct WebService {
     var getUser = getUser(with:)
     var updateUser = updateUser(with:)
     var getRecords = getAllRecords
-    var getRecord = getRecords(with:)
+    var getRecord = getRecord(with:)
     var createRecord = createRecord(with:)
     var updateRecord = updateRecord(with:)
     var deleteRecord = deleteRecord(with:)
     var searchUsers = searchUsers(with:)
+    var getAllFriends = getAllFriends(for:)
+    var addFriendship = addFriendship(with:)
+    var getFriend = getFriend(with:)
+    var removeFriendship = removeFriendship(with:)
 }
 
 // MARK: - Private
@@ -38,7 +42,7 @@ private func getAllRecords() -> Future<Result<[Record], NetworkError>> {
     return sendTokenAuthenticatedRequest(to: .records, method: .get)
 }
 
-private func getRecords(with id: Int) -> Future<Result<Record, NetworkError>> {
+private func getRecord(with id: Int) -> Future<Result<Record, NetworkError>> {
     return sendTokenAuthenticatedRequest(to: .record(id: id), method: .get)
 }
 
@@ -62,6 +66,22 @@ private func deleteRecord(with id: Int) -> Future<Result<SuccessResponse, Networ
 
 private func searchUsers(with key: String) -> Future<Result<[User], NetworkError>> {
     return sendTokenAuthenticatedRequest(to: .search(key: key), method: .get)
+}
+
+private func getAllFriends(for userID: Int) -> Future<Result<[User], NetworkError>> {
+    return sendTokenAuthenticatedRequest(to: .friends(userID: userID), method: .get)
+}
+
+private func addFriendship(with parameters: AddFriendshipParameters) -> Future<Result<SuccessResponse, NetworkError>> {
+    return sendTokenAuthenticatdRequest(to: .friends(userID: parameters.userID), method: .post, parameters: parameters)
+}
+
+private func getFriend(with parameters: GetFriendParameters) -> Future<Result<User, NetworkError>> {
+    return sendTokenAuthenticatedRequest(to: .friend(userID: parameters.userID, friendID: parameters.friendID), method: .get)
+}
+
+private func removeFriendship(with parameters: RemoveFriendshipParameters) -> Future<Result<SuccessResponse, NetworkError>> {
+    return sendTokenAuthenticatedRequest(to: .friend(userID: parameters.userID, friendID: parameters.friendID), method: .delete)
 }
 
 // MARK: - Helpers

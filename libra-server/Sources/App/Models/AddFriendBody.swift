@@ -2,10 +2,10 @@ import Vapor
 
 struct AddFriendBody: Decodable {
     enum CodingKeys: String, CodingKey {
-        case userID = "user_id"
+        case personID = "person_id"
     }
     
-    let userID: User.ID
+    let personID: User.ID
 }
 
 // MARK: - Add Friend Body Content

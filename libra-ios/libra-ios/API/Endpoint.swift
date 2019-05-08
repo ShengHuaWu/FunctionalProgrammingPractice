@@ -7,6 +7,8 @@ enum Endpoint {
     case records
     case record(id: Int)
     case search(key: String)
+    case friends(userID: Int)
+    case friend(userID: Int, friendID: Int)
 }
 
 extension Endpoint {
@@ -23,6 +25,8 @@ extension Endpoint {
         case .records: return baseURL.appendingPathComponent("records")
         case .record(let id): return baseURL.appendingPathComponent("records/\(id)")
         case .search(let key): return baseURL.appendingPathComponent("users/search").appending(queryItems: [URLQueryItem(name: "q", value: key)])
+        case .friends(let userID): return baseURL.appendingPathComponent("users/\(userID)/friends")
+        case let .friend(userID, friendID): return baseURL.appendingPathComponent("users/\(userID)/friends/\(friendID)")
         }
     }
 }

@@ -18,7 +18,11 @@ extension WebService {
         createRecord: { _ in return .empty },
         updateRecord: { _ in return .empty },
         deleteRecord: { _ in return .empty },
-        searchUsers: { _ in return .empty })
+        searchUsers: { _ in return .empty },
+        getAllFriends: { _ in return .empty },
+        addFriendship: { _ in return .empty },
+        getFriend: { _ in return .empty },
+        removeFriendship: { _ in return .empty })
 }
 
 extension Storage {
