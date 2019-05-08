@@ -9,6 +9,7 @@ struct FakeParameter: Encodable {
     let value: String
 }
 
+// TODO: Test encoding & decoding date strategies
 class RequestTests: XCTestCase {
     let baseURL = URL(string: "https://libra.co")!
     let generalHeader = ["Content-Type": "application/json"]
@@ -16,7 +17,7 @@ class RequestTests: XCTestCase {
     
     func testThatMakeGetRequest() throws {
         let method = HTTPMethod.get
-        let request = Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader)
+        let request = Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader, dateDecodingStrategy: nil)
         XCTAssertEqual(request.urlRequest.url, baseURL)
         XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
         XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
@@ -30,7 +31,7 @@ class RequestTests: XCTestCase {
     func testThatMakePostRequest() throws {
         let method = HTTPMethod.post
         let parameter = FakeParameter(value: "libra-ios")
-        let request = Request<FakeModel>(url: baseURL, method: method, bodyParameters: parameter, headers: generalHeader)
+        let request = Request<FakeModel>(url: baseURL, method: method, bodyParameters: parameter, dateEncodingStrategy: nil, headers: generalHeader, dateDecodingStrategy: nil)
         XCTAssertEqual(request.urlRequest.url, baseURL)
         XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
         XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
@@ -44,7 +45,7 @@ class RequestTests: XCTestCase {
     func testThatMakePutRequest() throws {
         let method = HTTPMethod.put
         let parameter = FakeParameter(value: "libra-ios")
-        let request = Request<FakeModel>(url: baseURL, method: method, bodyParameters: parameter, headers: generalHeader)
+        let request = Request<FakeModel>(url: baseURL, method: method, bodyParameters: parameter, dateEncodingStrategy: nil, headers: generalHeader, dateDecodingStrategy: nil)
         XCTAssertEqual(request.urlRequest.url, baseURL)
         XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
         XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
@@ -57,7 +58,7 @@ class RequestTests: XCTestCase {
     
     func testThatMakeDeleteRequest() throws {
         let method = HTTPMethod.delete
-        let request = Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader)
+        let request = Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader, dateDecodingStrategy: nil)
         XCTAssertEqual(request.urlRequest.url, baseURL)
         XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
         XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)

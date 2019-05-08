@@ -31,7 +31,7 @@
 		D8498C702265D24F00FACD2E /* Environment+TestUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8498C6F2265D24F00FACD2E /* Environment+TestUtility.swift */; };
 		D84FBB60227847EC0099C70C /* Record.swift in Sources */ = {isa = PBXBuildFile; fileRef = D84FBB5F227847EC0099C70C /* Record.swift */; };
 		D88A0F532271F16300C959DD /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88A0F522271F16300C959DD /* Storage.swift */; };
-		D89075032264C9C700724B89 /* LoginParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89075022264C9C700724B89 /* LoginParameters.swift */; };
+		D89075032264C9C700724B89 /* LogInParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89075022264C9C700724B89 /* LogInParameters.swift */; };
 		D8AD3179227C296500D2E756 /* RecordParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8AD3178227C296500D2E756 /* RecordParameters.swift */; };
 		D8CD1E54227ADFF000BF324C /* Companion.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CD1E53227ADFF000BF324C /* Companion.swift */; };
 		D8DC5D8822661D7400EEC1C4 /* DataTaskResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8DC5D8722661D7400EEC1C4 /* DataTaskResponseHandler.swift */; };
@@ -85,7 +85,7 @@
 		D8498C6F2265D24F00FACD2E /* Environment+TestUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Environment+TestUtility.swift"; sourceTree = "<group>"; };
 		D84FBB5F227847EC0099C70C /* Record.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Record.swift; sourceTree = "<group>"; };
 		D88A0F522271F16300C959DD /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
-		D89075022264C9C700724B89 /* LoginParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginParameters.swift; sourceTree = "<group>"; };
+		D89075022264C9C700724B89 /* LogInParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInParameters.swift; sourceTree = "<group>"; };
 		D8AD3178227C296500D2E756 /* RecordParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordParameters.swift; sourceTree = "<group>"; };
 		D8CD1E53227ADFF000BF324C /* Companion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Companion.swift; sourceTree = "<group>"; };
 		D8DC5D8722661D7400EEC1C4 /* DataTaskResponseHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTaskResponseHandler.swift; sourceTree = "<group>"; };
@@ -192,7 +192,7 @@
 			isa = PBXGroup;
 			children = (
 				D821FA182264AECE003A3B63 /* SignUpParameters.swift */,
-				D89075022264C9C700724B89 /* LoginParameters.swift */,
+				D89075022264C9C700724B89 /* LogInParameters.swift */,
 				D8DD0BEA22773B9600CAC829 /* UpdateUserParameters.swift */,
 				D8AD3178227C296500D2E756 /* RecordParameters.swift */,
 				D8F9A892228305FD00E8532D /* FriendshipParameters.swift */,
@@ -414,7 +414,7 @@
 				D821FA112264A878003A3B63 /* Environment.swift in Sources */,
 				D808A92422733C0500172FF4 /* Caching.swift in Sources */,
 				D820525A225E22D000936BF9 /* HTTPMethod.swift in Sources */,
-				D89075032264C9C700724B89 /* LoginParameters.swift in Sources */,
+				D89075032264C9C700724B89 /* LogInParameters.swift in Sources */,
 				D8DC5D8822661D7400EEC1C4 /* DataTaskResponseHandler.swift in Sources */,
 				9BAB474121BD86F400AD54CA /* AppDelegate.swift in Sources */,
 				D8FBBE812260DA0D001AFB6A /* Future.swift in Sources */,

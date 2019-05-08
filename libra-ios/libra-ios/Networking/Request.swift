@@ -4,8 +4,7 @@ struct Request<Entity> where Entity: Decodable {
     let urlRequest: URLRequest
     let parse: (Data) throws -> Entity
     
-    // TODO: Extract date strategy
-    init(url: URL, method: HTTPMethod, headers: [String: String]? = nil) {
+    init(url: URL, method: HTTPMethod, headers: [String: String]?, dateDecodingStrategy: JSONDecoder.DateDecodingStrategy?) {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
         urlRequest.allHTTPHeaderFields = headers
@@ -13,18 +12,21 @@ struct Request<Entity> where Entity: Decodable {
         self.urlRequest = urlRequest
         self.parse = { data in
             let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
+            if let strategy = dateDecodingStrategy {
+                decoder.dateDecodingStrategy = strategy
+            }
             return try decoder.decode(Entity.self, from: data)
         }
     }
     
-    // TODO: Extract date strategy
-    init<Parameter>(url: URL, method: HTTPMethod, bodyParameters: Parameter, headers: [String: String]? = nil) where Parameter: Encodable {
+    init<Parameter>(url: URL, method: HTTPMethod, bodyParameters: Parameter, dateEncodingStrategy: JSONEncoder.DateEncodingStrategy?, headers: [String: String]?, dateDecodingStrategy: JSONDecoder.DateDecodingStrategy?) where Parameter: Encodable {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
         
         let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .millisecondsSince1970
+        if let strategy = dateEncodingStrategy {
+            encoder.dateEncodingStrategy = strategy
+        }
         guard let body = try? encoder.encode(bodyParameters) else {
             preconditionFailure("Unable to encode \(Parameter.self) to JSON")
         }
@@ -35,7 +37,9 @@ struct Request<Entity> where Entity: Decodable {
         self.urlRequest = urlRequest
         self.parse = { data in
             let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
+            if let strategy = dateDecodingStrategy {
+                decoder.dateDecodingStrategy = strategy
+            }
             return try decoder.decode(Entity.self, from: data)
         }
     }

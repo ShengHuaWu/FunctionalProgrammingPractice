@@ -10,7 +10,7 @@ class URLSessionHelpersTests: XCTestCase {
         super.setUp()
         
         session = PartialMockURLSession()
-        request = Request<SuccessResponse>(url: URL(string: "https://libra.co")!, method: .get)
+        request = Request<SuccessResponse>(url: URL(string: "https://libra.co")!, method: .get, headers: nil, dateDecodingStrategy: nil)
     }
     
     override func tearDown() {

@@ -9,7 +9,7 @@ class ViewController: UIViewController {
         
         // TODO: To be removed
         /*
-        let parameters = LoginParameters(username: "shengwu1", password: "12345678")
+        let parameters = LogInParameters(username: "shengwu1", password: "12345678")
         Current.webService.logIn(parameters).map { result -> Result<Void, Error> in
             do {
                 let user = try result.get()

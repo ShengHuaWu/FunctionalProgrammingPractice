@@ -59,7 +59,7 @@ class WebServiceUsersTests: XCTestCase {
         urlSessionInterface.expectedEntity = user
         Current.urlSession = { return self.urlSessionInterface }
         
-        let parameters = LoginParameters(username: user.username, password: "")
+        let parameters = LogInParameters(username: user.username, password: "")
         webService.logIn(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
@@ -75,7 +75,7 @@ class WebServiceUsersTests: XCTestCase {
         urlSessionInterface.expectedError = .badRequest
         Current.urlSession = { return self.urlSessionInterface }
         
-        let parameters = LoginParameters(username: user.username, password: "")
+        let parameters = LogInParameters(username: user.username, password: "")
         webService.logIn(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:
