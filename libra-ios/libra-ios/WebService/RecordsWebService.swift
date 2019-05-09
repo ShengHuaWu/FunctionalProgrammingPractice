@@ -1,4 +1,6 @@
 // This type contains APIs related to records, and it should NOT be accessed directly
+
+// TODO: Rename properties, for example: `getRecord` to `getOne`
 struct RecordsWebService {
     var getRecords = getAllRecords
     var getRecord = getRecord(with:)

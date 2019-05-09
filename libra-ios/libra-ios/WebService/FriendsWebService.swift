@@ -1,4 +1,6 @@
 // This type contains APIs related to friends, and it should NOT be accessed directly
+
+// TODO: Rename properties, for example: `getFriend` to `getOne`
 struct FriendsWebService {
     var getAllFriends = getAllFriends(for:)
     var addFriendship = addFriendship(with:)

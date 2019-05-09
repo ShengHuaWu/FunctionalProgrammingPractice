@@ -27,7 +27,7 @@ final class PartialMockURLSession: URLSession {
     }
 }
 
-// This class is used for testing `WebService`
+// This class is used for testing `WebService`s
 final class MockURLSessionInterface: URLSessionInterface {
     private(set) var sendCallCount = 0
     var expectedError: NetworkError?
@@ -39,7 +39,6 @@ final class MockURLSessionInterface: URLSessionInterface {
         return MockURLSessionDataTask()
     }
     
-    // TODO: Considering invoke `unwrapData`
     func send<Entity>(_ request: Request<Entity>, unwrapData: @escaping UnwrapDataHandler) -> Future<Result<Entity, NetworkError>> where Entity : Decodable {
         sendCallCount += 1
         

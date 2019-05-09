@@ -1,5 +1,3 @@
-import Foundation
-
 enum NetworkError: Error {
     case failure(mesage: String)
     case unexpectedResponse

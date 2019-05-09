@@ -1,4 +1,6 @@
 // This type contains APIs related to users, and it should NOT be accessed directly
+
+// TODO: Rename properties, for example: `getUser` to `getMe`
 struct UsersWebService {
     var signUp = signUp(with:)
     var logIn = logIn(with:)
