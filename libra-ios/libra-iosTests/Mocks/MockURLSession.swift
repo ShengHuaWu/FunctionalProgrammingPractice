@@ -39,6 +39,7 @@ final class MockURLSessionInterface: URLSessionInterface {
         return MockURLSessionDataTask()
     }
     
+    // TODO: Considering invoke `unwrapData`
     func send<Entity>(_ request: Request<Entity>, unwrapData: @escaping UnwrapDataHandler) -> Future<Result<Entity, NetworkError>> where Entity : Decodable {
         sendCallCount += 1
         

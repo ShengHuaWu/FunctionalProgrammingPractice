@@ -8,17 +8,29 @@ extension DataTaskResponseHandler {
 }
 
 extension WebService {
-    static let mock = WebService(
+    static let mock = WebService(users: .mock, records: .mock, friends: .mock)
+}
+
+extension UsersWebService {
+    static let mock = UsersWebService(
         signUp: { _ in return .empty },
         logIn: { _ in return .empty },
         getUser: { _ in return .empty },
         updateUser: { _ in return .empty },
+        searchUsers: { _ in return .empty})
+}
+
+extension RecordsWebService {
+    static let mock = RecordsWebService(
         getRecords: { return .empty },
         getRecord: { _ in return .empty },
         createRecord: { _ in return .empty },
         updateRecord: { _ in return .empty },
-        deleteRecord: { _ in return .empty },
-        searchUsers: { _ in return .empty },
+        deleteRecord: { _ in return .empty })
+}
+
+extension FriendsWebService {
+    static let mock = FriendsWebService(
         getAllFriends: { _ in return .empty },
         addFriendship: { _ in return .empty },
         getFriend: { _ in return .empty },
