@@ -3,69 +3,87 @@ import XCTest
 
 struct FakeModel: Codable {
     let name: String
+    let date: Date
 }
 
-struct FakeParameter: Encodable {
+struct FakeParameters: Encodable {
     let value: String
+    let date: Date
 }
 
-// TODO: Test encoding & decoding date strategies
 class RequestTests: XCTestCase {
     let baseURL = URL(string: "https://libra.co")!
     let generalHeader = ["Content-Type": "application/json"]
-    let model = FakeModel(name: "libra")
+    
+    // Use an integer for time intervals to avoid encoding truncation
+    let model = FakeModel(name: "libra", date: Date(timeIntervalSince1970: 579088355))
+    let parameters = FakeParameters(value: "libra", date: Date(timeIntervalSince1970: 579088355))
     
     func testThatMakeGetRequest() throws {
         let method = HTTPMethod.get
-        let request = Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader, dateDecodingStrategy: nil)
+        let request = Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader, dateDecodingStrategy: .iso8601)
         XCTAssertEqual(request.urlRequest.url, baseURL)
         XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
         XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
         XCTAssertNil(request.urlRequest.httpBody)
         
-        let data = try JSONEncoder().encode(model)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let data = try encoder.encode(model)
         let result = try request.parse(data)
         XCTAssertEqual(result.name, model.name)
+        XCTAssertEqual(result.date, model.date)
     }
     
     func testThatMakePostRequest() throws {
         let method = HTTPMethod.post
-        let parameter = FakeParameter(value: "libra-ios")
-        let request = Request<FakeModel>(url: baseURL, method: method, bodyParameters: parameter, dateEncodingStrategy: nil, headers: generalHeader, dateDecodingStrategy: nil)
+        let request = Request<FakeModel>(url: baseURL, method: method, bodyParameters: parameters, dateEncodingStrategy: .millisecondsSince1970, headers: generalHeader, dateDecodingStrategy: .iso8601)
         XCTAssertEqual(request.urlRequest.url, baseURL)
         XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
         XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
-        XCTAssertEqual(request.urlRequest.httpBody, try JSONEncoder().encode(parameter))
         
-        let data = try JSONEncoder().encode(model)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .millisecondsSince1970
+        XCTAssertEqual(request.urlRequest.httpBody, try encoder.encode(parameters))
+        
+        encoder.dateEncodingStrategy = .iso8601
+        let data = try encoder.encode(model)
         let result = try request.parse(data)
         XCTAssertEqual(result.name, model.name)
+        XCTAssertEqual(result.date, model.date)
     }
     
     func testThatMakePutRequest() throws {
         let method = HTTPMethod.put
-        let parameter = FakeParameter(value: "libra-ios")
-        let request = Request<FakeModel>(url: baseURL, method: method, bodyParameters: parameter, dateEncodingStrategy: nil, headers: generalHeader, dateDecodingStrategy: nil)
+        let request = Request<FakeModel>(url: baseURL, method: method, bodyParameters: parameters, dateEncodingStrategy: .millisecondsSince1970, headers: generalHeader, dateDecodingStrategy: .iso8601)
         XCTAssertEqual(request.urlRequest.url, baseURL)
         XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
         XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
-        XCTAssertEqual(request.urlRequest.httpBody, try JSONEncoder().encode(parameter))
         
-        let data = try JSONEncoder().encode(model)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .millisecondsSince1970
+        XCTAssertEqual(request.urlRequest.httpBody, try encoder.encode(parameters))
+        
+        encoder.dateEncodingStrategy = .iso8601
+        let data = try encoder.encode(model)
         let result = try request.parse(data)
         XCTAssertEqual(result.name, model.name)
+        XCTAssertEqual(result.date, model.date)
     }
     
     func testThatMakeDeleteRequest() throws {
         let method = HTTPMethod.delete
-        let request = Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader, dateDecodingStrategy: nil)
+        let request = Request<FakeModel>.init(url: baseURL, method: method, headers: generalHeader, dateDecodingStrategy: .iso8601)
         XCTAssertEqual(request.urlRequest.url, baseURL)
         XCTAssertEqual(request.urlRequest.httpMethod, method.rawValue)
         XCTAssertEqual(request.urlRequest.allHTTPHeaderFields, generalHeader)
         XCTAssertNil(request.urlRequest.httpBody)
         
-        let data = try JSONEncoder().encode(model)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let data = try encoder.encode(model)
         let result = try request.parse(data)
         XCTAssertEqual(result.name, model.name)
+        XCTAssertEqual(result.date, model.date)
     }
 }

@@ -108,7 +108,7 @@ private func sendTokenAuthenticatdRequest<Entity, Parameters>(to endpoint: Endpo
     do {
         let token = try Current.storage.fetchToken()
         
-        return (endpoint.url, method, parameters, .iso8601, ["Authorization": "Bearer \(token)"], .millisecondsSince1970)
+        return (endpoint.url, method, parameters, .millisecondsSince1970, ["Authorization": "Bearer \(token)"], .iso8601)
             |> Request<Entity>.init(url:method:bodyParameters:dateEncodingStrategy:headers:dateDecodingStrategy:)
             >>> send
     } catch {
