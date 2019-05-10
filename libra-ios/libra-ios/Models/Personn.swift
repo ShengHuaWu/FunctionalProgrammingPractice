@@ -1,5 +1,4 @@
-// TODO: Merge this type by `User` with custom decoding (maybe rename to `Person`)
-struct Companion: Decodable {
+struct Person: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case username

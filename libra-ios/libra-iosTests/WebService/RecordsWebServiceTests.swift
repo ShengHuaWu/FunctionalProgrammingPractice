@@ -4,7 +4,7 @@ import XCTest
 class RecordsWebServiceTests: XCTestCase {
     var recordsWebService: RecordsWebService!
     var urlSessionInterface: MockURLSessionInterface!
-    let record = Record(id: 999, title: "Libra Record", note: "This is just one record", date: Date(), amount: 100, currency: .usd, mood: .good, companions: [Companion(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co")])
+    let record = Record(id: 999, title: "Libra Record", note: "This is just one record", date: Date(), amount: 100, currency: .usd, mood: .good, companions: [Person(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co")])
     
     override func setUp() {
         super.setUp()

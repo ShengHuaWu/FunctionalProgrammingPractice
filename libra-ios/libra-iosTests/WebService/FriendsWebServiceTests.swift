@@ -4,8 +4,8 @@ import XCTest
 class FriendsWebServiceTests: XCTestCase {
     var friendsWebService: FriendsWebService!
     var urlSessionInterface: MockURLSessionInterface!
-    let user = User(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co", token: "987654321")
-    
+    let user = User(person: Person(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co"), token: "987654321")
+
     override func setUp() {
         super.setUp()
         
@@ -38,7 +38,7 @@ class FriendsWebServiceTests: XCTestCase {
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
                 XCTAssertEqual(fetchTokenCallCount, 1)
                 XCTAssertEqual(entity.count, 1)
-                XCTAssertEqual(entity.first?.id, self.user.id)
+                XCTAssertEqual(entity.first?.person.id, self.user.person.id)
             case .failure:
                 XCTFail("Get all friends should succeed")
             }
@@ -77,7 +77,7 @@ class FriendsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameters = FriendshipParameters(userID: user.id, personID: user.id)
+        let parameters = FriendshipParameters(userID: user.person.id, personID: user.person.id)
         friendsWebService.addFriendship(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
@@ -100,7 +100,7 @@ class FriendsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameters = FriendshipParameters(userID: user.id, personID: user.id)
+        let parameters = FriendshipParameters(userID: user.person.id, personID: user.person.id)
         friendsWebService.addFriendship(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:
@@ -123,13 +123,13 @@ class FriendsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameters = FriendshipParameters(userID: user.id, personID: user.id)
+        let parameters = FriendshipParameters(userID: user.person.id, personID: user.person.id)
         friendsWebService.get(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
                 XCTAssertEqual(fetchTokenCallCount, 1)
-                XCTAssertEqual(entity.id, self.user.id)
+                XCTAssertEqual(entity.person.id, self.user.person.id)
             case .failure:
                 XCTFail("Get friend should succeed")
             }
@@ -146,7 +146,7 @@ class FriendsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameters = FriendshipParameters(userID: user.id, personID: user.id)
+        let parameters = FriendshipParameters(userID: user.person.id, personID: user.person.id)
         friendsWebService.get(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:
@@ -169,7 +169,7 @@ class FriendsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameters = FriendshipParameters(userID: user.id, personID: user.id)
+        let parameters = FriendshipParameters(userID: user.person.id, personID: user.person.id)
         friendsWebService.removeFriendship(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
@@ -192,7 +192,7 @@ class FriendsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameters = FriendshipParameters(userID: user.id, personID: user.id)
+        let parameters = FriendshipParameters(userID: user.person.id, personID: user.person.id)
         friendsWebService.removeFriendship(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:

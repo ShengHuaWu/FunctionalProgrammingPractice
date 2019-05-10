@@ -20,7 +20,7 @@ struct RecordParameters: Encodable {
     let currency: String
     let companionIDs: [Int]
     
-    init(id: Int?, title: String, note: String, date: Date, mood: Record.Mood, amount: Double, currency: Record.Currency, companions: [Companion]) {
+    init(id: Int?, title: String, note: String, date: Date, mood: Record.Mood, amount: Double, currency: Record.Currency, companions: [Person]) {
         self.id = id
         self.title = title
         self.note = note

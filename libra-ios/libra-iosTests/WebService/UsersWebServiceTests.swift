@@ -4,8 +4,7 @@ import XCTest
 class UsersWebServiceTests: XCTestCase {
     var usersWebService: UsersWebService!
     var urlSessionInterface: MockURLSessionInterface!
-    let user = User(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co", token: "987654321")
-    let record = Record(id: 999, title: "Libra Record", note: "This is just one record", date: Date(), amount: 100, currency: .usd, mood: .good, companions: [Companion(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co")])
+    let user = User(person: Person(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co"), token: "987654321")
 
     override func setUp() {
         super.setUp()
@@ -27,12 +26,12 @@ class UsersWebServiceTests: XCTestCase {
         urlSessionInterface.expectedEntity = user
         Current.urlSession = { return self.urlSessionInterface }
         
-        let parameter = SignUpParameters(username: user.username, password: "", firstName: user.firstName, lastName: user.lastName  , email: user.email)
+        let parameter = SignUpParameters(username: user.person.username, password: "", firstName: user.person.firstName, lastName: user.person.lastName  , email: user.person.email)
         usersWebService.signUp(parameter).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
-                XCTAssertEqual(entity.id, self.user.id)
+                XCTAssertEqual(entity.person.id, self.user.person.id)
             case .failure:
                 XCTFail("Signup should succeed")
             }
@@ -43,7 +42,7 @@ class UsersWebServiceTests: XCTestCase {
         urlSessionInterface.expectedError = .badRequest
         Current.urlSession = { return self.urlSessionInterface }
         
-        let parameter = SignUpParameters(username: user.username, password: "", firstName: user.firstName, lastName: user.lastName  , email: user.email)
+        let parameter = SignUpParameters(username: user.person.username, password: "", firstName: user.person.firstName, lastName: user.person.lastName, email: user.person.email)
         usersWebService.signUp(parameter).waitAndAssert(on: self) { result in
             switch result {
             case .success:
@@ -59,12 +58,12 @@ class UsersWebServiceTests: XCTestCase {
         urlSessionInterface.expectedEntity = user
         Current.urlSession = { return self.urlSessionInterface }
         
-        let parameters = LogInParameters(username: user.username, password: "")
+        let parameters = LogInParameters(username: user.person.username, password: "")
         usersWebService.logIn(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
-                XCTAssertEqual(entity.id, self.user.id)
+                XCTAssertEqual(entity.person.id, self.user.person.id)
             case .failure:
                 XCTFail("Signup should succeed")
             }
@@ -75,7 +74,7 @@ class UsersWebServiceTests: XCTestCase {
         urlSessionInterface.expectedError = .badRequest
         Current.urlSession = { return self.urlSessionInterface }
         
-        let parameters = LogInParameters(username: user.username, password: "")
+        let parameters = LogInParameters(username: user.person.username, password: "")
         usersWebService.logIn(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:
@@ -97,12 +96,12 @@ class UsersWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        usersWebService.get(user.id).waitAndAssert(on: self) { result in
+        usersWebService.get(user.person.id).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
                 XCTAssertEqual(fetchTokenCallCount, 1)
-                XCTAssertEqual(entity.id, self.user.id)
+                XCTAssertEqual(entity.person.id, self.user.person.id)
             case .failure:
                 XCTFail("Get user should succeed")
             }
@@ -119,7 +118,7 @@ class UsersWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        usersWebService.get(user.id).waitAndAssert(on: self) { result in
+        usersWebService.get(user.person.id).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Get user should fail")
@@ -141,13 +140,13 @@ class UsersWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameter = UpdateUserParameters(id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email)
+        let parameter = UpdateUserParameters(id: user.person.id, firstName: user.person.firstName, lastName: user.person.lastName, email: user.person.email)
         usersWebService.update(parameter).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
                 XCTAssertEqual(fetchTokenCallCount, 1)
-                XCTAssertEqual(entity.id, self.user.id)
+                XCTAssertEqual(entity.person.id, self.user.person.id)
             case .failure:
                 XCTFail("Update user should succeed")
             }
@@ -164,7 +163,7 @@ class UsersWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        let parameter = UpdateUserParameters(id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email)
+        let parameter = UpdateUserParameters(id: user.person.id, firstName: user.person.firstName, lastName: user.person.lastName, email: user.person.email)
         usersWebService.update(parameter).waitAndAssert(on: self) { result in
             switch result {
             case .success:
@@ -193,7 +192,7 @@ class UsersWebServiceTests: XCTestCase {
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
                 XCTAssertEqual(fetchTokenCallCount, 1)
                 XCTAssertEqual(entity.count, 1)
-                XCTAssertEqual(entity.first?.id, self.user.id)
+                XCTAssertEqual(entity.first?.person.id, self.user.person.id)
             case .failure:
                 XCTFail("Search users should succeed")
             }
