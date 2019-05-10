@@ -97,7 +97,7 @@ class UsersWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        usersWebService.getUser(user.id).waitAndAssert(on: self) { result in
+        usersWebService.get(user.id).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
@@ -119,7 +119,7 @@ class UsersWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        usersWebService.getUser(user.id).waitAndAssert(on: self) { result in
+        usersWebService.get(user.id).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Get user should fail")
@@ -142,7 +142,7 @@ class UsersWebServiceTests: XCTestCase {
         }
         
         let parameter = UpdateUserParameters(id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email)
-        usersWebService.updateUser(parameter).waitAndAssert(on: self) { result in
+        usersWebService.update(parameter).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
@@ -165,7 +165,7 @@ class UsersWebServiceTests: XCTestCase {
         }
         
         let parameter = UpdateUserParameters(id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email)
-        usersWebService.updateUser(parameter).waitAndAssert(on: self) { result in
+        usersWebService.update(parameter).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Update user should fail")
@@ -187,7 +187,7 @@ class UsersWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        usersWebService.searchUsers("sh").waitAndAssert(on: self) { result in
+        usersWebService.search("sh").waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
@@ -210,7 +210,7 @@ class UsersWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        usersWebService.searchUsers("sh").waitAndAssert(on: self) { result in
+        usersWebService.search("sh").waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Search users should fail")

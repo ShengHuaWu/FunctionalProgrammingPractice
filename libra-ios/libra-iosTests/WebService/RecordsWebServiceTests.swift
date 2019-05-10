@@ -32,7 +32,7 @@ class RecordsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        recordsWebService.getRecords().waitAndAssert(on: self) { result in
+        recordsWebService.getAll().waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
@@ -55,7 +55,7 @@ class RecordsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        recordsWebService.getRecords().waitAndAssert(on: self) { result in
+        recordsWebService.getAll().waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Get records should fail")
@@ -77,7 +77,7 @@ class RecordsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        recordsWebService.getRecord(999).waitAndAssert(on: self) { result in
+        recordsWebService.get(999).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
@@ -99,7 +99,7 @@ class RecordsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        recordsWebService.getRecord(999).waitAndAssert(on: self) { result in
+        recordsWebService.get(999).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Get record should fail")
@@ -122,7 +122,7 @@ class RecordsWebServiceTests: XCTestCase {
         }
         
         let parameters = RecordParameters(id: nil, title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions)
-        recordsWebService.createRecord(parameters).waitAndAssert(on: self) { result in
+        recordsWebService.create(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
@@ -145,7 +145,7 @@ class RecordsWebServiceTests: XCTestCase {
         }
         
         let parameters = RecordParameters(id: nil, title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions)
-        recordsWebService.createRecord(parameters).waitAndAssert(on: self) { result in
+        recordsWebService.create(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Create record should fail")
@@ -168,7 +168,7 @@ class RecordsWebServiceTests: XCTestCase {
         }
         
         let parameters = RecordParameters(id: 999, title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions)
-        recordsWebService.updateRecord(parameters).waitAndAssert(on: self) { result in
+        recordsWebService.update(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
@@ -191,7 +191,7 @@ class RecordsWebServiceTests: XCTestCase {
         }
         
         let parameters = RecordParameters(id: 999, title: record.title, note: record.note, date: record.date, mood: record.mood, amount: record.amount, currency: record.currency, companions: record.companions)
-        recordsWebService.updateRecord(parameters).waitAndAssert(on: self) { result in
+        recordsWebService.update(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Update record should fail")
@@ -213,7 +213,7 @@ class RecordsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        recordsWebService.deleteRecord(999).waitAndAssert(on: self) { result in
+        recordsWebService.delete(999).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
@@ -235,7 +235,7 @@ class RecordsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        recordsWebService.deleteRecord(999).waitAndAssert(on: self) { result in
+        recordsWebService.delete(999).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Delete record should fail")

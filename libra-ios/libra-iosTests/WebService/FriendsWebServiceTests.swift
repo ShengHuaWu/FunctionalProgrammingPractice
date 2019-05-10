@@ -32,7 +32,7 @@ class FriendsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        friendsWebService.getAllFriends(999).waitAndAssert(on: self) { result in
+        friendsWebService.getAll(999).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
@@ -55,7 +55,7 @@ class FriendsWebServiceTests: XCTestCase {
             return "This is a token"
         }
         
-        friendsWebService.getAllFriends(999).waitAndAssert(on: self) { result in
+        friendsWebService.getAll(999).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Get all friends should fail")
@@ -124,7 +124,7 @@ class FriendsWebServiceTests: XCTestCase {
         }
         
         let parameters = FriendshipParameters(userID: user.id, personID: user.id)
-        friendsWebService.getFriend(parameters).waitAndAssert(on: self) { result in
+        friendsWebService.get(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success(let entity):
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
@@ -147,7 +147,7 @@ class FriendsWebServiceTests: XCTestCase {
         }
         
         let parameters = FriendshipParameters(userID: user.id, personID: user.id)
-        friendsWebService.getFriend(parameters).waitAndAssert(on: self) { result in
+        friendsWebService.get(parameters).waitAndAssert(on: self) { result in
             switch result {
             case .success:
                 XCTFail("Get friend should fail")

@@ -1,12 +1,11 @@
 // This type contains APIs related to records, and it should NOT be accessed directly
 
-// TODO: Rename properties, for example: `getRecord` to `getOne`
 struct RecordsWebService {
-    var getRecords = getAllRecords
-    var getRecord = getRecord(with:)
-    var createRecord = createRecord(with:)
-    var updateRecord = updateRecord(with:)
-    var deleteRecord = deleteRecord(with:)
+    var getAll = getAllRecords
+    var get = getRecord(with:)
+    var create = createRecord(with:)
+    var update = updateRecord(with:)
+    var delete = deleteRecord(with:)
 }
 
 // MARK: - Private
