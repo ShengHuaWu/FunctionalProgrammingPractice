@@ -57,6 +57,8 @@ private extension UsersController {
         
         return try user.makeTokenFuture(on: req).save(on: req).makePublicUser(for: user)
     }
+    
+    // TODO: Logout handler?
 
     func searchHandler(_ req: Request) throws -> Future<[User.Public]> {
         let key = try req.query.get(String.self, at: "q")

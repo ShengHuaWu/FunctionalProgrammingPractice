@@ -50,6 +50,7 @@ private extension RecordsController {
         }
     }
     
+    // TODO: Not delete the record directly. Consider using a flag
     func deleteHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let user = try req.requireAuthenticated(User.self)
         return try req.parameters.next(Record.self).validate(creator: user).delete(on: req).transform(to: .noContent)

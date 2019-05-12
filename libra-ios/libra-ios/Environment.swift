@@ -6,6 +6,7 @@ struct Environment {
     var dataTaskResponseHandler = DataTaskResponseHandler()
     var webService = WebService()
     var storage = Storage()
+    // TODO: Data service class
 }
 
 var Current = Environment()

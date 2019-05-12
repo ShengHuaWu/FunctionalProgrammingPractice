@@ -1,6 +1,7 @@
 // This type contains APIs related to users, and it should NOT be accessed directly
 
 struct UsersWebService {
+    // TODO: Move `signUp` and `logIn` to `AuthenticationWebService`
     var signUp = signUp(with:)
     var logIn = logIn(with:)
     var get = getUser(with:)
@@ -29,6 +30,7 @@ private func updateUser(with parameters: UpdateUserParameters) -> Future<Result<
     return Current.urlSession().sendTokenAuthenticatdRequest(to: .user(id: parameters.id), method: .put, parameters: parameters)
 }
 
+// TODO: Search people instead of users
 private func searchUsers(with key: String) -> Future<Result<[User], NetworkError>> {
     return Current.urlSession().sendTokenAuthenticatedRequest(to: .search(key: key), method: .get)
 }

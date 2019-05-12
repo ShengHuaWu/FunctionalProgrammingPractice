@@ -12,6 +12,7 @@ final class Token: Codable {
     var id: Int?
     var token: String
     var userID: User.ID
+    // TODO: `isRevoked`, `deviceType`, `location` ...
     
     init(token: String, userID: User.ID) {
         self.token = token
