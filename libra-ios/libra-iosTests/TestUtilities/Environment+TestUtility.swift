@@ -8,13 +8,17 @@ extension DataTaskResponseHandler {
 }
 
 extension WebService {
-    static let mock = WebService(users: .mock, records: .mock, friends: .mock)
+    static let mock = WebService(authentication: .mock, users: .mock, records: .mock, friends: .mock)
+}
+
+extension AuthenticationWebService {
+    static let mock = AuthenticationWebService(
+        signUp: { _ in return .empty },
+        logIn: { _ in return .empty })
 }
 
 extension UsersWebService {
     static let mock = UsersWebService(
-        signUp: { _ in return .empty },
-        logIn: { _ in return .empty },
         get: { _ in return .empty },
         update: { _ in return .empty },
         search: { _ in return .empty})

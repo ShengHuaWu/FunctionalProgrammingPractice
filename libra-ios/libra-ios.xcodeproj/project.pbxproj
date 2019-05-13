@@ -38,6 +38,8 @@
 		D89C1CA422844EDD008BD352 /* RecordsWebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89C1CA322844EDD008BD352 /* RecordsWebService.swift */; };
 		D89C1CA622844F4D008BD352 /* FriendsWebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89C1CA522844F4D008BD352 /* FriendsWebService.swift */; };
 		D89C1CA8228459E6008BD352 /* URLSessionInterfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89C1CA7228459E6008BD352 /* URLSessionInterfaceTests.swift */; };
+		D89E1C8E228992CF00A65768 /* AuthenticationWebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89E1C8D228992CF00A65768 /* AuthenticationWebService.swift */; };
+		D89E1C902289939A00A65768 /* AuthenticationWebServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89E1C8F2289939A00A65768 /* AuthenticationWebServiceTests.swift */; };
 		D8AD3179227C296500D2E756 /* RecordParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8AD3178227C296500D2E756 /* RecordParameters.swift */; };
 		D8DC5D8822661D7400EEC1C4 /* DataTaskResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8DC5D8722661D7400EEC1C4 /* DataTaskResponseHandler.swift */; };
 		D8DC5D8A22662A0700EEC1C4 /* Curry.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8DC5D8922662A0700EEC1C4 /* Curry.swift */; };
@@ -97,6 +99,8 @@
 		D89C1CA322844EDD008BD352 /* RecordsWebService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsWebService.swift; sourceTree = "<group>"; };
 		D89C1CA522844F4D008BD352 /* FriendsWebService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsWebService.swift; sourceTree = "<group>"; };
 		D89C1CA7228459E6008BD352 /* URLSessionInterfaceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionInterfaceTests.swift; sourceTree = "<group>"; };
+		D89E1C8D228992CF00A65768 /* AuthenticationWebService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationWebService.swift; sourceTree = "<group>"; };
+		D89E1C8F2289939A00A65768 /* AuthenticationWebServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationWebServiceTests.swift; sourceTree = "<group>"; };
 		D8AD3178227C296500D2E756 /* RecordParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordParameters.swift; sourceTree = "<group>"; };
 		D8DC5D8722661D7400EEC1C4 /* DataTaskResponseHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTaskResponseHandler.swift; sourceTree = "<group>"; };
 		D8DC5D8922662A0700EEC1C4 /* Curry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Curry.swift; sourceTree = "<group>"; };
@@ -261,6 +265,7 @@
 				D821FA122264AE68003A3B63 /* Endpoint.swift */,
 				D8DC5D8722661D7400EEC1C4 /* DataTaskResponseHandler.swift */,
 				D821FA0E2264A33F003A3B63 /* WebService.swift */,
+				D89E1C8D228992CF00A65768 /* AuthenticationWebService.swift */,
 				D89C1C9C2284347A008BD352 /* UsersWebService.swift */,
 				D89C1CA322844EDD008BD352 /* RecordsWebService.swift */,
 				D89C1CA522844F4D008BD352 /* FriendsWebService.swift */,
@@ -291,6 +296,7 @@
 			children = (
 				9B0862002267AF0000721936 /* DataResponseHandlerTests.swift */,
 				D89C1CA7228459E6008BD352 /* URLSessionInterfaceTests.swift */,
+				D89E1C8F2289939A00A65768 /* AuthenticationWebServiceTests.swift */,
 				D8498C6D2265D22600FACD2E /* UsersWebServiceTests.swift */,
 				D8F9AAF62283169200E8532D /* RecordsWebServiceTests.swift */,
 				D8F9AAF82283172500E8532D /* FriendsWebServiceTests.swift */,
@@ -433,6 +439,7 @@
 				D89C1C9F22843AC8008BD352 /* URLSessionInterfcae+WebService.swift in Sources */,
 				D8F9A893228305FD00E8532D /* FriendshipParameters.swift in Sources */,
 				D8DD0BEB22773B9600CAC829 /* UpdateUserParameters.swift in Sources */,
+				D89E1C8E228992CF00A65768 /* AuthenticationWebService.swift in Sources */,
 				D8AD3179227C296500D2E756 /* RecordParameters.swift in Sources */,
 				D8FBED99225F829D0099D688 /* ForwardComposition.swift in Sources */,
 				D89C1CA622844F4D008BD352 /* FriendsWebService.swift in Sources */,
@@ -461,6 +468,7 @@
 				D8498C6E2265D22600FACD2E /* UsersWebServiceTests.swift in Sources */,
 				D8498C702265D24F00FACD2E /* Environment+TestUtility.swift in Sources */,
 				D8205256225E217000936BF9 /* RequestTests.swift in Sources */,
+				D89E1C902289939A00A65768 /* AuthenticationWebServiceTests.swift in Sources */,
 				D8F9AAF72283169200E8532D /* RecordsWebServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

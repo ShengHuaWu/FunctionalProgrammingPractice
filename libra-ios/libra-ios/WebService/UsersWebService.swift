@@ -1,27 +1,12 @@
 // This type contains APIs related to users, and it should NOT be accessed directly
 
 struct UsersWebService {
-    // TODO: Move `signUp` and `logIn` to `AuthenticationWebService`
-    var signUp = signUp(with:)
-    var logIn = logIn(with:)
     var get = getUser(with:)
     var update = updateUser(with:)
     var search = searchUsers(with:)
 }
 
 // MARK: - Private
-private func signUp(with parameters: SignUpParameters) -> Future<Result<User, NetworkError>> {
-    return parameters
-        |> Request.makeSignUp(with:)
-        >>> Current.urlSession().send(_:)
-}
-
-private func logIn(with parameters: LogInParameters) -> Future<Result<User, NetworkError>> {
-    return parameters
-        |> Request.makeBasicAuthenticated(with:)
-        >>> Current.urlSession().send(_:)
-}
-
 private func getUser(with id: Int) -> Future<Result<User, NetworkError>> {
     return Current.urlSession().sendTokenAuthenticatedRequest(to: .user(id: id), method: .get)
 }
@@ -33,15 +18,4 @@ private func updateUser(with parameters: UpdateUserParameters) -> Future<Result<
 // TODO: Search people instead of users
 private func searchUsers(with key: String) -> Future<Result<[User], NetworkError>> {
     return Current.urlSession().sendTokenAuthenticatedRequest(to: .search(key: key), method: .get)
-}
-
-// MARK: - Helpers
-private extension Request {
-    static func makeSignUp(with parameters: SignUpParameters) -> Request {
-        return Request(url: Endpoint.signUp.url, method: .post, bodyParameters: parameters, dateEncodingStrategy: nil, headers: nil, dateDecodingStrategy: nil)
-    }
-    
-    static func makeBasicAuthenticated(with parameters: LogInParameters) -> Request {
-        return Request(url: Endpoint.login.url, method: .post, headers: ["Authorization": "Basic \(parameters.makeBase64String())"], dateDecodingStrategy: nil)
-    }
 }
