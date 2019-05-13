@@ -1,6 +1,5 @@
 // This type contains APIs related to friends, and it should NOT be accessed directly
 
-// TODO: Return people or person instead of user
 struct FriendsWebService {
     var getAll = getAllFriends(for:)
     var addFriendship = addFriendship(with:)
@@ -9,7 +8,7 @@ struct FriendsWebService {
 }
 
 // MARK: - Private
-private func getAllFriends(for userID: Int) -> Future<Result<[User], NetworkError>> {
+private func getAllFriends(for userID: Int) -> Future<Result<[Person], NetworkError>> {
     return Current.urlSession().sendTokenAuthenticatedRequest(to: .friends(userID: userID), method: .get)
 }
 
@@ -17,7 +16,7 @@ private func addFriendship(with parameters: FriendshipParameters) -> Future<Resu
     return Current.urlSession().sendTokenAuthenticatdRequest(to: .friends(userID: parameters.userID), method: .post, parameters: parameters)
 }
 
-private func getFriend(with parameters: FriendshipParameters) -> Future<Result<User, NetworkError>> {
+private func getFriend(with parameters: FriendshipParameters) -> Future<Result<Person, NetworkError>> {
     return Current.urlSession().sendTokenAuthenticatedRequest(to: .friend(userID: parameters.userID, friendID: parameters.personID), method: .get)
 }
 

@@ -5,6 +5,7 @@ class UsersWebServiceTests: XCTestCase {
     var usersWebService: UsersWebService!
     var urlSessionInterface: MockURLSessionInterface!
     let user = User(person: Person(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co"), token: "987654321")
+    let person = Person(id: 999, username: "shengwu", firstName: "sheng", lastName: "wu", email: "shengwu@libra.co")
 
     override func setUp() {
         super.setUp()
@@ -113,7 +114,7 @@ class UsersWebServiceTests: XCTestCase {
     }
     
     func testThatSearchUsersReturnsUsersIfSuccess() {
-        urlSessionInterface.expectedEntity = [user]
+        urlSessionInterface.expectedEntity = [person]
         Current.urlSession = { return self.urlSessionInterface }
         
         var fetchTokenCallCount = 0
@@ -128,7 +129,7 @@ class UsersWebServiceTests: XCTestCase {
                 XCTAssertEqual(self.urlSessionInterface.sendCallCount, 1)
                 XCTAssertEqual(fetchTokenCallCount, 1)
                 XCTAssertEqual(entity.count, 1)
-                XCTAssertEqual(entity.first?.person.id, self.user.person.id)
+                XCTAssertEqual(entity.first?.id, self.person.id)
             case .failure:
                 XCTFail("Search users should succeed")
             }

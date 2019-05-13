@@ -15,7 +15,6 @@ private func updateUser(with parameters: UpdateUserParameters) -> Future<Result<
     return Current.urlSession().sendTokenAuthenticatdRequest(to: .user(id: parameters.id), method: .put, parameters: parameters)
 }
 
-// TODO: Search people instead of users
-private func searchUsers(with key: String) -> Future<Result<[User], NetworkError>> {
+private func searchUsers(with key: String) -> Future<Result<[Person], NetworkError>> {
     return Current.urlSession().sendTokenAuthenticatedRequest(to: .search(key: key), method: .get)
 }
