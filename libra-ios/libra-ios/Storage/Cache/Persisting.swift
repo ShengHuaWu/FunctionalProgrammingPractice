@@ -21,7 +21,17 @@ extension Persisting where Key == String, Entity == String {
     static let userDefaults = Persisting(
         save: save(_:toUserDefaultsFor:),
         fetch: fetchStringFromUserDefaults,
-        delete: deleteStringInUserDefaults)
+        delete: deleteEntityInUserDefaults)
+}
+
+extension Persisting where Key == String, Entity: Codable {
+    // Cannot use `static let` because it doesn't support generic type `Entity: Codable`
+    static var userDefaults: Persisting {
+        return Persisting(
+        save: save(_:toUserDefaultsFor:),
+        fetch: fetchEntityFromUserDefaults,
+        delete: deleteEntityInUserDefaults)
+    }
 }
 
 // MARK: - Keychain
@@ -103,6 +113,25 @@ private func fetchStringFromUserDefaults(for key: String) throws -> String {
     return result
 }
 
-private func deleteStringInUserDefaults(for key: String) throws {
+private func deleteEntityInUserDefaults(for key: String) throws {
     UserDefaults.standard.removeObject(forKey: key)
+}
+
+private func save<Entity>(_ entity: Entity, toUserDefaultsFor key: String) throws where Entity: Encodable {
+    do {
+        let data = try PropertyListEncoder().encode(entity)
+        UserDefaults.standard.set(data, forKey: key)
+    } catch {
+        throw PersistingError.unexpectedEntityData
+    }
+}
+
+private func fetchEntityFromUserDefaults<Entity>(for key: String) throws -> Entity where Entity: Decodable {
+    guard let data = UserDefaults.standard.data(forKey: key) else { throw PersistingError.noEntity }
+    
+    do {
+        return try PropertyListDecoder().decode(Entity.self, from: data)
+    } catch {
+        throw PersistingError.unexpectedEntityData
+    }
 }

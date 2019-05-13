@@ -1,4 +1,4 @@
-struct Person: Decodable {
+struct Person: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case username

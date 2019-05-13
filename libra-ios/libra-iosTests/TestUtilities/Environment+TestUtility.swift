@@ -45,7 +45,16 @@ extension Storage {
     static let mock = Storage(
         saveToken: { _ in throw PersistingError.noEntity },
         fetchToken: { throw PersistingError.noEntity },
-        deleteToken: { throw PersistingError.noEntity })
+        deleteToken: { throw PersistingError.noEntity },
+        saveUser: { _ in throw PersistingError.noEntity },
+        fetchUser: { throw PersistingError.noEntity },
+        deleteUser: { throw PersistingError.noEntity },
+        saveRecords: { _ in throw PersistingError.noEntity },
+        fetchRecords: { throw PersistingError.noEntity },
+        deleteRecords: { throw PersistingError.noEntity },
+        saveFriends: { _ in throw PersistingError.noEntity },
+        fetchFriends: { throw PersistingError.noEntity },
+        deleteFriends: { throw PersistingError.noEntity })
 }
 
 extension Environment {

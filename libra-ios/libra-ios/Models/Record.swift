@@ -1,6 +1,6 @@
 import Foundation
 
-struct Record: Decodable {
+struct Record: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case title

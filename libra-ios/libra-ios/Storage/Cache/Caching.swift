@@ -18,7 +18,19 @@ struct Caching<Key, Entity> where Key: Hashable {
     let key: Key
 }
 
+// Use `userDefaults` to cache token & user for now, because there is no certificate for Apple developer
 extension Caching where Key == String, Entity == String {
-    // Use `userDefaults` for now, because there is no certificate for Apple developer
     static let token = Caching(persisting: .userDefaults, key: "co.libra-ios.token")
+}
+
+extension Caching where Key == String, Entity == User {
+    static let user = Caching(persisting: .userDefaults, key: "co.libra-ios.user")
+}
+
+extension Caching where Key == String, Entity == [Record] {
+    static let records = Caching(persisting: .userDefaults, key: "co.libra.ios.records")
+}
+
+extension Caching where Key == String, Entity == [Person] {
+    static let friends = Caching(persisting: .userDefaults, key: "co.libra.ios.friends")
 }

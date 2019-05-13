@@ -1,9 +1,4 @@
 struct User {
-    let person: Person
-    let token: String?
-}
-
-extension User: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case username
@@ -13,6 +8,13 @@ extension User: Decodable {
         case token
     }
     
+    let person: Person
+    let token: String?
+    // TODO: Need one `shouldSync` or `isChanged` property
+    // The same in `Record` & `Person`
+}
+
+extension User: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.token = try container.decodeIfPresent(String.self, forKey: .token)
@@ -23,5 +25,17 @@ extension User: Decodable {
         let lastName = try container.decode(String.self, forKey: .lastName)
         let email = try container.decode(String.self, forKey: .email)
         self.person = Person(id: id, username: username, firstName: firstName, lastName: lastName, email: email)
+    }
+}
+
+extension User: Encodable {
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(token, forKey: .token)
+        try container.encode(person.id, forKey: .id)
+        try container.encode(person.username, forKey: .username)
+        try container.encode(person.firstName, forKey: .firstName)
+        try container.encode(person.lastName, forKey: .lastName)
+        try container.encode(person.email, forKey: .email)
     }
 }

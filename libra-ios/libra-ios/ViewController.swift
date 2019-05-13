@@ -17,6 +17,7 @@ class ViewController: UIViewController {
                 guard let token = user.token else { return .failure(NetworkError.unexpectedResponse) }
                 
                 try Current.storage.saveToken(token)
+                try Current.storage.saveUser(user)
                 
                 return .success(())
             } catch {
@@ -25,6 +26,9 @@ class ViewController: UIViewController {
         }.run { result in
             DispatchQueue.main.async {
                 print(result)
+                
+                let user = try! Current.storage.fetchUser()
+                print(user)
             }
         }*/
     }
