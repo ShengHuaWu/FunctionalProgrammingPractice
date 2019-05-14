@@ -8,7 +8,7 @@ class ViewController: UIViewController {
         view.backgroundColor = .yellow
         
         // TODO: To be removed
-        
+        /*
         let parameters = LogInParameters(username: "shengwu1", password: "12345678")
         Current.webService.authentication.logIn(parameters).map { result -> Result<Void, Error> in
             do {
@@ -30,6 +30,6 @@ class ViewController: UIViewController {
                 let user = try! Current.storage.user.fetch()
                 print(user)
             }
-        }
+        }*/
     }
 }
