@@ -1,0 +1,41 @@
+import XCTest
+@testable import libra_ios
+
+class RecordsStorageTests: XCTestCase {
+    let record = Record(id: 999, title: "Good event", note: "There is something good", date: Date(), amount: 100, currency: .usd, mood: .good, companions: [ Person(id: 999, username: "shengwu", firstName: "Sheng", lastName: "Wu", email: "shengwu@libra.co")])
+    var recordsStorage: RecordsStorage!
+    
+    override func setUp() {
+        super.setUp()
+        
+        recordsStorage = RecordsStorage()
+    }
+
+    override func tearDown() {
+        super.tearDown()
+        
+        recordsStorage = nil
+    }
+    
+    func testThatFetchReturnsRecordsIfRecordsAreSaved() throws {
+        try recordsStorage.save([record])
+        
+        let result = try recordsStorage.fetch()
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.id, record.id)
+        
+        try recordsStorage.delete()
+    }
+    
+    func testThatFetchThrowsPersistingErrorIfRecordsAreDeleted() {
+        do {
+            try recordsStorage.delete()
+            _ = try recordsStorage.fetch()
+            XCTFail("The string has been deleted already")
+        } catch PersistingError.noEntity {
+            
+        } catch {
+            XCTFail("The error should be no entity")
+        }
+    }
+}

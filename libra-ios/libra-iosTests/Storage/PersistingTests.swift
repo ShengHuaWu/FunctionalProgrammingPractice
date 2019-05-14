@@ -16,8 +16,7 @@ class PersistingTests: XCTestCase {
         let persisting = Persisting<String, String>.userDefaults
         try persisting.save(string, key)
         
-        let result = try persisting.fetch(key)
-        XCTAssertEqual(result, string)
+        XCTAssertEqual(try persisting.fetch(key), string)
         
         try persisting.delete(key)
     }

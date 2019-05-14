@@ -35,6 +35,10 @@
 		D86CF3CF228AF49000613022 /* FriendsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF3CE228AF49000613022 /* FriendsStorage.swift */; };
 		D86CF3D1228AF52F00613022 /* AuthenticationStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF3D0228AF52F00613022 /* AuthenticationStorage.swift */; };
 		D86CF3D3228AF87000613022 /* PersistingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF3D2228AF87000613022 /* PersistingTests.swift */; };
+		D86CF3D6228AFD7000613022 /* AuthenticationStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF3D5228AFD7000613022 /* AuthenticationStorageTests.swift */; };
+		D86CF3D8228AFF9D00613022 /* UserStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF3D7228AFF9D00613022 /* UserStorageTests.swift */; };
+		D86CF3DA228B00CA00613022 /* RecordsStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF3D9228B00CA00613022 /* RecordsStorageTests.swift */; };
+		D86CF3DC228B016C00613022 /* FriendsStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF3DB228B016C00613022 /* FriendsStorageTests.swift */; };
 		D88A0F532271F16300C959DD /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88A0F522271F16300C959DD /* Storage.swift */; };
 		D89075032264C9C700724B89 /* LogInParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89075022264C9C700724B89 /* LogInParameters.swift */; };
 		D89B4D6E2285C1BB00C43E36 /* Personn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89B4D6D2285C1BB00C43E36 /* Personn.swift */; };
@@ -101,6 +105,10 @@
 		D86CF3CE228AF49000613022 /* FriendsStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsStorage.swift; sourceTree = "<group>"; };
 		D86CF3D0228AF52F00613022 /* AuthenticationStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationStorage.swift; sourceTree = "<group>"; };
 		D86CF3D2228AF87000613022 /* PersistingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistingTests.swift; sourceTree = "<group>"; };
+		D86CF3D5228AFD7000613022 /* AuthenticationStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationStorageTests.swift; sourceTree = "<group>"; };
+		D86CF3D7228AFF9D00613022 /* UserStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStorageTests.swift; sourceTree = "<group>"; };
+		D86CF3D9228B00CA00613022 /* RecordsStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsStorageTests.swift; sourceTree = "<group>"; };
+		D86CF3DB228B016C00613022 /* FriendsStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsStorageTests.swift; sourceTree = "<group>"; };
 		D88A0F522271F16300C959DD /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		D89075022264C9C700724B89 /* LogInParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInParameters.swift; sourceTree = "<group>"; };
 		D89B4D6D2285C1BB00C43E36 /* Personn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Personn.swift; sourceTree = "<group>"; };
@@ -255,6 +263,10 @@
 			isa = PBXGroup;
 			children = (
 				D86CF3D2228AF87000613022 /* PersistingTests.swift */,
+				D86CF3D5228AFD7000613022 /* AuthenticationStorageTests.swift */,
+				D86CF3D7228AFF9D00613022 /* UserStorageTests.swift */,
+				D86CF3D9228B00CA00613022 /* RecordsStorageTests.swift */,
+				D86CF3DB228B016C00613022 /* FriendsStorageTests.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -488,16 +500,20 @@
 			files = (
 				D8FBEDA2225F985B0099D688 /* URLSessionHelpersTests.swift in Sources */,
 				9B168465226141B000DCE4E9 /* Future+TestUtility.swift in Sources */,
+				D86CF3D8228AFF9D00613022 /* UserStorageTests.swift in Sources */,
 				D89C1CA8228459E6008BD352 /* URLSessionInterfaceTests.swift in Sources */,
+				D86CF3DA228B00CA00613022 /* RecordsStorageTests.swift in Sources */,
 				D86CF3D3228AF87000613022 /* PersistingTests.swift in Sources */,
 				9B0862012267AF0000721936 /* DataResponseHandlerTests.swift in Sources */,
 				D8498C6C2265CCE200FACD2E /* MockURLSession.swift in Sources */,
 				D8F9AAF92283172500E8532D /* FriendsWebServiceTests.swift in Sources */,
 				D8498C6E2265D22600FACD2E /* UsersWebServiceTests.swift in Sources */,
+				D86CF3D6228AFD7000613022 /* AuthenticationStorageTests.swift in Sources */,
 				D8498C702265D24F00FACD2E /* Environment+TestUtility.swift in Sources */,
 				D8205256225E217000936BF9 /* RequestTests.swift in Sources */,
 				D89E1C902289939A00A65768 /* AuthenticationWebServiceTests.swift in Sources */,
 				D8F9AAF72283169200E8532D /* RecordsWebServiceTests.swift in Sources */,
+				D86CF3DC228B016C00613022 /* FriendsStorageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
