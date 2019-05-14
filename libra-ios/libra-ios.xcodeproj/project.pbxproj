@@ -30,6 +30,10 @@
 		D8498C6E2265D22600FACD2E /* UsersWebServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8498C6D2265D22600FACD2E /* UsersWebServiceTests.swift */; };
 		D8498C702265D24F00FACD2E /* Environment+TestUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8498C6F2265D24F00FACD2E /* Environment+TestUtility.swift */; };
 		D84FBB60227847EC0099C70C /* Record.swift in Sources */ = {isa = PBXBuildFile; fileRef = D84FBB5F227847EC0099C70C /* Record.swift */; };
+		D86CF3CB228AF30A00613022 /* UserStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF3CA228AF30A00613022 /* UserStorage.swift */; };
+		D86CF3CD228AF42A00613022 /* RecordsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF3CC228AF42A00613022 /* RecordsStorage.swift */; };
+		D86CF3CF228AF49000613022 /* FriendsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF3CE228AF49000613022 /* FriendsStorage.swift */; };
+		D86CF3D1228AF52F00613022 /* AuthenticationStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF3D0228AF52F00613022 /* AuthenticationStorage.swift */; };
 		D88A0F532271F16300C959DD /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88A0F522271F16300C959DD /* Storage.swift */; };
 		D89075032264C9C700724B89 /* LogInParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89075022264C9C700724B89 /* LogInParameters.swift */; };
 		D89B4D6E2285C1BB00C43E36 /* Personn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89B4D6D2285C1BB00C43E36 /* Personn.swift */; };
@@ -91,6 +95,10 @@
 		D8498C6D2265D22600FACD2E /* UsersWebServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersWebServiceTests.swift; sourceTree = "<group>"; };
 		D8498C6F2265D24F00FACD2E /* Environment+TestUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Environment+TestUtility.swift"; sourceTree = "<group>"; };
 		D84FBB5F227847EC0099C70C /* Record.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Record.swift; sourceTree = "<group>"; };
+		D86CF3CA228AF30A00613022 /* UserStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStorage.swift; sourceTree = "<group>"; };
+		D86CF3CC228AF42A00613022 /* RecordsStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsStorage.swift; sourceTree = "<group>"; };
+		D86CF3CE228AF49000613022 /* FriendsStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsStorage.swift; sourceTree = "<group>"; };
+		D86CF3D0228AF52F00613022 /* AuthenticationStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationStorage.swift; sourceTree = "<group>"; };
 		D88A0F522271F16300C959DD /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		D89075022264C9C700724B89 /* LogInParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInParameters.swift; sourceTree = "<group>"; };
 		D89B4D6D2285C1BB00C43E36 /* Personn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Personn.swift; sourceTree = "<group>"; };
@@ -245,6 +253,10 @@
 			children = (
 				D8DD0BE622771EA300CAC829 /* Cache */,
 				D88A0F522271F16300C959DD /* Storage.swift */,
+				D86CF3D0228AF52F00613022 /* AuthenticationStorage.swift */,
+				D86CF3CA228AF30A00613022 /* UserStorage.swift */,
+				D86CF3CC228AF42A00613022 /* RecordsStorage.swift */,
+				D86CF3CE228AF49000613022 /* FriendsStorage.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -421,6 +433,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D86CF3CB228AF30A00613022 /* UserStorage.swift in Sources */,
 				D821FA132264AE68003A3B63 /* Endpoint.swift in Sources */,
 				D8205254225E10BB00936BF9 /* URLSession+Helpers.swift in Sources */,
 				D8FBED9B225F86B10099D688 /* ForwardApplication.swift in Sources */,
@@ -441,9 +454,12 @@
 				D8DD0BEB22773B9600CAC829 /* UpdateUserParameters.swift in Sources */,
 				D89E1C8E228992CF00A65768 /* AuthenticationWebService.swift in Sources */,
 				D8AD3179227C296500D2E756 /* RecordParameters.swift in Sources */,
+				D86CF3D1228AF52F00613022 /* AuthenticationStorage.swift in Sources */,
 				D8FBED99225F829D0099D688 /* ForwardComposition.swift in Sources */,
+				D86CF3CD228AF42A00613022 /* RecordsStorage.swift in Sources */,
 				D89C1CA622844F4D008BD352 /* FriendsWebService.swift in Sources */,
 				D821FA112264A878003A3B63 /* Environment.swift in Sources */,
+				D86CF3CF228AF49000613022 /* FriendsStorage.swift in Sources */,
 				D808A92422733C0500172FF4 /* Caching.swift in Sources */,
 				D820525A225E22D000936BF9 /* HTTPMethod.swift in Sources */,
 				D89075032264C9C700724B89 /* LogInParameters.swift in Sources */,

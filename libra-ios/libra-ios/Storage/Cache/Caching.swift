@@ -1,6 +1,6 @@
 import Foundation
 
-func save<Key, Entity>(_ entity: Entity, as witness: Caching<Key, Entity>) throws where Key: Hashable  {
+func saveEntity<Key, Entity>(_ entity: Entity, as witness: Caching<Key, Entity>) throws where Key: Hashable  {
     try witness.persisting.save(entity, witness.key)
 }
 
@@ -18,7 +18,7 @@ struct Caching<Key, Entity> where Key: Hashable {
     let key: Key
 }
 
-// Use `userDefaults` to cache token & user for now, because there is no certificate for Apple developer
+// Use `userDefaults` to cache token for now, because there is no certificate for Apple developer
 extension Caching where Key == String, Entity == String {
     static let token = Caching(persisting: .userDefaults, key: "co.libra-ios.token")
 }

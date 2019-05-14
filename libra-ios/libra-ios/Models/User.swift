@@ -9,7 +9,8 @@ struct User {
     }
     
     let person: Person
-    let token: String?
+    let token: String? // Only used for signup & login APIs
+    
     // TODO: Need one `shouldSync` or `isChanged` property
     // The same in `Record` & `Person`
 }
@@ -31,7 +32,8 @@ extension User: Decodable {
 extension User: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(token, forKey: .token)
+        // Should NOT include token for local storage
+//        try container.encodeIfPresent(token, forKey: .token)
         try container.encode(person.id, forKey: .id)
         try container.encode(person.username, forKey: .username)
         try container.encode(person.firstName, forKey: .firstName)

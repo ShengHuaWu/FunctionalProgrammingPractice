@@ -5,7 +5,7 @@ extension URLSessionInterface {
     
     func sendTokenAuthenticatedRequest<Entity>(to endpoint: Endpoint, method: HTTPMethod) -> Future<Result<Entity, NetworkError>> where Entity: Decodable {
         do {
-            return (endpoint, method, try Current.storage.fetchToken())
+            return (endpoint, method, try Current.storage.authentication.fetchToken())
                 |> Request<Entity>.makeTokenAuthenticatd(to:method:token:)
                 >>> send
         } catch {
@@ -17,7 +17,7 @@ extension URLSessionInterface {
     
     func sendTokenAuthenticatdRequest<Entity, Parameters>(to endpoint: Endpoint, method: HTTPMethod, parameters: Parameters) -> Future<Result<Entity, NetworkError>> where Entity: Decodable, Parameters: Encodable {
         do {
-            return (endpoint, method, try Current.storage.fetchToken(), parameters)
+            return (endpoint, method, try Current.storage.authentication.fetchToken(), parameters)
                 |> Request.makeTokenAuthenticated(to:method:token:parameters:)
                 >>> send
         } catch {

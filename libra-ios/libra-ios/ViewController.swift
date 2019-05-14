@@ -8,7 +8,7 @@ class ViewController: UIViewController {
         view.backgroundColor = .yellow
         
         // TODO: To be removed
-        /*
+        
         let parameters = LogInParameters(username: "shengwu1", password: "12345678")
         Current.webService.authentication.logIn(parameters).map { result -> Result<Void, Error> in
             do {
@@ -16,8 +16,8 @@ class ViewController: UIViewController {
                 
                 guard let token = user.token else { return .failure(NetworkError.unexpectedResponse) }
                 
-                try Current.storage.saveToken(token)
-                try Current.storage.saveUser(user)
+                try Current.storage.authentication.saveToken(token)
+                try Current.storage.user.save(user)
                 
                 return .success(())
             } catch {
@@ -27,9 +27,9 @@ class ViewController: UIViewController {
             DispatchQueue.main.async {
                 print(result)
                 
-                let user = try! Current.storage.fetchUser()
+                let user = try! Current.storage.user.fetch()
                 print(user)
             }
-        }*/
+        }
     }
 }

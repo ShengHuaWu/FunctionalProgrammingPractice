@@ -33,7 +33,7 @@ class URLSessionInterfaceTests: XCTestCase {
     
     func testThatSendTokenAuthenticatedRequestAsksStorageToFetchToken() {
         var fetchTokenCallCount = 0
-        Current.storage.fetchToken = {
+        Current.storage.authentication.fetchToken = {
             fetchTokenCallCount += 1
             return "This is a token"
         }
@@ -50,7 +50,7 @@ class URLSessionInterfaceTests: XCTestCase {
     
     func testThatSendTokenAuthenticatedRequestThrowsMissingTokenIfFetchTokenFails() {
         var fetchTokenCallCount = 0
-        Current.storage.fetchToken = {
+        Current.storage.authentication.fetchToken = {
             fetchTokenCallCount += 1
             throw PersistingError.noEntity
         }
