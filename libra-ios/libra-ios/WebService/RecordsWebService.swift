@@ -1,5 +1,4 @@
 // This type contains APIs related to records, and it should NOT be accessed directly
-
 struct RecordsWebService {
     var getAll = getAllRecords
     var get = getRecord(with:)

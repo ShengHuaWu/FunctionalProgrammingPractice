@@ -13,6 +13,9 @@ struct User {
     
     // TODO: Need one `shouldSync` or `isChanged` property
     // The same in `Record` & `Person`
+    /*
+     Consider using `struct Changing<A> where A: Codable` to present old and new values
+    */
 }
 
 extension User: Decodable {

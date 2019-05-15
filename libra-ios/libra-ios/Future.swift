@@ -1,5 +1,3 @@
-import Foundation
-
 struct Future<A> {
     let run: (@escaping (A) -> Void) -> Void
 }

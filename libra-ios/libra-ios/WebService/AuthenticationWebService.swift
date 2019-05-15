@@ -1,5 +1,4 @@
 // This type contains APIs related to authentication, and it should NOT be accessed directly
-
 struct AuthenticationWebService {
     var signUp = signUp(with:)
     var logIn = logIn(with:)

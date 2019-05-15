@@ -1,5 +1,4 @@
 // This type contains APIs related to friends, and it should NOT be accessed directly
-
 struct FriendsWebService {
     var getAll = getAllFriends(for:)
     var addFriendship = addFriendship(with:)

@@ -1,3 +1,4 @@
+// Use this type to persits records
 struct RecordsStorage {
     var save = { try saveEntity($0, as: .records) }
     var fetch = { try fetchEntity(as: .records) }

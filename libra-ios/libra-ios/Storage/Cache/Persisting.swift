@@ -102,7 +102,7 @@ private func makeKeychainQuery(with key: String) -> [String: AnyObject] {
     return query
 }
 
-// MARK: User Defaults
+// MARK: - User Defaults
 private func save(_ string: String, toUserDefaultsFor key: String) throws {
     UserDefaults.standard.set(string, forKey: key)
 }
