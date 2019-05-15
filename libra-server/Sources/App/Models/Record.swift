@@ -23,6 +23,7 @@ final class Record: Codable {
     var creatorID: User.ID // It creates a parent-child relationship
     
     // TODO: `attachments` properties
+    // https://github.com/vapor/vapor/issues/730
     init(title: String, note: String, date: Date, amount: Double = 0.0, currency: String, mood: String, creatorID: User.ID) {
         self.title = title
         self.note = note

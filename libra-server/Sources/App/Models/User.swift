@@ -20,6 +20,8 @@ final class User: Codable {
     var password: String
     var email: String
     
+    // TODO: `avatar` upload: https://github.com/vapor/vapor/issues/730
+    
     init(firstName: String, lastName: String, username: String, password: String, email: String) {
         self.firstName = firstName
         self.lastName = lastName
