@@ -31,7 +31,34 @@ class UserStorageTests: XCTestCase {
         do {
             try userStorage.delete()
             _ = try userStorage.fetch()
-            XCTFail("The string has been deleted already")
+            XCTFail("The user has been deleted already")
+        } catch PersistingError.noEntity {
+            
+        } catch {
+            XCTFail("The error should be no entity")
+        }
+    }
+    
+    func testThatFetchChangingActionsReturnsChangingActionsIfChangingActionsIsSaved() throws {
+        let changingAction = ChangingAction.update(oldValue: user, newValue: user)
+        try userStorage.saveChangingActions([changingAction])
+        
+        let result = try userStorage.fetchChangingActions()
+        XCTAssertEqual(result.count, 1)
+        guard let first = result.first, case let .update(old, new) = first else {
+            return XCTFail("The first result should be an update action")
+        }
+        XCTAssertEqual(old.person.id, user.person.id)
+        XCTAssertEqual(new.person.id, user.person.id)
+        
+        try userStorage.deleteChangingActions()
+    }
+    
+    func testThatFetchChangingActionsThrowsPersistingErrorIfChangingActionsIsDeleted() {
+        do {
+            try userStorage.deleteChangingActions()
+            _ = try userStorage.fetchChangingActions()
+            XCTFail("The changing actions have been deleted already")
         } catch PersistingError.noEntity {
             
         } catch {

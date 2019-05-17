@@ -28,9 +28,13 @@ extension Caching where Key == String, Entity == User {
 }
 
 extension Caching where Key == String, Entity == [Record] {
-    static let records = Caching(persisting: .userDefaults, key: "co.libra.ios.records")
+    static let records = Caching(persisting: .userDefaults, key: "co.libra-ios.records")
 }
 
 extension Caching where Key == String, Entity == [Person] {
-    static let friends = Caching(persisting: .userDefaults, key: "co.libra.ios.friends")
+    static let friends = Caching(persisting: .userDefaults, key: "co.libra-ios.friends")
+}
+
+extension Caching where Key == String, Entity == [ChangingAction<User>] {
+    static let userChangingActions = Caching(persisting: .userDefaults, key: "co.libra-ios.user.changing-actions")
 }
