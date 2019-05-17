@@ -72,7 +72,10 @@ extension FriendsStorage {
     static let mock = FriendsStorage(
         save: { _ in throw PersistingError.noEntity },
         fetch: { throw PersistingError.noEntity },
-        delete: { throw PersistingError.noEntity })
+        delete: { throw PersistingError.noEntity },
+        saveChangingActions: { _ in throw PersistingError.noEntity },
+        fetchChangingActions: { throw PersistingError.noEntity },
+        deleteChangingActions: { throw PersistingError.noEntity })
 }
 
 extension Storage {

@@ -42,3 +42,7 @@ extension Caching where Key == String, Entity == [ChangingAction<User>] {
 extension Caching where Key == String, Entity == [ChangingAction<Record>] {
     static let recordChangingActions = Caching(persisting: .userDefaults, key: "co.libra-ios.record.changing-actions")
 }
+
+extension Caching where Key == String, Entity == [ChangingAction<Person>] {
+    static let friendChangingActions = Caching(persisting: .userDefaults, key: "co.libra-ios.friend.changing-actions")
+}

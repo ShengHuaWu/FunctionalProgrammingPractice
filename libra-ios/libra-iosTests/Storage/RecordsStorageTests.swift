@@ -31,7 +31,7 @@ class RecordsStorageTests: XCTestCase {
         do {
             try recordsStorage.delete()
             _ = try recordsStorage.fetch()
-            XCTFail("The record has been deleted already")
+            XCTFail("The records have been deleted already")
         } catch PersistingError.noEntity {
             
         } catch {
@@ -39,7 +39,7 @@ class RecordsStorageTests: XCTestCase {
         }
     }
     
-    func testThatFetchChangingActionsReturnsChangingActionsIfChangingActionsIsSaved() throws {
+    func testThatFetchChangingActionsReturnsChangingActionsIfChangingActionsAreSaved() throws {
         let changingAction = ChangingAction.update(oldValue: record, newValue: record)
         try recordsStorage.saveChangingActions([changingAction])
         
@@ -54,7 +54,7 @@ class RecordsStorageTests: XCTestCase {
         try recordsStorage.deleteChangingActions()
     }
     
-    func testThatFetchChangingActionsThrowsPersistingErrorIfChangingActionsIsDeleted() {
+    func testThatFetchChangingActionsThrowsPersistingErrorIfChangingActionsAreDeleted() {
         do {
             try recordsStorage.deleteChangingActions()
             _ = try recordsStorage.fetchChangingActions()

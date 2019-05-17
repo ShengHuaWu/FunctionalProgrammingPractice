@@ -31,7 +31,34 @@ class FriendsStorageTests: XCTestCase {
         do {
             try friendsStorage.delete()
             _ = try friendsStorage.fetch()
-            XCTFail("The string has been deleted already")
+            XCTFail("The friends have been deleted already")
+        } catch PersistingError.noEntity {
+            
+        } catch {
+            XCTFail("The error should be no entity")
+        }
+    }
+    
+    func testThatFetchChangingActionsReturnsChangingActionsIfChangingActionsAreSaved() throws {
+        let changingAction = ChangingAction.update(oldValue: friend, newValue: friend)
+        try friendsStorage.saveChangingActions([changingAction])
+        
+        let result = try friendsStorage.fetchChangingActions()
+        XCTAssertEqual(result.count, 1)
+        guard let first = result.first, case let .update(old, new) = first else {
+            return XCTFail("The first result should be an update action")
+        }
+        XCTAssertEqual(old.id, friend.id)
+        XCTAssertEqual(new.id, friend.id)
+        
+        try friendsStorage.deleteChangingActions()
+    }
+    
+    func testThatFetchChangingActionsThrowsPersistingErrorIfChangingActionsAreDeleted() {
+        do {
+            try friendsStorage.deleteChangingActions()
+            _ = try friendsStorage.fetchChangingActions()
+            XCTFail("The changing actions have been deleted already")
         } catch PersistingError.noEntity {
             
         } catch {

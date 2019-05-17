@@ -39,7 +39,7 @@ class UserStorageTests: XCTestCase {
         }
     }
     
-    func testThatFetchChangingActionsReturnsChangingActionsIfChangingActionsIsSaved() throws {
+    func testThatFetchChangingActionsReturnsChangingActionsIfChangingActionsAreSaved() throws {
         let changingAction = ChangingAction.update(oldValue: user, newValue: user)
         try userStorage.saveChangingActions([changingAction])
         
@@ -54,7 +54,7 @@ class UserStorageTests: XCTestCase {
         try userStorage.deleteChangingActions()
     }
     
-    func testThatFetchChangingActionsThrowsPersistingErrorIfChangingActionsIsDeleted() {
+    func testThatFetchChangingActionsThrowsPersistingErrorIfChangingActionsAreDeleted() {
         do {
             try userStorage.deleteChangingActions()
             _ = try userStorage.fetchChangingActions()
