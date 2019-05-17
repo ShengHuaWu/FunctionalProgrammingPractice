@@ -31,7 +31,34 @@ class RecordsStorageTests: XCTestCase {
         do {
             try recordsStorage.delete()
             _ = try recordsStorage.fetch()
-            XCTFail("The string has been deleted already")
+            XCTFail("The record has been deleted already")
+        } catch PersistingError.noEntity {
+            
+        } catch {
+            XCTFail("The error should be no entity")
+        }
+    }
+    
+    func testThatFetchChangingActionsReturnsChangingActionsIfChangingActionsIsSaved() throws {
+        let changingAction = ChangingAction.update(oldValue: record, newValue: record)
+        try recordsStorage.saveChangingActions([changingAction])
+        
+        let result = try recordsStorage.fetchChangingActions()
+        XCTAssertEqual(result.count, 1)
+        guard let first = result.first, case let .update(old, new) = first else {
+            return XCTFail("The first result should be an update action")
+        }
+        XCTAssertEqual(old.id, record.id)
+        XCTAssertEqual(new.id, record.id)
+        
+        try recordsStorage.deleteChangingActions()
+    }
+    
+    func testThatFetchChangingActionsThrowsPersistingErrorIfChangingActionsIsDeleted() {
+        do {
+            try recordsStorage.deleteChangingActions()
+            _ = try recordsStorage.fetchChangingActions()
+            XCTFail("The changing actions have been deleted already")
         } catch PersistingError.noEntity {
             
         } catch {
