@@ -9,6 +9,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         
         let vc = ViewController()
+        // TODO: Build UI: authenticated (login/signup) and list of records 
         window?.rootViewController = vc
         window?.makeKeyAndVisible()
         

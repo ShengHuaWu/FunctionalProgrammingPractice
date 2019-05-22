@@ -43,4 +43,6 @@ struct Request<Entity> where Entity: Decodable {
             return try decoder.decode(Entity.self, from: data)
         }
     }
+    
+    // TODO: Multi-parts upload request
 }
