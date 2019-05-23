@@ -4,6 +4,7 @@ import Crypto
 final class UsersController: RouteCollection {
     func boot(router: Router) throws {
         // Not protected: signup
+        // TODO: API key?
         let usersGroup = router.grouped("users")
         usersGroup.post("signup", use: signupHandler)
         

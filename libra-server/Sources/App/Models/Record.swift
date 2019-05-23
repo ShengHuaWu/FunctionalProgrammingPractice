@@ -20,7 +20,7 @@ final class Record: Codable {
     var amount: Double
     var currency: String
     var mood: String
-    var creatorID: User.ID // It creates a parent-child relationship
+    var creatorID: User.ID // This creates a parent-child relationship
     
     // TODO: `attachments` properties
     // https://github.com/vapor/vapor/issues/730
