@@ -10,6 +10,7 @@ final class Record: Codable {
         case amount
         case currency
         case mood
+        case isDeleted = "is_deleted"
         case creatorID = "creator_id"
     }
     
@@ -20,17 +21,19 @@ final class Record: Codable {
     var amount: Double
     var currency: String
     var mood: String
+    var isDeleted: Bool
     var creatorID: User.ID // This creates a parent-child relationship
     
     // TODO: `attachments` properties
     // https://github.com/vapor/vapor/issues/730
-    init(title: String, note: String, date: Date, amount: Double = 0.0, currency: String, mood: String, creatorID: User.ID) {
+    init(title: String, note: String, date: Date, amount: Double = 0.0, currency: String, mood: String, isDeleted: Bool, creatorID: User.ID) {
         self.title = title
         self.note = note
         self.date = date
         self.amount = amount
         self.currency = currency
         self.mood = mood
+        self.isDeleted = isDeleted
         self.creatorID = creatorID
     }
 }

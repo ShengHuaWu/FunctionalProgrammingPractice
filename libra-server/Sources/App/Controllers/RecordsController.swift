@@ -16,12 +16,12 @@ final class RecordsController: RouteCollection {
 
 private extension RecordsController {
     func getAllFromUserHandler(_ req: Request) throws -> Future<[Record.Intact]> {
-        return try req.requireAuthenticated(User.self).makeAllRecordsFuture(on: req).makeIntacts(on: req)
+        return try req.requireAuthenticated(User.self).makeAllUndeletedRecordsFuture(on: req).makeIntacts(on: req)
     }
     
     func getOneHandler(_ req: Request) throws -> Future<Record.Intact> {
         let user = try req.requireAuthenticated(User.self)
-        return try req.parameters.next(Record.self).validate(creator: user).makeIntact(on: req)
+        return try req.parameters.next(Record.self).validate(creator: user).validateDeletion().makeIntact(on: req)
     }
     
     func createHandler(_ req: Request) throws -> Future<Record.Intact> {
@@ -37,7 +37,7 @@ private extension RecordsController {
     
     func updateHandler(_ req: Request) throws -> Future<Record.Intact> {
         let user = try req.requireAuthenticated(User.self)
-        let recordFuture = try req.parameters.next(Record.self).validate(creator: user)
+        let recordFuture = try req.parameters.next(Record.self).validate(creator: user).validateDeletion()
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
         
         return flatMap(to: Record.Intact.self, recordFuture, bodyFuture) { record, body in
@@ -50,9 +50,8 @@ private extension RecordsController {
         }
     }
     
-    // TODO: Not delete the record directly. Consider using a flag
     func deleteHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let user = try req.requireAuthenticated(User.self)
-        return try req.parameters.next(Record.self).validate(creator: user).delete(on: req).transform(to: .noContent)
+        return try req.parameters.next(Record.self).validate(creator: user).markAsDeleted(on: req).transform(to: .noContent)
     }
 }

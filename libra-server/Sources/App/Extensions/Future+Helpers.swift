@@ -56,6 +56,23 @@ extension Future where T: Record {
             return self
         }
     }
+    
+    func markAsDeleted(on conn: DatabaseConnectable) -> Future<T> {
+        return flatMap { record in
+            record.isDeleted = true
+            return record.save(on: conn)
+        }
+    }
+    
+    func validateDeletion() -> Future<T> {
+        return map { record in
+            guard !record.isDeleted else {
+                throw Abort(.notFound)
+            }
+            
+            return record
+        }
+    }
 }
 
 extension Future where T == [Record] {

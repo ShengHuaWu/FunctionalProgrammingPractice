@@ -121,8 +121,8 @@ extension User {
         }
     }
     
-    func makeAllRecordsFuture(on conn: DatabaseConnectable) throws -> Future<[Record]> {
-        return try records.query(on: conn).all()
+    func makeAllUndeletedRecordsFuture(on conn: DatabaseConnectable) throws -> Future<[Record]> {
+        return try records.query(on: conn).filter(\.isDeleted == false).all()
     }
     
     func makeAllFriendsFuture(on conn: DatabaseConnectable) throws -> Future<[User]> {
