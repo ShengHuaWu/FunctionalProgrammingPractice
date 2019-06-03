@@ -10,3 +10,4 @@
 7. The `attach` method on `Siblings` will NOT handle duplications.
 8. It's important to set up environment variable for admin user or just not seeding the admin user in production.
 9. Access PostgreSQL on Docker: `docker exec -it libra-db psql -U libra`.
+10. There is a default limit of 1 million bytes for incoming requests, but we can override it by registering a custom `NIOServerConfig` instance `configure.swift`. For example, `services.register(NIOServerConfig.default(maxBodySize: 20_000_000))`.

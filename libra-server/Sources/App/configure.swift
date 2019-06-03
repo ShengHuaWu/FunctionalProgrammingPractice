@@ -55,6 +55,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     migrations.add(migration: AdminUser.self, database: .psql)
     migrations.add(model: Token.self, database: .psql)
     migrations.add(model: Record.self, database: .psql)
+    migrations.add(model: Asset.self, database: .psql)
     migrations.add(model: RecordCompanionPivot.self, database: .psql)
     migrations.add(model: FriendshipPivot.self, database: .psql)
     services.register(migrations)

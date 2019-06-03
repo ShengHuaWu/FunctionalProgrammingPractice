@@ -11,6 +11,7 @@ final class RecordsController: RouteCollection {
         tokenProtected.post(use: createHandler)
         tokenProtected.put(Record.parameter, use: updateHandler)
         tokenProtected.delete(Record.parameter, use: deleteHandler)
+        tokenProtected.post(Record.parameter, "attachments", use: uploadAttachmentHandler)
     }
 }
 
@@ -54,4 +55,28 @@ private extension RecordsController {
         let user = try req.requireAuthenticated(User.self)
         return try req.parameters.next(Record.self).validate(creator: user).markAsDeleted(on: req).transform(to: .noContent)
     }
+    
+    func uploadAttachmentHandler(_ req: Request) throws -> Future<Asset> {
+        let user = try req.requireAuthenticated(User.self)
+        let recordFuture = try req.parameters.next(Record.self).validate(creator: user).validateDeletion()
+        let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
+        
+        return flatMap(to: Asset.self, recordFuture, fileFuture) { record, file in
+            // TODO: Extract url as a function
+            let directory = DirectoryConfig.detect()
+            let workPath = directory.workDir
+            let name = UUID().uuidString
+            let url = URL(fileURLWithPath: workPath).appendingPathComponent("Resources/Records", isDirectory: true).appendingPathComponent(name, isDirectory: false)
+            
+            do {
+                try file.data.write(to: url) // TODO: `save` method to `File`?
+                let asset = Asset(name: name, recordID: try record.requireID())
+                return asset.save(on: req)
+            } catch {
+                throw Abort(.internalServerError)
+            }
+        }
+    }
+    
+    // TODO: Download attachment, remove attachment
 }

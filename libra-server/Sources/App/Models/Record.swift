@@ -24,8 +24,6 @@ final class Record: Codable {
     var isDeleted: Bool
     var creatorID: User.ID // This creates a parent-child relationship
     
-    // TODO: `attachments` properties
-    // https://github.com/vapor/vapor/issues/730
     init(title: String, note: String, date: Date, amount: Double = 0.0, currency: String, mood: String, isDeleted: Bool, creatorID: User.ID) {
         self.title = title
         self.note = note
@@ -63,6 +61,10 @@ extension Record {
         return parent(\.creatorID)
     }
     
+    private var attachments: Children<Record, Asset> {
+        return children(\.recordID)
+    }
+    
     private var companions: Siblings<Record, User, RecordCompanionPivot> {
         return siblings()
     }
@@ -83,9 +85,10 @@ extension Record {
         let companionsFuture = try companions.query(on: conn).all().map(to: [User.Public].self) { users in
             return users.map { $0.makePublic() }
         }
+        let attachmentsFuture = try attachments.query(on: conn).all()
         
-        return map(to: Intact.self, creatorFuture, companionsFuture) { creator, companions in
-            return Intact(id: self.id, title: self.title, note: self.note, date: self.date, amount: self.amount, currency: self.currency, mood: self.mood, creator: creator, companions: companions)
+        return map(to: Intact.self, creatorFuture, companionsFuture, attachmentsFuture) { creator, companions, attachments in
+            return Intact(id: self.id, title: self.title, note: self.note, date: self.date, amount: self.amount, currency: self.currency, mood: self.mood, creator: creator, companions: companions, attachments: attachments)
         }
     }
     
