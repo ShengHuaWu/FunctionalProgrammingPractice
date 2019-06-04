@@ -110,6 +110,17 @@ private extension RecordsController {
         }
         
         return assetFuture.flatMap(to: HTTPStatus.self) { asset in
+            // TODO: Extract url as a function
+            let directory = DirectoryConfig.detect()
+            let workPath = directory.workDir
+            let url = URL(fileURLWithPath: workPath).appendingPathComponent("Resources/Records", isDirectory: true).appendingPathComponent(asset.name, isDirectory: false)
+            let fileManager = FileManager() // TODO: How to handle dependency?
+            guard fileManager.fileExists(atPath: url.path) else {
+                throw Abort(.notFound)
+            }
+            
+            try fileManager.removeItem(at: url)
+            
             return asset.delete(on: req).transform(to: .noContent)
         }
     }
