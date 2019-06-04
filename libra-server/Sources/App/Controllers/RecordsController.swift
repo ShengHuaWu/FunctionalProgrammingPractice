@@ -24,7 +24,7 @@ private extension RecordsController {
     
     func getOneHandler(_ req: Request) throws -> Future<Record.Intact> {
         let user = try req.requireAuthenticated(User.self)
-        return try req.parameters.next(Record.self).validate(creator: user).validateDeletion().makeIntact(on: req)
+        return try req.parameters.next(Record.self).hasCreator(user).isDeleted().makeIntact(on: req)
     }
     
     func createHandler(_ req: Request) throws -> Future<Record.Intact> {
@@ -40,7 +40,7 @@ private extension RecordsController {
     
     func updateHandler(_ req: Request) throws -> Future<Record.Intact> {
         let user = try req.requireAuthenticated(User.self)
-        let recordFuture = try req.parameters.next(Record.self).validate(creator: user).validateDeletion()
+        let recordFuture = try req.parameters.next(Record.self).hasCreator(user).isDeleted()
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
         
         return flatMap(to: Record.Intact.self, recordFuture, bodyFuture) { record, body in
@@ -55,12 +55,12 @@ private extension RecordsController {
     
     func deleteHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let user = try req.requireAuthenticated(User.self)
-        return try req.parameters.next(Record.self).validate(creator: user).markAsDeleted(on: req).transform(to: .noContent)
+        return try req.parameters.next(Record.self).hasCreator(user).markAsDeleted(on: req).transform(to: .noContent)
     }
     
     func uploadAttachmentHandler(_ req: Request) throws -> Future<Asset> {
         let user = try req.requireAuthenticated(User.self)
-        let recordFuture = try req.parameters.next(Record.self).validate(creator: user).validateDeletion()
+        let recordFuture = try req.parameters.next(Record.self).hasCreator(user).isDeleted()
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
         return flatMap(to: Asset.self, recordFuture, fileFuture) { record, file in
@@ -70,9 +70,9 @@ private extension RecordsController {
     
     func downloadAttachmentHandler(_ req: Request) throws -> Future<HTTPResponse> {
         let user = try req.requireAuthenticated(User.self)
-        let recordFuture = try req.parameters.next(Record.self).validate(creator: user).validateDeletion()
+        let recordFuture = try req.parameters.next(Record.self).hasCreator(user).isDeleted()
         let assetFuture = recordFuture.flatMap(to: Asset.self) { record in
-            return try req.parameters.next(Asset.self).validate(record: record)
+            return try req.parameters.next(Asset.self).isAttached(to: record)
         }
         
         return assetFuture.makeDownloadHTTPResponse()
@@ -80,9 +80,9 @@ private extension RecordsController {
     
     func deleteAttachmentHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let user = try req.requireAuthenticated(User.self)
-        let recordFuture = try req.parameters.next(Record.self).validate(creator: user).validateDeletion()
+        let recordFuture = try req.parameters.next(Record.self).hasCreator(user).isDeleted()
         let assetFuture = recordFuture.flatMap(to: Asset.self) { record in
-            return try req.parameters.next(Asset.self).validate(record: record)
+            return try req.parameters.next(Asset.self).isAttached(to: record)
         }
         
         return assetFuture.deleteFile(on: req).delete(on: req).transform(to: .noContent)

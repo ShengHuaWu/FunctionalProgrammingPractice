@@ -35,12 +35,12 @@ private extension UsersController {
     func getOneHandler(_ req: Request) throws -> Future<User.Public> {
         let authedUser = try req.requireAuthenticated(User.self)
         
-        return try req.parameters.next(User.self).validate(authedUser: authedUser).makePublic()
+        return try req.parameters.next(User.self).isAuthorized(by: authedUser).makePublic()
     }
     
     func updateHandler(_ req: Request) throws -> Future<User.Public> {
         let authedUser = try req.requireAuthenticated(User.self)
-        let userParametersFuture = try req.parameters.next(User.self).validate(authedUser: authedUser)
+        let userParametersFuture = try req.parameters.next(User.self).isAuthorized(by: authedUser)
         
         return try flatMap(to: User.Public.self, userParametersFuture, req.content.decode(User.UpdateRequestBody.self)) { user, body in
             return user.update(with: body).save(on: req).makePublic()
@@ -71,12 +71,12 @@ private extension UsersController {
     func getAllFriendsHandler(_ req: Request) throws -> Future<[User.Public]> {
         let authedUser = try req.requireAuthenticated(User.self)
         
-        return try req.parameters.next(User.self).validate(authedUser: authedUser).makeAllFriends(on: req).makePublics()
+        return try req.parameters.next(User.self).isAuthorized(by: authedUser).makeAllFriends(on: req).makePublics()
     }
     
     func getOneFriendHandler(_ req: Request) throws -> Future<User.Public> {
         let authedUser = try req.requireAuthenticated(User.self)
-        let userParametersFuture = try req.parameters.next(User.self).validate(authedUser: authedUser)
+        let userParametersFuture = try req.parameters.next(User.self).isAuthorized(by: authedUser)
         let personParametersFuture = try req.parameters.next(User.self)
         
         return flatMap(to: User.Public.self, userParametersFuture, personParametersFuture) { user, person in
@@ -90,7 +90,7 @@ private extension UsersController {
     
     func addFriendHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let authedUser = try req.requireAuthenticated(User.self)
-        let userParametersFuture = try req.parameters.next(User.self).validate(authedUser: authedUser)
+        let userParametersFuture = try req.parameters.next(User.self).isAuthorized(by: authedUser)
         let queryPersonFuture = try req.content.decode(AddFriendBody.self).flatMap(to: User?.self) { body in
             return User.makeSingleQueryFuture(using: body.personID, on: req)
         }
@@ -108,7 +108,7 @@ private extension UsersController {
     
     func removeFriendHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let authedUser = try req.requireAuthenticated(User.self)
-        let userParametersFuture = try req.parameters.next(User.self).validate(authedUser: authedUser)
+        let userParametersFuture = try req.parameters.next(User.self).isAuthorized(by: authedUser)
         let personParametersFuture = try req.parameters.next(User.self)
         
         return flatMap(to: HTTPStatus.self, userParametersFuture, personParametersFuture) { user, person in

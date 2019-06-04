@@ -10,7 +10,7 @@ extension Future where T: User {
         return map { $0.makePublic() }
     }
     
-    func validate(authedUser: User) throws -> Future<T> {
+    func isAuthorized(by authedUser: User) throws -> Future<T> {
         return flatMap { user in
             guard authedUser.id == user.id else {
                 throw Abort(.unauthorized)
@@ -21,9 +21,7 @@ extension Future where T: User {
     }
     
     func makeAllFriends(on conn: DatabaseConnectable) throws -> Future<[User]> {
-        return flatMap { user in
-            return try user.makeAllFriendsFuture(on: conn)
-        }
+        return flatMap { try $0.makeAllFriendsFuture(on: conn) }
     }
 }
 
@@ -36,18 +34,14 @@ extension Future where T == [User] {
 // MARK: - Record Helpers
 extension Future where T: Record {
     func makeIntact(on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
-        return flatMap { record in
-            return try record.makeIntactFuture(on: conn)
-        }
+        return flatMap { try $0.makeIntactFuture(on: conn) }
     }
     
     func makeRemoveAllCompanions(on conn: DatabaseConnectable) -> Future<Void> {
-        return flatMap { record in
-            return record.makeRemoveAllCompanionsFuture(on: conn)
-        }
+        return flatMap { $0.makeRemoveAllCompanionsFuture(on: conn) }
     }
     
-    func validate(creator: User) throws -> Future<T> {
+    func hasCreator(_ creator: User) throws -> Future<T> {
         return map { record in
             guard try creator.requireID() == record.creatorID else {
                 throw Abort(.unauthorized)
@@ -64,7 +58,7 @@ extension Future where T: Record {
         }
     }
     
-    func validateDeletion() -> Future<T> {
+    func isDeleted() -> Future<T> {
         return map { record in
             guard !record.isDeleted else {
                 throw Abort(.notFound)
@@ -86,28 +80,24 @@ extension Future where T == [Record] {
 // MARK: - Record Request Body Helpers
 extension Future where T == Record.RequestBody {
     func makeRecord(for user: User) throws -> Future<Record> {
-        return map(to: Record.self) { try $0.makeRecord(for: user) }
+        return map { try $0.makeRecord(for: user) }
     }
     
     func makeQueuyCompanions(on conn: DatabaseConnectable) -> Future<[User]> {
-        return flatMap(to: [User].self) { body in
-            return User.makeQueryFuture(using: body.companionIDs, on: conn)
-        }
+        return flatMap { User.makeQueryFuture(using: $0.companionIDs, on: conn) }
     }
 }
 
 // MARK: - Token Helpers
 extension Future where T: Token {
     func makePublicUser(for user: User) -> Future<User.Public> {
-        return map { token in
-            return user.makePublic(with: token)
-        }
+        return map { user.makePublic(with: $0) }
     }
 }
 
 // MARK: - Asset Helpers
 extension Future where T: Asset {
-    func validate(record: Record) throws -> Future<T> {
+    func isAttached(to record: Record) throws -> Future<T> {
         return map { asset in
             guard try record.requireID() == asset.recordID else {
                 throw Abort(.badRequest)
@@ -118,14 +108,10 @@ extension Future where T: Asset {
     }
     
     func makeDownloadHTTPResponse() -> Future<HTTPResponse> {
-        return map { asset in
-            return HTTPResponse(body: try asset.getFileData())
-        }
+        return map {  HTTPResponse(body: try $0.getFileData()) }
     }
     
     func deleteFile(on conn: DatabaseConnectable) -> Future<Asset> {
-        return map { asset in
-            return try asset.removeFile()
-        }
+        return map { try $0.removeFile() }
     }
 }
