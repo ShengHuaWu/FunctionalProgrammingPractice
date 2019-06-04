@@ -116,4 +116,16 @@ extension Future where T: Asset {
             return asset
         }
     }
+    
+    func makeDownloadHTTPResponse() -> Future<HTTPResponse> {
+        return map { asset in
+            return HTTPResponse(body: try asset.getFileData())
+        }
+    }
+    
+    func deleteFile(on conn: DatabaseConnectable) -> Future<Asset> {
+        return map { asset in
+            return try asset.removeFile()
+        }
+    }
 }

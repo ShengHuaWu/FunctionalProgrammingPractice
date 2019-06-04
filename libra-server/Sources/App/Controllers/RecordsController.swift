@@ -64,19 +64,7 @@ private extension RecordsController {
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
         return flatMap(to: Asset.self, recordFuture, fileFuture) { record, file in
-            // TODO: Extract url as a function
-            let directory = DirectoryConfig.detect()
-            let workPath = directory.workDir
-            let name = UUID().uuidString
-            let url = URL(fileURLWithPath: workPath).appendingPathComponent("Resources/Records", isDirectory: true).appendingPathComponent(name, isDirectory: false)
-            
-            do {
-                try file.data.write(to: url) // TODO: `save` method to `File`?
-                let asset = Asset(name: name, recordID: try record.requireID())
-                return asset.save(on: req)
-            } catch {
-                throw Abort(.internalServerError)
-            }
+            return try file.makeAssetFuture(for: record, on: req)
         }
     }
     
@@ -87,19 +75,7 @@ private extension RecordsController {
             return try req.parameters.next(Asset.self).validate(record: record)
         }
         
-        return assetFuture.map(to: HTTPResponse.self) { asset in
-            // TODO: Extract url as a function
-            let directory = DirectoryConfig.detect()
-            let workPath = directory.workDir
-            let url = URL(fileURLWithPath: workPath).appendingPathComponent("Resources/Records", isDirectory: true).appendingPathComponent(asset.name, isDirectory: false)
-            let fileManager = FileManager() // TODO: How to handle dependency?
-            guard fileManager.fileExists(atPath: url.path) else {
-                throw Abort(.notFound)
-            }
-            
-            let data = try Data(contentsOf: url)
-            return HTTPResponse(body: data)
-        }
+        return assetFuture.makeDownloadHTTPResponse()
     }
     
     func deleteAttachmentHandler(_ req: Request) throws -> Future<HTTPStatus> {
@@ -109,19 +85,6 @@ private extension RecordsController {
             return try req.parameters.next(Asset.self).validate(record: record)
         }
         
-        return assetFuture.flatMap(to: HTTPStatus.self) { asset in
-            // TODO: Extract url as a function
-            let directory = DirectoryConfig.detect()
-            let workPath = directory.workDir
-            let url = URL(fileURLWithPath: workPath).appendingPathComponent("Resources/Records", isDirectory: true).appendingPathComponent(asset.name, isDirectory: false)
-            let fileManager = FileManager() // TODO: How to handle dependency?
-            guard fileManager.fileExists(atPath: url.path) else {
-                throw Abort(.notFound)
-            }
-            
-            try fileManager.removeItem(at: url)
-            
-            return asset.delete(on: req).transform(to: .noContent)
-        }
+        return assetFuture.deleteFile(on: req).delete(on: req).transform(to: .noContent)
     }
 }
