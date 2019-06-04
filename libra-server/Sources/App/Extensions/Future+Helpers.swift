@@ -41,7 +41,7 @@ extension Future where T: Record {
         return flatMap { $0.makeRemoveAllCompanionsFuture(on: conn) }
     }
     
-    func hasCreator(_ creator: User) throws -> Future<T> {
+    func isOwned(by creator: User) throws -> Future<T> {
         return map { record in
             guard try creator.requireID() == record.creatorID else {
                 throw Abort(.unauthorized)
