@@ -12,6 +12,8 @@ final class RecordsController: RouteCollection {
         tokenProtected.put(Record.parameter, use: updateHandler)
         tokenProtected.delete(Record.parameter, use: deleteHandler)
         tokenProtected.post(Record.parameter, "attachments", use: uploadAttachmentHandler)
+        tokenProtected.get(Record.parameter, "attachments", Asset.parameter, use: downloadAttachmentHandler)
+        tokenProtected.delete(Record.parameter, "attachments", Asset.parameter, use: deleteAttachmentHandler)
     }
 }
 
@@ -78,5 +80,37 @@ private extension RecordsController {
         }
     }
     
-    // TODO: Download attachment, remove attachment
+    func downloadAttachmentHandler(_ req: Request) throws -> Future<HTTPResponse> {
+        let user = try req.requireAuthenticated(User.self)
+        let recordFuture = try req.parameters.next(Record.self).validate(creator: user).validateDeletion()
+        let assetFuture = recordFuture.flatMap(to: Asset.self) { record in
+            return try req.parameters.next(Asset.self).validate(record: record)
+        }
+        
+        return assetFuture.map(to: HTTPResponse.self) { asset in
+            // TODO: Extract url as a function
+            let directory = DirectoryConfig.detect()
+            let workPath = directory.workDir
+            let url = URL(fileURLWithPath: workPath).appendingPathComponent("Resources/Records", isDirectory: true).appendingPathComponent(asset.name, isDirectory: false)
+            let fileManager = FileManager() // TODO: How to handle dependency?
+            guard fileManager.fileExists(atPath: url.path) else {
+                throw Abort(.notFound)
+            }
+            
+            let data = try Data(contentsOf: url)
+            return HTTPResponse(body: data)
+        }
+    }
+    
+    func deleteAttachmentHandler(_ req: Request) throws -> Future<HTTPStatus> {
+        let user = try req.requireAuthenticated(User.self)
+        let recordFuture = try req.parameters.next(Record.self).validate(creator: user).validateDeletion()
+        let assetFuture = recordFuture.flatMap(to: Asset.self) { record in
+            return try req.parameters.next(Asset.self).validate(record: record)
+        }
+        
+        return assetFuture.flatMap(to: HTTPStatus.self) { asset in
+            return asset.delete(on: req).transform(to: .noContent)
+        }
+    }
 }

@@ -48,12 +48,12 @@ extension Future where T: Record {
     }
     
     func validate(creator: User) throws -> Future<T> {
-        return flatMap { record in
-            guard creator.id == record.creatorID else {
+        return map { record in
+            guard try creator.requireID() == record.creatorID else {
                 throw Abort(.unauthorized)
             }
             
-            return self
+            return record
         }
     }
     
@@ -101,6 +101,19 @@ extension Future where T: Token {
     func makePublicUser(for user: User) -> Future<User.Public> {
         return map { token in
             return user.makePublic(with: token)
+        }
+    }
+}
+
+// MARK: - Asset Helpers
+extension Future where T: Asset {
+    func validate(record: Record) throws -> Future<T> {
+        return map { asset in
+            guard try record.requireID() == asset.recordID else {
+                throw Abort(.badRequest)
+            }
+            
+            return asset
         }
     }
 }
