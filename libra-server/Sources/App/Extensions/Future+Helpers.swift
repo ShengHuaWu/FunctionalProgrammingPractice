@@ -96,14 +96,14 @@ extension Future where T: Token {
 }
 
 // MARK: - Asset Helpers
-extension Future where T: Asset {
+extension Future where T: Attachment {
     func isAttached(to record: Record) throws -> Future<T> {
-        return map { asset in
-            guard try record.requireID() == asset.recordID else {
+        return map { attachment in
+            guard try record.requireID() == attachment.recordID else {
                 throw Abort(.badRequest)
             }
             
-            return asset
+            return attachment
         }
     }
     
@@ -111,7 +111,7 @@ extension Future where T: Asset {
         return map {  HTTPResponse(body: try $0.getFileData()) }
     }
     
-    func deleteFile(on conn: DatabaseConnectable) -> Future<Asset> {
+    func deleteFile(on conn: DatabaseConnectable) -> Future<Attachment> {
         return map { try $0.removeFile() }
     }
 }

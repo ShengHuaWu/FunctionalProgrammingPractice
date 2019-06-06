@@ -1,7 +1,7 @@
 import Vapor
 import FluentPostgreSQL
 
-final class Asset: Codable {
+final class Attachment: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case name
@@ -19,13 +19,13 @@ final class Asset: Codable {
 }
 
 // MARK: - PostgreSQLModel
-extension Asset: PostgreSQLModel {}
+extension Attachment: PostgreSQLModel {}
 
 // MARK: - Content
-extension Asset: Content {}
+extension Attachment: Content {}
 
 // MARK: - Migration
-extension Asset: Migration {
+extension Attachment: Migration {
     static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
         return Database.create(self, on: conn) { builder in
             try addProperties(to: builder)
@@ -35,10 +35,11 @@ extension Asset: Migration {
 }
 
 // MARK: - Parameter
-extension Asset: Parameter {}
+extension Attachment: Parameter {}
 
 // MARK: - Helpers
-extension Asset {
+// TODO: Merge with `Avatar`
+extension Attachment {
     static func makeURL(with name: String) -> URL {
         let directory = DirectoryConfig.detect()
         let workPath = directory.workDir
@@ -46,12 +47,12 @@ extension Asset {
         return URL(fileURLWithPath: workPath).appendingPathComponent("Resources/Records", isDirectory: true).appendingPathComponent(name, isDirectory: false)
     }
     
-    private var record: Parent<Asset, Record> {
+    private var record: Parent<Attachment, Record> {
         return parent(\.recordID)
     }
     
     var url: URL {
-        return Asset.makeURL(with: name)
+        return Attachment.makeURL(with: name)
     }
     
     func getFileData() throws -> Data {
@@ -63,7 +64,7 @@ extension Asset {
         return try Data(contentsOf: url)
     }
     
-    func removeFile() throws -> Asset {
+    func removeFile() throws -> Attachment {
         let fileManager = FileManager() // TODO: How to handle dependency?
         guard fileManager.fileExists(atPath: url.path) else {
             throw Abort(.notFound)
@@ -77,11 +78,12 @@ extension Asset {
 
 // MARK: - File Helpers
 extension File {
-    func makeAssetFuture(for record: Record, on conn: DatabaseConnectable) throws -> Future<Asset> {
+    func makeAttachmentFuture(for record: Record, on conn: DatabaseConnectable) throws -> Future<Attachment> {
         let name = UUID().uuidString
-        let url = Asset.makeURL(with: name)
+        let url = Attachment.makeURL(with: name)
         try data.write(to: url)
         
-        return Asset(name: name, recordID: try record.requireID()).save(on: conn)
+        return Attachment(name: name, recordID: try record.requireID()).save(on: conn)
     }
 }
+

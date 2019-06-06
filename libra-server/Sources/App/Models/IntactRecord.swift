@@ -11,7 +11,7 @@ extension Record {
         let mood: String
         let creator: User.Public
         let companions: [User.Public]
-        let attachments: [Asset]
+        let attachments: [Attachment]
     }
 }
 

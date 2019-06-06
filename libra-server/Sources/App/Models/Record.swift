@@ -61,7 +61,7 @@ extension Record {
         return parent(\.creatorID)
     }
     
-    private var attachments: Children<Record, Asset> {
+    private var attachments: Children<Record, Attachment> {
         return children(\.recordID)
     }
     
