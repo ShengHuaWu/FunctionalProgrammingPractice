@@ -85,10 +85,10 @@ extension Record {
         let companionsFuture = try companions.query(on: conn).all().map(to: [User.Public].self) { users in
             return users.map { $0.makePublic() }
         }
-        let attachmentsFuture = try attachments.query(on: conn).all()
+        let assetsFuture = try attachments.query(on: conn).all().makeAssets()
         
-        return map(to: Intact.self, creatorFuture, companionsFuture, attachmentsFuture) { creator, companions, attachments in
-            return Intact(id: self.id, title: self.title, note: self.note, date: self.date, amount: self.amount, currency: self.currency, mood: self.mood, creator: creator, companions: companions, attachments: attachments)
+        return map(to: Intact.self, creatorFuture, companionsFuture, assetsFuture) { creator, companions, assets in
+            return Intact(id: self.id, title: self.title, note: self.note, date: self.date, amount: self.amount, currency: self.currency, mood: self.mood, creator: creator, companions: companions, assets: assets)
         }
     }
     
