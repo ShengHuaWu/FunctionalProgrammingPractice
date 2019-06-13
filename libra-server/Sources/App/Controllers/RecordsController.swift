@@ -58,6 +58,7 @@ private extension RecordsController {
         return try req.parameters.next(Record.self).isOwned(by: user).markAsDeleted(on: req).transform(to: .noContent)
     }
     
+    // TODO: Return `Asset`?
     func uploadAttachmentHandler(_ req: Request) throws -> Future<Attachment> {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self).isOwned(by: user).isDeleted()

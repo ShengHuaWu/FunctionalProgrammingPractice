@@ -119,4 +119,6 @@ private extension UsersController {
             }
         }
     }
+    
+    // TODO: Upload & download avatar
 }

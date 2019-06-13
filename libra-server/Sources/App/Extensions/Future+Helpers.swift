@@ -108,11 +108,15 @@ extension Future where T: Attachment {
     }
     
     func makeDownloadHTTPResponse() -> Future<HTTPResponse> {
-        return map { HTTPResponse(body: try $0.getFileData()) }
+        return map { HTTPResponse(body: try Current.resourcesService.fetch($0.name)) }
     }
     
     func deleteFile(on conn: DatabaseConnectable) -> Future<Attachment> {
-        return map { try $0.removeFile() }
+        return map { attachment in
+            try Current.resourcesService.delete(attachment.name)
+            
+            return attachment
+        }
     }
 }
 

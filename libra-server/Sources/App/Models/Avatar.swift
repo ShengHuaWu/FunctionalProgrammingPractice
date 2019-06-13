@@ -39,48 +39,17 @@ extension Avatar: Parameter {}
 
 // MARK: - Helpers
 extension Avatar {
-    static func makeURL(with name: String) -> URL {
-        let directory = DirectoryConfig.detect()
-        let workPath = directory.workDir
-        
-        return URL(fileURLWithPath: workPath).appendingPathComponent("Resources/Records", isDirectory: true).appendingPathComponent(name, isDirectory: false)
-    }
-    
-    private var record: Parent<Avatar, Record> {
+    private var user: Parent<Avatar, User> {
         return parent(\.userID)
-    }
-    
-    var url: URL {
-        return Avatar.makeURL(with: name)
-    }
-    
-    func getFileData() throws -> Data {
-        let fileManager = FileManager() // TODO: How to handle dependency?
-        guard fileManager.fileExists(atPath: url.path) else {
-            throw Abort(.notFound)
-        }
-        
-        return try Data(contentsOf: url)
-    }
-    
-    func removeFile() throws -> Avatar {
-        let fileManager = FileManager() // TODO: How to handle dependency?
-        guard fileManager.fileExists(atPath: url.path) else {
-            throw Abort(.notFound)
-        }
-        
-        try fileManager.removeItem(at: url)
-        
-        return self
     }
 }
 
 // MARK: - File Helpers
+// TODO: Move to another file?
 extension File {
     func makeAvatarFuture(for user: User, on conn: DatabaseConnectable) throws -> Future<Avatar> {
         let name = UUID().uuidString
-        let url = Avatar.makeURL(with: name)
-        try data.write(to: url)
+        try Current.resourcesService.save(data, name)
         
         return Avatar(name: name, userID: try user.requireID()).save(on: conn)
     }
