@@ -43,14 +43,3 @@ extension Attachment {
         return parent(\.recordID)
     }
 }
-
-// MARK: - File Helpers
-// TODO: Move to another file?
-extension File {
-    func makeAttachmentFuture(for record: Record, on conn: DatabaseConnectable) throws -> Future<Attachment> {
-        let name = UUID().uuidString
-        try Current.resourcesService.save(data, name)
-        
-        return Attachment(name: name, recordID: try record.requireID()).save(on: conn)
-    }
-}

@@ -43,16 +43,3 @@ extension Avatar {
         return parent(\.userID)
     }
 }
-
-// MARK: - File Helpers
-// TODO: Move to another file?
-extension File {
-    func makeAvatarFuture(for user: User, on conn: DatabaseConnectable) throws -> Future<Avatar> {
-        let name = UUID().uuidString
-        try Current.resourcesService.save(data, name)
-        
-        return Avatar(name: name, userID: try user.requireID()).save(on: conn)
-    }
-}
-
-
