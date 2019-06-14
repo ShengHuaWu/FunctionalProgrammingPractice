@@ -1,8 +1,7 @@
 import Foundation
 import Vapor
 
-// TODO: Change to `Persisting`?
-struct ResourcesService {
+struct ResourcePersisting {
     let save = { try saveData($0, to: makeResourcesURL(with: $1)) }
     let delete = makeResourcesURL(with:) >>> deleteData(at:)
     let fetch = makeResourcesURL(with:) >>> fetchData(from:)

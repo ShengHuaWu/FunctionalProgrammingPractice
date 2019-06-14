@@ -1,5 +1,5 @@
 struct Dependencies {
-    var resourcesService = ResourcesService()
+    var resourcePersisting = ResourcePersisting()
 }
 
 var Current = Dependencies()
