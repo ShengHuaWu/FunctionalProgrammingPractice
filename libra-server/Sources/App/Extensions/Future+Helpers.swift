@@ -118,6 +118,10 @@ extension Future where T: Attachment {
             return attachment
         }
     }
+    
+    func makeAsset() -> Future<Asset> {
+        return map { Asset(id: try $0.requireID()) }
+    }
 }
 
 extension Future where T == [Attachment] {

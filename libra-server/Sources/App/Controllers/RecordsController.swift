@@ -58,14 +58,13 @@ private extension RecordsController {
         return try req.parameters.next(Record.self).isOwned(by: user).markAsDeleted(on: req).transform(to: .noContent)
     }
     
-    // TODO: Return `Asset`?
-    func uploadAttachmentHandler(_ req: Request) throws -> Future<Attachment> {
+    func uploadAttachmentHandler(_ req: Request) throws -> Future<Asset> {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self).isOwned(by: user).isDeleted()
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
-        return flatMap(to: Attachment.self, recordFuture, fileFuture) { record, file in
-            return try file.makeAttachmentFuture(for: record, on: req)
+        return flatMap(to: Asset.self, recordFuture, fileFuture) { record, file in
+            return try file.makeAttachmentFuture(for: record, on: req).makeAsset()
         }
     }
     
