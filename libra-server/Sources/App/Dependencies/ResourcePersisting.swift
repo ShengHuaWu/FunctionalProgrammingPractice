@@ -8,13 +8,12 @@ struct ResourcePersisting {
 }
 
 // MARK: - Private
-// TODO: How to handle `FileManager` dependency?
 private func makeResourcesURL(with name: String) throws -> URL {
     let directory = DirectoryConfig.detect()
     let workPath = directory.workDir
     let directoryURL = URL(fileURLWithPath: workPath).appendingPathComponent("Resources/Records", isDirectory: true)
     
-    let fileManager = FileManager()
+    let fileManager = Current.fileManager()
     if !fileManager.fileExists(atPath: directoryURL.path) {
         try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
     }
@@ -27,7 +26,7 @@ private func saveData(_ data: Data, to url: URL) throws {
 }
 
 private func deleteData(at url: URL) throws {
-    let fileManager = FileManager()
+    let fileManager = Current.fileManager()
     guard fileManager.fileExists(atPath: url.path) else {
         throw Abort(.notFound)
     }
@@ -36,7 +35,7 @@ private func deleteData(at url: URL) throws {
 }
 
 private func fetchData(from url: URL) throws -> Data {
-    let fileManager = FileManager()
+    let fileManager = Current.fileManager()
     guard fileManager.fileExists(atPath: url.path) else {
         throw Abort(.notFound)
     }
