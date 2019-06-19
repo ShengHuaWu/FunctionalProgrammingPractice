@@ -64,7 +64,7 @@ private extension RecordsController {
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
         return flatMap(to: Asset.self, recordFuture, fileFuture) { record, file in
-            return try file.makeAttachmentFuture(for: record, on: req).makeAsset()
+            return try record.makeAttachmentFuture(with: file, on: req).makeAsset()
         }
     }
     
