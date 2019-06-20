@@ -35,6 +35,7 @@ final class UsersController: RouteCollection {
 }
 
 private extension UsersController {
+    // TODO: Take a look at `makePublic` usage
     func getOneHandler(_ req: Request) throws -> Future<User.Public> {
         let authedUser = try req.requireAuthenticated(User.self)
         
