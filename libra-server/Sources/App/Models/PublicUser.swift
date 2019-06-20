@@ -10,6 +10,7 @@ extension User {
             case username
             case email
             case token
+            case asset
         }
         
         let id: Int?
@@ -18,6 +19,7 @@ extension User {
         let username: String
         let email: String
         let token: String?
+        let asset: Asset?
     }
 }
 

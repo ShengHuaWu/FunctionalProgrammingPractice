@@ -19,9 +19,7 @@ final class User: Codable {
     var username: String
     var password: String
     var email: String
-    
-    // TODO: `avatar` upload: https://github.com/vapor/vapor/issues/730
-    
+        
     init(firstName: String, lastName: String, username: String, password: String, email: String) {
         self.firstName = firstName
         self.lastName = lastName
@@ -76,6 +74,10 @@ extension User {
         return siblings(FriendshipPivot.leftIDKey, FriendshipPivot.rightIDKey)
     }
     
+    private var avatar: Children<User, Avatar> {
+        return children(\.userID)
+    }
+    
     static func makeQueryFuture(using ids: [User.ID], on conn: DatabaseConnectable) -> Future<[User]> {
         return User.query(on: conn).filter(.make(\.id, .in, ids)).all()
     }
@@ -97,8 +99,14 @@ extension User {
         return self
     }
     
-    func makePublic(with token: Token? = nil) -> Public {
-        return Public(id: id, firstName: firstName, lastName: lastName, username: username, email: email, token: token?.token)
+    func makePublicFuture(with token: Token? = nil, on conn: DatabaseConnectable) throws -> Future<Public> {
+        let assetFuture = try avatar.query(on: conn).first().map(to: Asset?.self) { avatar in
+            return try avatar.map { Asset(id: try $0.requireID()) }
+        }
+        
+        return assetFuture.map(to: Public.self) { asset in
+            return Public(id: self.id, firstName: self.firstName, lastName: self.lastName, username: self.username, email: self.email, token: token?.token, asset: asset)
+        }
     }
     
     func update(with body: UpdateRequestBody) -> User {
@@ -139,6 +147,13 @@ extension User {
     
     func makeRemoveFriendshipFuture(to person: User, on conn: DatabaseConnectable) -> Future<HTTPStatus> {
         return friends.detach(person, on: conn).transform(to: .noContent)
+    }
+    
+    func makeAvatarFuture(with file: File, on conn: DatabaseConnectable) throws -> Future<Avatar> {
+        let name = UUID().uuidString
+        try Current.resourcePersisting.save(file.data, name)
+        
+        return Avatar(name: name, userID: try requireID()).save(on: conn)
     }
 }
 

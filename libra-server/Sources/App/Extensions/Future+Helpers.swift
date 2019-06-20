@@ -6,8 +6,8 @@ extension Future where T: User {
         return map { try $0.encryptPassword() }
     }
     
-    func makePublic() -> Future<User.Public> {
-        return map { $0.makePublic() }
+    func makePublic(on conn: DatabaseConnectable) -> Future<User.Public> {
+        return flatMap { try $0.makePublicFuture(on: conn) }
     }
     
     func isAuthorized(by authedUser: User) throws -> Future<T> {
@@ -20,14 +20,14 @@ extension Future where T: User {
         }
     }
     
-    func makeAllFriends(on conn: DatabaseConnectable) throws -> Future<[User]> {
+    func makeAllFriends(on conn: DatabaseConnectable) -> Future<[User]> {
         return flatMap { try $0.makeAllFriendsFuture(on: conn) }
     }
 }
 
 extension Future where T == [User] {
-    func makePublics() -> Future<[User.Public]> {
-        return map { $0.map { $0.makePublic() } }
+    func makePublics(on conn: DatabaseConnectable) -> Future<[User.Public]> {
+        return flatMap { try $0.map { try $0.makePublicFuture(on: conn) }.flatten(on: conn) }
     }
 }
 
@@ -90,8 +90,8 @@ extension Future where T == Record.RequestBody {
 
 // MARK: - Token Helpers
 extension Future where T: Token {
-    func makePublicUser(for user: User) -> Future<User.Public> {
-        return map { user.makePublic(with: $0) }
+    func makePublicUser(for user: User, on conn: DatabaseConnectable) -> Future<User.Public> {
+        return flatMap { try user.makePublicFuture(with: $0, on: conn) }
     }
 }
 
@@ -111,7 +111,7 @@ extension Future where T: Attachment {
         return map { HTTPResponse(body: try Current.resourcePersisting.fetch($0.name)) }
     }
     
-    func deleteFile(on conn: DatabaseConnectable) -> Future<Attachment> {
+    func deleteFile(on conn: DatabaseConnectable) -> Future<T> {
         return map { attachment in
             try Current.resourcePersisting.delete(attachment.name)
             
@@ -127,5 +127,34 @@ extension Future where T: Attachment {
 extension Future where T == [Attachment] {
     func makeAssets() -> Future<[Asset]> {
         return map { try $0.map { Asset(id: try $0.requireID()) } }
+    }
+}
+
+// MARK: - Avatar Helpers
+extension Future where T: Avatar {
+    func isBelong(to user: User) throws -> Future<T> {
+        return map { avatar in
+            guard try user.requireID() == avatar.userID else {
+                throw Abort(.badRequest)
+            }
+            
+            return avatar
+        }
+    }
+    
+    func makeDownloadHTTPResponse() -> Future<HTTPResponse> {
+        return map { HTTPResponse(body: try Current.resourcePersisting.fetch($0.name)) }
+    }
+    
+    func deleteFile(on conn: DatabaseConnectable) -> Future<T> {
+        return map { avatar in
+            try Current.resourcePersisting.delete(avatar.name)
+            
+            return avatar
+        }
+    }
+    
+    func makeAsset() -> Future<Asset> {
+        return map { Asset(id: try $0.requireID()) }
     }
 }
