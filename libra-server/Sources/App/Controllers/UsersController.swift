@@ -14,14 +14,11 @@ final class UsersController: RouteCollection {
         let basicProtected = usersGroup.grouped(basicAuthMiddleware, guardMiddleware)
         basicProtected.post("login", use: loginHandler)
         
-        // Token protected: get user, update user, avatars, search and friends group
+        // Token protected: get user, update user, search, friends group, and avatars
         let tokenAuthMiddleware = User.tokenAuthMiddleware()
         let tokenProtected = usersGroup.grouped(tokenAuthMiddleware, guardMiddleware)
         tokenProtected.get(User.parameter, use: getOneHandler)
         tokenProtected.put(User.parameter, use: updateHandler)
-        tokenProtected.post(User.parameter, "avatars", use: uploadAvatarHandler)
-        tokenProtected.get(User.parameter, "avatars", Avatar.parameter, use: downloadAvatarHandler)
-        tokenProtected.delete(User.parameter, "avatars", Avatar.parameter, use: deleteAvatarHandler)
         
         let searchGroup = tokenProtected.grouped("search")
         searchGroup.get(use: searchHandler)
@@ -31,11 +28,15 @@ final class UsersController: RouteCollection {
         friendsGroup.get(User.parameter, use: getOneFriendHandler)
         friendsGroup.post(use: addFriendHandler)
         friendsGroup.delete(User.parameter, use: removeFriendHandler)
+        
+        let avatarsGroup = tokenProtected.grouped(User.parameter, "avatars")
+        avatarsGroup.post(use: uploadAvatarHandler)
+        avatarsGroup.get(Avatar.parameter, use: downloadAvatarHandler)
+        avatarsGroup.delete(Avatar.parameter, use: deleteAvatarHandler)
     }
 }
 
 private extension UsersController {
-    // TODO: Take a look at `makePublic` usage
     func getOneHandler(_ req: Request) throws -> Future<User.Public> {
         let authedUser = try req.requireAuthenticated(User.self)
         

@@ -99,7 +99,6 @@ extension User {
         return self
     }
     
-    // TODO: Refactor?
     func makePublicFuture(with token: Token? = nil, on conn: DatabaseConnectable) throws -> Future<Public> {
         let assetFuture = try avatar.query(on: conn).first().map(to: Asset?.self) { avatar in
             return try avatar.map { Asset(id: try $0.requireID()) }
