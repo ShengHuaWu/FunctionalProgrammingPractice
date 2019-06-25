@@ -3,25 +3,25 @@ import Crypto
 
 final class UsersController: RouteCollection {
     func boot(router: Router) throws {
-        // Not protected: signup
+        // Not protected
         // TODO: API key?
         let usersGroup = router.grouped("users")
         usersGroup.post("signup", use: signupHandler)
         
-        // Basic protected: login
+        // Basic protected
         let basicAuthMiddleware = User.basicAuthMiddleware(using: BCryptDigest())
         let guardMiddleware = User.guardAuthMiddleware()
         let basicProtected = usersGroup.grouped(basicAuthMiddleware, guardMiddleware)
         basicProtected.post("login", use: loginHandler)
         
-        // Token protected: get user, update user, search, friends group, and avatars
+        // Token protected
         let tokenAuthMiddleware = User.tokenAuthMiddleware()
         let tokenProtected = usersGroup.grouped(tokenAuthMiddleware, guardMiddleware)
+        tokenProtected.delete("logout", use: logoutHandler)
+        tokenProtected.get("search", use: searchHandler)
+
         tokenProtected.get(User.parameter, use: getOneHandler)
         tokenProtected.put(User.parameter, use: updateHandler)
-        
-        let searchGroup = tokenProtected.grouped("search")
-        searchGroup.get(use: searchHandler)
         
         let friendsGroup = tokenProtected.grouped(User.parameter, "friends")
         friendsGroup.get(use: getAllFriendsHandler)
@@ -64,7 +64,12 @@ private extension UsersController {
         return try user.makeTokenFuture(on: req).save(on: req).makePublicUser(for: user, on: req)
     }
     
-    // TODO: Logout handler?
+    func logoutHandler(_ req: Request) throws -> Future<HTTPStatus> {
+        let user = try req.requireAuthenticated(User.self)
+
+        // TODO: Mark the token as revoked instead of deleting it directly
+        return try user.makeTokenFuture(on: req).delete(on: req).transform(to: .noContent)
+    }
 
     func searchHandler(_ req: Request) throws -> Future<[User.Public]> {
         let key = try req.query.get(String.self, at: "q")

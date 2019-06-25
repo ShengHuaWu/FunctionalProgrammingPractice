@@ -119,6 +119,7 @@ extension User {
     
     func makeTokenFuture(on conn: DatabaseConnectable) throws -> Future<Token> {
         // TODO: Refresh token? Sorting is just a temporary
+        // Exclude revoked tokens
         return try authTokens.query(on: conn).sort(\.token, .descending).first().map { token in
             guard let unwrappedToken = token else {
                 let random = try CryptoRandom().generateData(count: 16)
