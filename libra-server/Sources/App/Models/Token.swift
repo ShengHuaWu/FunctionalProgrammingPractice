@@ -6,16 +6,24 @@ final class Token: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case token
+        case isRevoked = "is_revoked"
+        case osName = "os_name"
+        case timeZone = "time_zone"
         case userID = "user_id"
     }
     
     var id: Int?
     var token: String
+    var isRevoked: Bool
+    var osName: String
+    var timeZone: String
     var userID: User.ID
-    // TODO: `isRevoked`, `deviceType`, `location` ...
     
-    init(token: String, userID: User.ID) {
+    init(token: String, isRevoked: Bool, osName: String, timeZone: String, userID: User.ID) {
         self.token = token
+        self.isRevoked = isRevoked
+        self.osName = osName
+        self.timeZone = timeZone
         self.userID = userID
     }
 }

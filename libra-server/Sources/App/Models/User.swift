@@ -118,12 +118,14 @@ extension User {
     }
     
     func makeTokenFuture(on conn: DatabaseConnectable) throws -> Future<Token> {
-        // TODO: Refresh token? Sorting is just a temporary
-        // Exclude revoked tokens
+        // TODO: Refresh token?
+        // Filter by `isRevoked`
         return try authTokens.query(on: conn).sort(\.token, .descending).first().map { token in
             guard let unwrappedToken = token else {
                 let random = try CryptoRandom().generateData(count: 16)
-                return try Token(token: random.base64EncodedString(), userID: self.requireID())
+                
+                // TODO: Pass `osName` and `timeZone`
+                return try Token(token: random.base64EncodedString(), isRevoked: false, osName: "", timeZone: "", userID: self.requireID())
             }
             
             return unwrappedToken

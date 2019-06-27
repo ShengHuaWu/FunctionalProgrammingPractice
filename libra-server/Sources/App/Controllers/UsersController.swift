@@ -61,6 +61,8 @@ private extension UsersController {
     func loginHandler(_ req: Request) throws -> Future<User.Public> {
         let user = try req.requireAuthenticated(User.self)
         
+        // TODO: Pass device os type & time zone within the body
+        
         return try user.makeTokenFuture(on: req).save(on: req).makePublicUser(for: user, on: req)
     }
     
