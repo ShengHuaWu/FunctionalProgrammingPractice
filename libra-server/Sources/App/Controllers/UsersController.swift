@@ -15,7 +15,7 @@ final class UsersController: RouteCollection {
         basicProtected.post("login", use: loginHandler)
         
         // Token protected
-        let tokenAuthMiddleware = User.tokenAuthMiddleware() // TODO: Check whether a token is revoked or not
+        let tokenAuthMiddleware = User.customTokenAuthMiddleware()
         let tokenProtected = usersGroup.grouped(tokenAuthMiddleware, guardMiddleware)
         tokenProtected.delete("logout", use: logoutHandler)
         tokenProtected.get("search", use: searchHandler)

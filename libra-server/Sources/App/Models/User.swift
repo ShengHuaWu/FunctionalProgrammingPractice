@@ -102,6 +102,10 @@ extension User {
         }.first()
     }
     
+    static func customTokenAuthMiddleware() -> CustomTokenAuthenticationMiddleware {
+        return CustomTokenAuthenticationMiddleware()
+    }
+    
     func encryptPassword() throws -> User {
         password = try BCrypt.hash(password)
         return self
