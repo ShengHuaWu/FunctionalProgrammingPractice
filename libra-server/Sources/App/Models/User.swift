@@ -94,6 +94,14 @@ extension User {
         }.all()
     }
     
+    private func makeQueryTokenFuture(with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<Token?> {
+        return try authTokens.query(on: conn).group(.and) { andGroup in
+            andGroup.filter(\.isRevoked == false)
+            andGroup.filter(.make(\.osName, .in, [body.osName]))
+            andGroup.filter(.make(\.timeZone, .in, [body.timeZone]))
+        }.first()
+    }
+    
     func encryptPassword() throws -> User {
         password = try BCrypt.hash(password)
         return self
@@ -117,14 +125,25 @@ extension User {
         return self
     }
     
-    func makeTokenFuture(on conn: DatabaseConnectable) throws -> Future<Token> {
+    func makeTokenFuture(with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<Token> {
         // TODO: Refresh token?
-        // Filter by `isRevoked`
+        return try makeQueryTokenFuture(with: body, on: conn).map { token in
+            guard let unwrappedToken = token else {
+                let random = try CryptoRandom().generateData(count: 16)
+                
+                return try Token(token: random.base64EncodedString(), isRevoked: false, osName: body.osName, timeZone: body.timeZone, userID: self.requireID())
+            }
+            
+            return unwrappedToken
+        }
+    }
+    
+    // TODO: To be removed
+    private func makeTokenFuture(on conn: DatabaseConnectable) throws -> Future<Token> {
         return try authTokens.query(on: conn).sort(\.token, .descending).first().map { token in
             guard let unwrappedToken = token else {
                 let random = try CryptoRandom().generateData(count: 16)
                 
-                // TODO: Pass `osName` and `timeZone`
                 return try Token(token: random.base64EncodedString(), isRevoked: false, osName: "", timeZone: "", userID: self.requireID())
             }
             
