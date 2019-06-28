@@ -53,39 +53,22 @@ private extension UsersController {
     }
     
     func signupHandler(_ req: Request) throws -> Future<User.Public> {
-        // TODO: Need refectoring
-        return try req.content.decode(AuthenticationBody.self).flatMap(to: User.Public.self) { body in
-            guard let userInfo = body.userInfo else {
-                throw Abort(.badRequest)
-            }
-            
-            return try userInfo.makeUser().encryptPassword().save(on: req).flatMap(to: User.Public.self) { user in
-                return try user.makeTokenFuture(with: body, on: req).save(on: req).makePublicUser(for: user, on: req)
-            }
-        }
+        return try req.content.decode(AuthenticationBody.self).signUp(on: req)
     }
     
     func loginHandler(_ req: Request) throws -> Future<User.Public> {
-        // TODO: Need refectoring
         let user = try req.requireAuthenticated(User.self)
-        let bodyFuture = try req.content.decode(AuthenticationBody.self)
         
-        return bodyFuture.flatMap(to: User.Public.self) { body in
-            return try user.makeTokenFuture(with: body, on: req).save(on: req).makePublicUser(for: user, on: req)
-        }
+        return try req.content.decode(AuthenticationBody.self).logIn(for: user, on: req)
     }
     
     func logoutHandler(_ req: Request) throws -> Future<HTTPStatus> {
-        // TODO: Need refectoring
         let user = try req.requireAuthenticated(User.self)
         let bodyFuture = try req.content.decode(AuthenticationBody.self)
         
         return bodyFuture.flatMap(to: Token.self) { body in
             return try user.makeTokenFuture(with: body, on: req)
-        }.flatMap(to: HTTPStatus.self) { token in
-            token.isRevoked = true
-            return token.save(on: req).transform(to: .noContent)
-        }
+        }.revoke(on: req)
     }
 
     func searchHandler(_ req: Request) throws -> Future<[User.Public]> {

@@ -31,6 +31,23 @@ extension Future where T == [User] {
     }
 }
 
+// MARK: - Authentication Body Helpers
+extension Future where T == AuthenticationBody {
+    func signUp(on conn: DatabaseConnectable) throws -> Future<User.Public> {
+        return flatMap { body in
+            guard let userInfo = body.userInfo else {
+                throw Abort(.badRequest)
+            }
+            
+            return try userInfo.makeUser().encryptPassword().save(on: conn).flatMap { try body.makeTokenFuture(for: $0, on: conn) }
+        }
+    }
+    
+    func logIn(for user: User, on conn: DatabaseConnectable) -> Future<User.Public> {
+        return flatMap { try $0.makeTokenFuture(for: user, on: conn) }
+    }
+}
+
 // MARK: - Record Helpers
 extension Future where T: Record {
     func makeIntact(on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
@@ -92,6 +109,13 @@ extension Future where T == Record.RequestBody {
 extension Future where T: Token {
     func makePublicUser(for user: User, on conn: DatabaseConnectable) -> Future<User.Public> {
         return flatMap { try user.makePublicFuture(with: $0, on: conn) }
+    }
+    
+    func revoke(on conn: DatabaseConnectable) -> Future<HTTPStatus> {
+        return flatMap { token in
+            token.isRevoked = true
+            return token.save(on: conn).transform(to: .noContent)
+        }
     }
 }
 

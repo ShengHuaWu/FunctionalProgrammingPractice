@@ -36,6 +36,13 @@ extension AuthenticationBody: Content {}
 extension AuthenticationBody.UserInfo: Content {}
 
 // MARK: - Helpers
+extension AuthenticationBody {
+    // TODO: Need refactoring. Maybe merge with `makeTokenFuturn` in `User.swift`
+    func makeTokenFuture(for user: User, on conn: DatabaseConnectable) throws -> Future<User.Public> {
+        return try user.makeTokenFuture(with: self, on: conn).save(on: conn).makePublicUser(for: user, on: conn)
+    }
+}
+
 extension AuthenticationBody.UserInfo {
     func makeUser() -> User {
         return User(firstName: firstName, lastName: lastName, username: username, password: password, email: email)

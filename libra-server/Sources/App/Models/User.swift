@@ -142,19 +142,6 @@ extension User {
         }
     }
     
-    // TODO: To be removed
-    private func makeTokenFuture(on conn: DatabaseConnectable) throws -> Future<Token> {
-        return try authTokens.query(on: conn).sort(\.token, .descending).first().map { token in
-            guard let unwrappedToken = token else {
-                let random = try CryptoRandom().generateData(count: 16)
-                
-                return try Token(token: random.base64EncodedString(), isRevoked: false, osName: "", timeZone: "", userID: self.requireID())
-            }
-            
-            return unwrappedToken
-        }
-    }
-    
     func makeAllUndeletedRecordsFuture(on conn: DatabaseConnectable) throws -> Future<[Record]> {
         return try records.query(on: conn).filter(\.isDeleted == false).all()
     }
