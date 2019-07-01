@@ -40,7 +40,9 @@ private extension UsersController {
     func getOneHandler(_ req: Request) throws -> Future<User.Public> {
         let authedUser = try req.requireAuthenticated(User.self)
         
-        return try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }.makePublic(on: req)
+        return try req.parameters.next(User.self)
+            .map { try authorize(authedUser, hasAccessTo: $0) }
+            .flatMap { try makePublicUserFuture(for: $0, on: req) }
     }
     
     func updateHandler(_ req: Request) throws -> Future<User.Public> {
@@ -48,7 +50,7 @@ private extension UsersController {
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }
         
         return try flatMap(to: User.Public.self, userFuture, req.content.decode(User.UpdateRequestBody.self)) { user, body in
-            return user.update(with: body).save(on: req).makePublic(on: req)
+            return user.update(with: body).save(on: req).flatMap { try makePublicUserFuture(for: $0, on: req) }
         }
     }
     
@@ -93,7 +95,7 @@ private extension UsersController {
             return user.makeHasFriendshipFuture(with: person, on: req).flatMap(to: User.Public.self) { isFriend in
                 guard isFriend else { throw Abort(.notFound) }
                 
-                return try person.makePublicFuture(on: req)
+                return try makePublicUserFuture(for: person, on: req)
             }
         }
     }

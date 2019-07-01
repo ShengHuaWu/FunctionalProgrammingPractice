@@ -74,7 +74,7 @@ extension User {
         return siblings(FriendshipPivot.leftIDKey, FriendshipPivot.rightIDKey)
     }
     
-    private var avatar: Children<User, Avatar> {
+    var avatar: Children<User, Avatar> {
         return children(\.userID)
     }
     
@@ -109,16 +109,6 @@ extension User {
     func encryptPassword() throws -> User {
         password = try BCrypt.hash(password)
         return self
-    }
-    
-    func makePublicFuture(with token: Token? = nil, on conn: DatabaseConnectable) throws -> Future<Public> {
-        let assetFuture = try avatar.query(on: conn).first().map(to: Asset?.self) { avatar in
-            return try avatar.map { Asset(id: try $0.requireID()) }
-        }
-        
-        return assetFuture.map(to: Public.self) { asset in
-            return Public(id: self.id, firstName: self.firstName, lastName: self.lastName, username: self.username, email: self.email, token: token?.token, asset: asset)
-        }
     }
     
     func update(with body: UpdateRequestBody) -> User {

@@ -10,3 +10,13 @@ func authorize(_ authenticatedUser: User, hasAccessTo user: User) throws -> User
     
     return user
 }
+
+func makePublicUserFuture(for user: User, with token: Token? = nil, on conn: DatabaseConnectable) throws -> Future<User.Public> {
+    let avatarFuture = try user.avatar.query(on: conn).first()
+    
+    return avatarFuture.map(to: User.Public.self) { avatar in
+        let asset = try avatar.map { Asset(id: try $0.requireID()) }
+        
+        return User.Public(id: user.id, firstName: user.firstName, lastName: user.lastName, username: user.username, email: user.email, token: token?.token, asset: asset)
+    }
+}
