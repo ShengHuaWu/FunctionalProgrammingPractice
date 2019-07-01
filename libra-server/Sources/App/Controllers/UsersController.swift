@@ -42,7 +42,7 @@ private extension UsersController {
         
         return try req.parameters.next(User.self)
             .map { try authorize(authedUser, hasAccessTo: $0) }
-            .flatMap { try makePublicUser(for: $0, on: req) }
+            .flatMap { try convert($0, toPublicOn: req) }
     }
     
     func updateHandler(_ req: Request) throws -> Future<User.Public> {
@@ -50,7 +50,7 @@ private extension UsersController {
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }
         
         return try flatMap(to: User.Public.self, userFuture, req.content.decode(User.UpdateRequestBody.self)) { user, body in
-            return user.update(with: body).save(on: req).flatMap { try makePublicUser(for: $0, on: req) }
+            return user.update(with: body).save(on: req).flatMap { try convert($0, toPublicOn: req) }
         }
     }
     
@@ -77,7 +77,7 @@ private extension UsersController {
         let key = try req.query.get(String.self, at: "q")
 
         // Wildcards: https://www.tutorialspoint.com/postgresql/postgresql_like_clause.htm
-        return User.makeSearchQueryFuture(using: "%\(key)%", on: req).flatMap { try makePublicUsers(for: $0, on: req) }
+        return User.makeSearchQueryFuture(using: "%\(key)%", on: req).flatMap { try convert($0, toPublicsOn: req) }
     }
     
     func getAllFriendsHandler(_ req: Request) throws -> Future<[User.Public]> {
@@ -85,8 +85,8 @@ private extension UsersController {
         
         return try req.parameters.next(User.self)
             .map { try authorize(authedUser, hasAccessTo: $0) }
-            .flatMap { try queryAllFriends(for: $0, on: req) }
-            .flatMap { try makePublicUsers(for: $0, on: req) }
+            .flatMap { try queryAllFriends(of: $0, on: req) }
+            .flatMap { try convert($0, toPublicsOn: req) }
     }
     
     func getOneFriendHandler(_ req: Request) throws -> Future<User.Public> {
@@ -98,7 +98,7 @@ private extension UsersController {
             return user.makeHasFriendshipFuture(with: person, on: req).flatMap(to: User.Public.self) { isFriend in
                 guard isFriend else { throw Abort(.notFound) }
                 
-                return try makePublicUser(for: person, on: req)
+                return try convert(person, toPublicOn: req)
             }
         }
     }
