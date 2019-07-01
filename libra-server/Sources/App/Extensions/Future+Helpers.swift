@@ -39,12 +39,14 @@ extension Future where T == AuthenticationBody {
                 throw Abort(.badRequest)
             }
             
-            return try userInfo.makeUser().encryptPassword().save(on: conn).flatMap { try body.makeTokenFuture(for: $0, on: conn) }
+            return try userInfo.makeUser().encryptPassword().save(on: conn).flatMap { user in
+               return try user.makeTokenFuture(with: body, on: conn).save(on: conn).makePublicUser(for: user, on: conn)
+            }
         }
     }
     
     func logIn(for user: User, on conn: DatabaseConnectable) -> Future<User.Public> {
-        return flatMap { try $0.makeTokenFuture(for: user, on: conn) }
+        return flatMap { try user.makeTokenFuture(with: $0, on: conn).save(on: conn).makePublicUser(for: user, on: conn) }
     }
 }
 
