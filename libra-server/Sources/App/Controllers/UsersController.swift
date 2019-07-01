@@ -77,7 +77,7 @@ private extension UsersController {
         let key = try req.query.get(String.self, at: "q")
 
         // Wildcards: https://www.tutorialspoint.com/postgresql/postgresql_like_clause.htm
-        return User.makeSearchQueryFuture(using: "%\(key)%", on: req).makePublics(on: req)
+        return User.makeSearchQueryFuture(using: "%\(key)%", on: req).flatMap { try makePublicUsersFuture(for: $0, on: req) }
     }
     
     func getAllFriendsHandler(_ req: Request) throws -> Future<[User.Public]> {
@@ -86,7 +86,7 @@ private extension UsersController {
         return try req.parameters.next(User.self)
             .map { try authorize(authedUser, hasAccessTo: $0) }
             .flatMap { try makeQueryAllFriendsFuture(for: $0, on: req) }
-            .makePublics(on: req)
+            .flatMap { try makePublicUsersFuture(for: $0, on: req) }
     }
     
     func getOneFriendHandler(_ req: Request) throws -> Future<User.Public> {

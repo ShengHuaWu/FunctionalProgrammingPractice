@@ -2,13 +2,6 @@ import Vapor
 
 // TODO: Move these methods to `Helpers.swift`
 
-// MARK: - User Helpers
-extension Future where T == [User] {
-    func makePublics(on conn: DatabaseConnectable) -> Future<[User.Public]> {
-        return flatMap { try $0.map { try makePublicUserFuture(for: $0, on: conn) }.flatten(on: conn) }
-    }
-}
-
 // MARK: - Authentication Body Helpers
 extension Future where T == AuthenticationBody {
     func signUp(on conn: DatabaseConnectable) throws -> Future<User.Public> {
