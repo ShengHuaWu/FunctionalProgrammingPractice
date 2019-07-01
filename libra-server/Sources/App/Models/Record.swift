@@ -81,8 +81,8 @@ extension Record {
     }
     
     func makeIntactFuture(on conn: DatabaseConnectable) throws -> Future<Intact> {
-        let creatorFuture = creator.get(on: conn).flatMap { try makePublicUserFuture(for: $0, on: conn) } 
-        let companionsFuture = try companions.query(on: conn).all().flatMap { try makePublicUsersFuture(for: $0, on: conn) }
+        let creatorFuture = creator.get(on: conn).flatMap { try makePublicUser(for: $0, on: conn) } 
+        let companionsFuture = try companions.query(on: conn).all().flatMap { try makePublicUsers(for: $0, on: conn) }
         let assetsFuture = try attachments.query(on: conn).all().makeAssets()
         
         return map(to: Intact.self, creatorFuture, companionsFuture, assetsFuture) { creator, companions, assets in

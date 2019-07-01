@@ -2,25 +2,6 @@ import Vapor
 
 // TODO: Move these methods to `Helpers.swift`
 
-// MARK: - Authentication Body Helpers
-extension Future where T == AuthenticationBody {
-    func signUp(on conn: DatabaseConnectable) throws -> Future<User.Public> {
-        return flatMap { body in
-            guard let userInfo = body.userInfo else {
-                throw Abort(.badRequest)
-            }
-            
-            return try userInfo.makeUser().encryptPassword().save(on: conn).flatMap { user in
-                return try user.makeTokenFuture(with: body, on: conn).save(on: conn).flatMap { try makePublicUserFuture(for: user, with: $0, on: conn) }
-            }
-        }
-    }
-    
-    func logIn(for user: User, on conn: DatabaseConnectable) -> Future<User.Public> {
-        return flatMap { try user.makeTokenFuture(with: $0, on: conn).save(on: conn).flatMap { try makePublicUserFuture(for: user, with: $0, on: conn) } }
-    }
-}
-
 // MARK: - Record Helpers
 extension Future where T: Record {
     func makeIntact(on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
