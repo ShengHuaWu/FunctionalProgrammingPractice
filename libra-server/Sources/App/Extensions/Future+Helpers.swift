@@ -1,5 +1,7 @@
 import Vapor
 
+// TODO: Move these methods to `Helpers.swift`
+
 // MARK: - User Helpers
 extension Future where T: User {
     func encryptPassword() throws -> Future<User> {
@@ -8,16 +10,6 @@ extension Future where T: User {
     
     func makePublic(on conn: DatabaseConnectable) -> Future<User.Public> {
         return flatMap { try $0.makePublicFuture(on: conn) }
-    }
-    
-    func isAuthorized(by authedUser: User) throws -> Future<T> {
-        return flatMap { user in
-            guard authedUser.id == user.id else {
-                throw Abort(.unauthorized)
-            }
-            
-            return self
-        }
     }
     
     func makeAllFriends(on conn: DatabaseConnectable) -> Future<[User]> {
