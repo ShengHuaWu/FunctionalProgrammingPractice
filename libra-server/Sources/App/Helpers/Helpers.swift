@@ -20,3 +20,7 @@ func makePublicUserFuture(for user: User, with token: Token? = nil, on conn: Dat
         return User.Public(id: user.id, firstName: user.firstName, lastName: user.lastName, username: user.username, email: user.email, token: token?.token, asset: asset)
     }
 }
+
+func makeQueryAllFriendsFuture(for user: User, on conn: DatabaseConnectable) throws -> Future<[User]> {
+    return try user.friends.query(on: conn).all()
+}

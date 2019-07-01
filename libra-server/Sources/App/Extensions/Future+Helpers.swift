@@ -3,12 +3,6 @@ import Vapor
 // TODO: Move these methods to `Helpers.swift`
 
 // MARK: - User Helpers
-extension Future where T: User {
-    func makeAllFriends(on conn: DatabaseConnectable) -> Future<[User]> {
-        return flatMap { try $0.makeAllFriendsFuture(on: conn) }
-    }
-}
-
 extension Future where T == [User] {
     func makePublics(on conn: DatabaseConnectable) -> Future<[User.Public]> {
         return flatMap { try $0.map { try makePublicUserFuture(for: $0, on: conn) }.flatten(on: conn) }
@@ -24,13 +18,13 @@ extension Future where T == AuthenticationBody {
             }
             
             return try userInfo.makeUser().encryptPassword().save(on: conn).flatMap { user in
-               return try user.makeTokenFuture(with: body, on: conn).save(on: conn).makePublicUser(for: user, on: conn)
+                return try user.makeTokenFuture(with: body, on: conn).save(on: conn).flatMap { try makePublicUserFuture(for: user, with: $0, on: conn) }
             }
         }
     }
     
     func logIn(for user: User, on conn: DatabaseConnectable) -> Future<User.Public> {
-        return flatMap { try user.makeTokenFuture(with: $0, on: conn).save(on: conn).makePublicUser(for: user, on: conn) }
+        return flatMap { try user.makeTokenFuture(with: $0, on: conn).save(on: conn).flatMap { try makePublicUserFuture(for: user, with: $0, on: conn) } }
     }
 }
 
@@ -93,10 +87,6 @@ extension Future where T == Record.RequestBody {
 
 // MARK: - Token Helpers
 extension Future where T: Token {
-    func makePublicUser(for user: User, on conn: DatabaseConnectable) -> Future<User.Public> {
-        return flatMap { try makePublicUserFuture(for: user, with: $0, on: conn) }
-    }
-    
     func revoke(on conn: DatabaseConnectable) -> Future<HTTPStatus> {
         return flatMap { token in
             token.isRevoked = true

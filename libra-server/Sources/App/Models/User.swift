@@ -70,7 +70,7 @@ extension User {
         return children(\.creatorID)
     }
     
-    private var friends: Siblings<User, User, FriendshipPivot> {
+    var friends: Siblings<User, User, FriendshipPivot> {
         return siblings(FriendshipPivot.leftIDKey, FriendshipPivot.rightIDKey)
     }
     
@@ -134,10 +134,6 @@ extension User {
     
     func makeAllUndeletedRecordsFuture(on conn: DatabaseConnectable) throws -> Future<[Record]> {
         return try records.query(on: conn).filter(\.isDeleted == false).all()
-    }
-    
-    func makeAllFriendsFuture(on conn: DatabaseConnectable) throws -> Future<[User]> {
-        return try friends.query(on: conn).all()
     }
     
     func makeHasFriendshipFuture(with person: User, on conn: DatabaseConnectable) -> Future<Bool> {

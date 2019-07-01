@@ -83,7 +83,10 @@ private extension UsersController {
     func getAllFriendsHandler(_ req: Request) throws -> Future<[User.Public]> {
         let authedUser = try req.requireAuthenticated(User.self)
         
-        return try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }.makeAllFriends(on: req).makePublics(on: req)
+        return try req.parameters.next(User.self)
+            .map { try authorize(authedUser, hasAccessTo: $0) }
+            .flatMap { try makeQueryAllFriendsFuture(for: $0, on: req) }
+            .makePublics(on: req)
     }
     
     func getOneFriendHandler(_ req: Request) throws -> Future<User.Public> {
