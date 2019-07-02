@@ -3,25 +3,6 @@ import Vapor
 // TODO: Move these methods to `Helpers.swift`
 
 // MARK: - Record Helpers
-extension Future where T: Record {
-    func markAsDeleted(on conn: DatabaseConnectable) -> Future<T> {
-        return flatMap { record in
-            record.isDeleted = true
-            return record.save(on: conn)
-        }
-    }
-    
-    func isDeleted() -> Future<T> {
-        return map { record in
-            guard !record.isDeleted else {
-                throw Abort(.notFound)
-            }
-            
-            return record
-        }
-    }
-}
-
 extension Future where T == [Record] {
     func makeIntacts(on conn: DatabaseConnectable) throws -> Future<[Record.Intact]> {
         return flatMap { records in

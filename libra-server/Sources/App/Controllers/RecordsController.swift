@@ -27,7 +27,6 @@ private extension RecordsController {
         
         return try req.parameters.next(Record.self)
             .map { try authorize(user, hasAccessTo: $0) }
-            .isDeleted()
             .flatMap { try convert($0, toIntactOn: req) }
     }
     
@@ -46,7 +45,6 @@ private extension RecordsController {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self)
             .map { try authorize(user, hasAccessTo: $0) }
-            .isDeleted()
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
         
         return flatMap(to: Record.Intact.self, recordFuture, bodyFuture) { record, body in
@@ -64,7 +62,7 @@ private extension RecordsController {
         
         return try req.parameters.next(Record.self)
             .map { try authorize(user, hasAccessTo: $0) }
-            .markAsDeleted(on: req)
+            .flatMap { mark($0, asDeletedOn: req) }
             .transform(to: .noContent)
     }
     
@@ -72,7 +70,6 @@ private extension RecordsController {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self)
             .map { try authorize(user, hasAccessTo: $0) }
-            .isDeleted()
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
         return flatMap(to: Asset.self, recordFuture, fileFuture) { record, file in
@@ -84,7 +81,6 @@ private extension RecordsController {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self)
             .map { try authorize(user, hasAccessTo: $0) }
-            .isDeleted()
         let attachmentFuture = recordFuture.flatMap(to: Attachment.self) { record in
             return try req.parameters.next(Attachment.self).isAttached(to: record)
         }
@@ -96,7 +92,6 @@ private extension RecordsController {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self)
             .map { try authorize(user, hasAccessTo: $0) }
-            .isDeleted()
         let attachmentFuture = recordFuture.flatMap(to: Attachment.self) { record in
             return try req.parameters.next(Attachment.self).isAttached(to: record)
         }

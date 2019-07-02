@@ -63,10 +63,21 @@ func removeAllCompanions(of record: Record, on conn: DatabaseConnectable) -> Fut
     return record.companions.detachAll(on: conn)
 }
 
+// Check `creatorID` as well as `isDeleted`
 func authorize(_ authenticatedUser: User, hasAccessTo record: Record) throws -> Record {
     guard try authenticatedUser.requireID() == record.creatorID else {
         throw Abort(.unauthorized)
     }
     
+    guard !record.isDeleted else {
+        throw Abort(.notFound)
+    }
+    
     return record
+}
+
+func mark(_ record: Record, asDeletedOn conn: DatabaseConnectable) -> Future<Record> {
+    record.isDeleted = true
+    
+    return record.save(on: conn)
 }
