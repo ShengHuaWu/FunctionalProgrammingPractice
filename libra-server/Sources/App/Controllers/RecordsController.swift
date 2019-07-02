@@ -19,7 +19,9 @@ final class RecordsController: RouteCollection {
 
 private extension RecordsController {
     func getAllFromUserHandler(_ req: Request) throws -> Future<[Record.Intact]> {
-        return try req.requireAuthenticated(User.self).makeAllUndeletedRecordsFuture(on: req).makeIntacts(on: req)
+        return try req.requireAuthenticated(User.self)
+            .makeAllUndeletedRecordsFuture(on: req)
+            .flatMap { try convert($0, toIntactsOn: req) }
     }
     
     func getOneHandler(_ req: Request) throws -> Future<Record.Intact> {

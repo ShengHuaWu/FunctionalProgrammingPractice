@@ -59,6 +59,10 @@ func convert(_ record: Record, toIntactOn conn: DatabaseConnectable) throws -> F
     }
 }
 
+func convert(_ records: [Record], toIntactsOn conn: DatabaseConnectable) throws -> Future<[Record.Intact]> {
+    return try records.map { try convert($0, toIntactOn: conn) }.flatten(on: conn)
+}
+
 func removeAllCompanions(of record: Record, on conn: DatabaseConnectable) -> Future<Void> {
     return record.companions.detachAll(on: conn)
 }

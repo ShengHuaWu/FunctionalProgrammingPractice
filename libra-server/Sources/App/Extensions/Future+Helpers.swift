@@ -2,15 +2,6 @@ import Vapor
 
 // TODO: Move these methods to `Helpers.swift`
 
-// MARK: - Record Helpers
-extension Future where T == [Record] {
-    func makeIntacts(on conn: DatabaseConnectable) throws -> Future<[Record.Intact]> {
-        return flatMap { records in
-            return try records.map { try convert($0, toIntactOn: conn) }.flatten(on: conn)
-        }
-    }
-}
-
 // MARK: - Record Request Body Helpers
 extension Future where T == Record.RequestBody {
     func makeRecord(for user: User) throws -> Future<Record> {
