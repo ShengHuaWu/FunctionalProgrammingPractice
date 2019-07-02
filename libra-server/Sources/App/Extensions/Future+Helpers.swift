@@ -4,20 +4,6 @@ import Vapor
 
 // MARK: - Record Helpers
 extension Future where T: Record {
-    func makeRemoveAllCompanions(on conn: DatabaseConnectable) -> Future<Void> {
-        return flatMap { $0.makeRemoveAllCompanionsFuture(on: conn) }
-    }
-    
-    func isOwned(by creator: User) throws -> Future<T> {
-        return map { record in
-            guard try creator.requireID() == record.creatorID else {
-                throw Abort(.unauthorized)
-            }
-            
-            return record
-        }
-    }
-    
     func markAsDeleted(on conn: DatabaseConnectable) -> Future<T> {
         return flatMap { record in
             record.isDeleted = true

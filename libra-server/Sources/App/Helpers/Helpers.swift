@@ -58,3 +58,15 @@ func convert(_ record: Record, toIntactOn conn: DatabaseConnectable) throws -> F
         return Record.Intact(id: record.id, title: record.title, note: record.note, date: record.date, amount: record.amount, currency: record.currency, mood: record.mood, creator: creator, companions: companions, assets: assets)
     }
 }
+
+func removeAllCompanions(of record: Record, on conn: DatabaseConnectable) -> Future<Void> {
+    return record.companions.detachAll(on: conn)
+}
+
+func authorize(_ authenticatedUser: User, hasAccessTo record: Record) throws -> Record {
+    guard try authenticatedUser.requireID() == record.creatorID else {
+        throw Abort(.unauthorized)
+    }
+    
+    return record
+}

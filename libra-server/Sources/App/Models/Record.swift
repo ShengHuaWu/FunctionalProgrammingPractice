@@ -88,10 +88,6 @@ extension Record {
         }
     }
     
-    func makeRemoveAllCompanionsFuture(on conn: DatabaseConnectable) -> Future<Void> {
-        return companions.detachAll(on: conn)
-    }
-    
     func makeAttachmentFuture(with file: File, on conn: DatabaseConnectable) throws -> Future<Attachment> {
         let name = UUID().uuidString
         try Current.resourcePersisting.save(file.data, name)
