@@ -57,15 +57,15 @@ extension Record: Parameter {}
 
 // MARK: - Helpers
 extension Record {
-    private var creator: Parent<Record, User> {
+    var creator: Parent<Record, User> {
         return parent(\.creatorID)
     }
     
-    private var attachments: Children<Record, Attachment> {
+    var attachments: Children<Record, Attachment> {
         return children(\.recordID)
     }
     
-    private var companions: Siblings<Record, User, RecordCompanionPivot> {
+    var companions: Siblings<Record, User, RecordCompanionPivot> {
         return siblings()
     }
     
@@ -80,21 +80,11 @@ extension Record {
         return self
     }
     
-    func makeIntactFuture(on conn: DatabaseConnectable) throws -> Future<Intact> {
-        let creatorFuture = creator.get(on: conn).flatMap { try convert($0, toPublicOn: conn) }
-        let companionsFuture = try companions.query(on: conn).all().flatMap { try convert($0, toPublicsOn: conn) }
-        let assetsFuture = try attachments.query(on: conn).all().makeAssets()
-        
-        return map(to: Intact.self, creatorFuture, companionsFuture, assetsFuture) { creator, companions, assets in
-            return Intact(id: self.id, title: self.title, note: self.note, date: self.date, amount: self.amount, currency: self.currency, mood: self.mood, creator: creator, companions: companions, assets: assets)
-        }
-    }
-    
     func makeAddCompanionsFuture(_ companions: [User], on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
         return companions.map { companion in
             return self.companions.attach(companion, on: conn)
         }.flatMap(to: Record.Intact.self, on: conn) { _ in
-            return try self.makeIntactFuture(on: conn)
+            return try convert(self, toIntactOn: conn)
         }
     }
     

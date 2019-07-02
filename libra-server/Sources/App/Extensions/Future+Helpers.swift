@@ -4,10 +4,6 @@ import Vapor
 
 // MARK: - Record Helpers
 extension Future where T: Record {
-    func makeIntact(on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
-        return flatMap { try $0.makeIntactFuture(on: conn) }
-    }
-    
     func makeRemoveAllCompanions(on conn: DatabaseConnectable) -> Future<Void> {
         return flatMap { $0.makeRemoveAllCompanionsFuture(on: conn) }
     }
@@ -43,7 +39,7 @@ extension Future where T: Record {
 extension Future where T == [Record] {
     func makeIntacts(on conn: DatabaseConnectable) throws -> Future<[Record.Intact]> {
         return flatMap { records in
-            return try records.map { try $0.makeIntactFuture(on: conn) }.flatten(on: conn)
+            return try records.map { try convert($0, toIntactOn: conn) }.flatten(on: conn)
         }
     }
 }

@@ -24,7 +24,11 @@ private extension RecordsController {
     
     func getOneHandler(_ req: Request) throws -> Future<Record.Intact> {
         let user = try req.requireAuthenticated(User.self)
-        return try req.parameters.next(Record.self).isOwned(by: user).isDeleted().makeIntact(on: req)
+        
+        return try req.parameters.next(Record.self)
+            .isOwned(by: user)
+            .isDeleted()
+            .flatMap { try convert($0, toIntactOn: req) }
     }
     
     func createHandler(_ req: Request) throws -> Future<Record.Intact> {

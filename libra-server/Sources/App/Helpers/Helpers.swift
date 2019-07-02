@@ -47,3 +47,14 @@ func logIn(for user: User, with body: AuthenticationBody, on conn: DatabaseConne
         .save(on: conn)
         .flatMap { try convert(user, toPublicOn: conn, with: $0) }
 }
+
+// MARK: - Record Helpers
+func convert(_ record: Record, toIntactOn conn: DatabaseConnectable) throws -> Future<Record.Intact> {
+    let creatorFuture = record.creator.get(on: conn).flatMap { try convert($0, toPublicOn: conn) }
+    let companionsFuture = try record.companions.query(on: conn).all().flatMap { try convert($0, toPublicsOn: conn) }
+    let assetsFuture = try record.attachments.query(on: conn).all().makeAssets()
+    
+    return map(to: Record.Intact.self, creatorFuture, companionsFuture, assetsFuture) { creator, companions, assets in
+        return Record.Intact(id: record.id, title: record.title, note: record.note, date: record.date, amount: record.amount, currency: record.currency, mood: record.mood, creator: creator, companions: companions, assets: assets)
+    }
+}
