@@ -68,9 +68,11 @@ private extension UsersController {
         let user = try req.requireAuthenticated(User.self)
         let bodyFuture = try req.content.decode(AuthenticationBody.self)
         
-        return bodyFuture.flatMap(to: Token.self) { body in
-            return try user.makeTokenFuture(with: body, on: req)
-        }.revoke(on: req)
+        return bodyFuture
+            .flatMap(to: Token.self) { body in
+                return try user.makeTokenFuture(with: body, on: req)
+            }
+            .flatMap { revoke($0, on: req) }
     }
 
     func searchHandler(_ req: Request) throws -> Future<[User.Public]> {

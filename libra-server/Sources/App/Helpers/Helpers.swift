@@ -3,6 +3,8 @@
 import Vapor
 
 // MARK: - User Helpers
+// TODO: `Accessing` struct
+// `authorize(_ user: U, toAccess rescourse: R, as accessing: A)`
 func authorize(_ authenticatedUser: User, hasAccessTo user: User) throws -> User {
     guard authenticatedUser.id == user.id else {
         throw Abort(.unauthorized)
@@ -46,6 +48,13 @@ func logIn(for user: User, with body: AuthenticationBody, on conn: DatabaseConne
     return try user.makeTokenFuture(with: body, on: conn)
         .save(on: conn)
         .flatMap { try convert(user, toPublicOn: conn, with: $0) }
+}
+
+// MARK: - Token Helpers
+func revoke(_ token: Token, on conn: DatabaseConnectable) -> Future<HTTPStatus> {
+    token.isRevoked = true
+    
+    return token.save(on: conn).transform(to: .noContent)
 }
 
 // MARK: - Record Helpers

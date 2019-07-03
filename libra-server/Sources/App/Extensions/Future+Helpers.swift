@@ -13,16 +13,6 @@ extension Future where T == Record.RequestBody {
     }
 }
 
-// MARK: - Token Helpers
-extension Future where T: Token {
-    func revoke(on conn: DatabaseConnectable) -> Future<HTTPStatus> {
-        return flatMap { token in
-            token.isRevoked = true
-            return token.save(on: conn).transform(to: .noContent)
-        }
-    }
-}
-
 // MARK: - Attachment Helpers
 extension Future where T: Attachment {
     func isAttached(to record: Record) throws -> Future<T> {
