@@ -35,8 +35,8 @@ private extension RecordsController {
     func createHandler(_ req: Request) throws -> Future<Record.Intact> {
         let user = try req.requireAuthenticated(User.self)
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
-        let recordFuture = try bodyFuture.makeRecord(for: user).save(on: req)
-        let companionsFuture = bodyFuture.makeQueuyCompanions(on: req)
+        let recordFuture = bodyFuture.map { try createRecord(with: $0, for: user) }
+        let companionsFuture = bodyFuture.flatMap { queryCompanions(with: $0.companionIDs, on: req) }
         
         return flatMap(to: Record.Intact.self, recordFuture, companionsFuture) { record, companions in
             return try record.makeAddCompanionsFuture(companions, on: req)
@@ -51,7 +51,7 @@ private extension RecordsController {
         
         return flatMap(to: Record.Intact.self, recordFuture, bodyFuture) { record, body in
             let updateRecordFuture = record.update(with: body).save(on: req).flatMap { removeAllCompanions(of: $0, on: req) }
-            let companionsFuture = User.makeQueryFuture(using: body.companionIDs, on: req)
+            let companionsFuture = queryCompanions(with: body.companionIDs, on: req)
             
             return flatMap(to: Record.Intact.self, updateRecordFuture, companionsFuture) { _, companions in
                 return try record.makeAddCompanionsFuture(companions, on: req)

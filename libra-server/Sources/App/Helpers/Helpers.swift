@@ -31,6 +31,10 @@ func queryAllFriends(of user: User, on conn: DatabaseConnectable) throws -> Futu
     return try user.friends.query(on: conn).all()
 }
 
+func queryCompanions(with userIDs: [User.ID], on conn: DatabaseConnectable) -> Future<[User]> {
+    return User.query(on: conn).filter(.make(\.id, .in, userIDs)).all()
+}
+
 // MARK: - Authentication Body Helpers
 func signUp(with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<User.Public> {
     guard let userInfo = body.userInfo else {
@@ -93,4 +97,9 @@ func mark(_ record: Record, asDeletedOn conn: DatabaseConnectable) -> Future<Rec
     record.isDeleted = true
     
     return record.save(on: conn)
+}
+
+// MARK: - Record Request Body Helpers
+func createRecord(with body: Record.RequestBody, for user: User) throws -> Record {
+    return try Record(title: body.title, note: body.note, date: body.date, amount: body.amount, currency: body.currency, mood: body.mood, isDeleted: false, creatorID: user.requireID())
 }

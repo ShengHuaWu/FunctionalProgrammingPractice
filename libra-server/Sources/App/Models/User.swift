@@ -78,10 +78,6 @@ extension User {
         return children(\.userID)
     }
     
-    static func makeQueryFuture(using ids: [User.ID], on conn: DatabaseConnectable) -> Future<[User]> {
-        return User.query(on: conn).filter(.make(\.id, .in, ids)).all()
-    }
-    
     static func makeSingleQueryFuture(using id: User.ID, on conn: DatabaseConnectable) -> Future<User?> {
         return User.query(on: conn).filter(.make(\.id, .in, [id])).first()
     }

@@ -24,10 +24,3 @@ extension Record {
 
 // MARK: - Record Request Body Content
 extension Record.RequestBody: Content {}
-
-// MARK: - Record Request Body Helpers
-extension Record.RequestBody {
-    func makeRecord(for user: User) throws -> Record {
-        return try Record(title: title, note: note, date: date, amount: amount, currency: currency, mood: mood, isDeleted: false, creatorID: user.requireID())
-    }
-}
