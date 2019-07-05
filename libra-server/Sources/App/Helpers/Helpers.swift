@@ -103,3 +103,17 @@ func mark(_ record: Record, asDeletedOn conn: DatabaseConnectable) -> Future<Rec
 func createRecord(with body: Record.RequestBody, for user: User) throws -> Record {
     return try Record(title: body.title, note: body.note, date: body.date, amount: body.amount, currency: body.currency, mood: body.mood, isDeleted: false, creatorID: user.requireID())
 }
+
+// MARK: - Attachment Helpers
+func check(_ attachment: Attachment, isAttachedTo record: Record) throws -> Attachment {
+    guard try record.requireID() == attachment.recordID else {
+        throw Abort(.badRequest)
+    }
+    
+    return attachment
+}
+
+// TODO: Consider moving to `Attachment`?
+func convertToHTTPResponse(from attachment: Attachment) throws -> HTTPResponse {
+    return HTTPResponse(body: try Current.resourcePersisting.fetch(attachment.name))
+}

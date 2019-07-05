@@ -84,10 +84,10 @@ private extension RecordsController {
         let recordFuture = try req.parameters.next(Record.self)
             .map { try authorize(user, hasAccessTo: $0) }
         let attachmentFuture = recordFuture.flatMap(to: Attachment.self) { record in
-            return try req.parameters.next(Attachment.self).isAttached(to: record)
+            return try req.parameters.next(Attachment.self).map { try check($0, isAttachedTo: record) }
         }
         
-        return attachmentFuture.makeDownloadHTTPResponse()
+        return attachmentFuture.map { try convertToHTTPResponse(from: $0) }
     }
     
     func deleteAttachmentHandler(_ req: Request) throws -> Future<HTTPStatus> {
@@ -95,7 +95,7 @@ private extension RecordsController {
         let recordFuture = try req.parameters.next(Record.self)
             .map { try authorize(user, hasAccessTo: $0) }
         let attachmentFuture = recordFuture.flatMap(to: Attachment.self) { record in
-            return try req.parameters.next(Attachment.self).isAttached(to: record)
+            return try req.parameters.next(Attachment.self).map { try check($0, isAttachedTo: record) }
         }
         
         return attachmentFuture.deleteFile(on: req).delete(on: req).transform(to: .noContent)

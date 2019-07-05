@@ -4,20 +4,6 @@ import Vapor
 
 // MARK: - Attachment Helpers
 extension Future where T: Attachment {
-    func isAttached(to record: Record) throws -> Future<T> {
-        return map { attachment in
-            guard try record.requireID() == attachment.recordID else {
-                throw Abort(.badRequest)
-            }
-            
-            return attachment
-        }
-    }
-    
-    func makeDownloadHTTPResponse() -> Future<HTTPResponse> {
-        return map { HTTPResponse(body: try Current.resourcePersisting.fetch($0.name)) }
-    }
-    
     func deleteFile(on conn: DatabaseConnectable) -> Future<T> {
         return map { attachment in
             try Current.resourcePersisting.delete(attachment.name)
