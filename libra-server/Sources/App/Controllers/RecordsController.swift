@@ -75,7 +75,7 @@ private extension RecordsController {
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
         return flatMap(to: Asset.self, recordFuture, fileFuture) { record, file in
-            return try record.makeAttachmentFuture(with: file, on: req).makeAsset()
+            return try record.makeAttachmentFuture(with: file, on: req).map(createAsset)
         }
     }
     
@@ -98,6 +98,9 @@ private extension RecordsController {
             return try req.parameters.next(Attachment.self).map { try check($0, isAttachedTo: record) }
         }
         
-        return attachmentFuture.deleteFile(on: req).delete(on: req).transform(to: .noContent)
+        return attachmentFuture
+            .map(deleteFile)
+            .delete(on: req)
+            .transform(to: .noContent)
     }
 }

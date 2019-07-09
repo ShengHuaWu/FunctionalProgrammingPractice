@@ -65,7 +65,7 @@ func revoke(_ token: Token, on conn: DatabaseConnectable) -> Future<HTTPStatus> 
 func convert(_ record: Record, toIntactOn conn: DatabaseConnectable) throws -> Future<Record.Intact> {
     let creatorFuture = record.creator.get(on: conn).flatMap { try convert($0, toPublicOn: conn) }
     let companionsFuture = try record.companions.query(on: conn).all().flatMap { try convert($0, toPublicsOn: conn) }
-    let assetsFuture = try record.attachments.query(on: conn).all().makeAssets()
+    let assetsFuture = try record.attachments.query(on: conn).all().map(createAssets)
     
     return map(to: Record.Intact.self, creatorFuture, companionsFuture, assetsFuture) { creator, companions, assets in
         return Record.Intact(id: record.id, title: record.title, note: record.note, date: record.date, amount: record.amount, currency: record.currency, mood: record.mood, creator: creator, companions: companions, assets: assets)
@@ -116,4 +116,18 @@ func check(_ attachment: Attachment, isAttachedTo record: Record) throws -> Atta
 // TODO: Consider moving to `Attachment`?
 func convertToHTTPResponse(from attachment: Attachment) throws -> HTTPResponse {
     return HTTPResponse(body: try Current.resourcePersisting.fetch(attachment.name))
+}
+
+func deleteFile(of attachment: Attachment) throws -> Attachment {
+    try Current.resourcePersisting.delete(attachment.name)
+    
+    return attachment
+}
+
+func createAsset(from attachment: Attachment) throws -> Asset {
+    return Asset(id: try attachment.requireID())
+}
+
+func createAssets(from attachments: [Attachment]) throws -> [Asset] {
+    return try attachments.map(createAsset)
 }
