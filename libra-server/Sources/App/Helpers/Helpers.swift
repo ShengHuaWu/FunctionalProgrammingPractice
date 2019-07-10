@@ -113,15 +113,15 @@ func check(_ attachment: Attachment, isAttachedTo record: Record) throws -> Atta
     return attachment
 }
 
-// TODO: Consider moving to `Attachment`?
-func convertToHTTPResponse(from attachment: Attachment) throws -> HTTPResponse {
-    return HTTPResponse(body: try Current.resourcePersisting.fetch(attachment.name))
-}
-
 func deleteFile(of attachment: Attachment) throws -> Attachment {
     try Current.resourcePersisting.delete(attachment.name)
     
     return attachment
+}
+
+// TODO: Consider moving to `Attachment`?
+func convertToHTTPResponse(from attachment: Attachment) throws -> HTTPResponse {
+    return HTTPResponse(body: try Current.resourcePersisting.fetch(attachment.name))
 }
 
 func createAsset(from attachment: Attachment) throws -> Asset {
@@ -130,4 +130,28 @@ func createAsset(from attachment: Attachment) throws -> Asset {
 
 func createAssets(from attachments: [Attachment]) throws -> [Asset] {
     return try attachments.map(createAsset)
+}
+
+// MARK: - Avatar Helpers
+func check(_ avatar: Avatar, isBelongTo user: User) throws -> Avatar {
+    guard try user.requireID() == avatar.userID else {
+        throw Abort(.badRequest)
+    }
+    
+    return avatar
+}
+
+func deleteFile(of avatar: Avatar) throws -> Avatar {
+    try Current.resourcePersisting.delete(avatar.name)
+    
+    return avatar
+}
+
+// TODO: Consider moving to `Avatar`?
+func convertToHTTPResponse(from avatar: Avatar) throws -> HTTPResponse {
+    return HTTPResponse(body: try Current.resourcePersisting.fetch(avatar.name))
+}
+
+func createAsset(from avatar: Avatar) throws -> Asset {
+    return Asset(id: try avatar.requireID())
 }

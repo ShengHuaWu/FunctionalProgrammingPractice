@@ -143,7 +143,7 @@ private extension UsersController {
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
         return flatMap(to: Asset.self, userFuture, fileFuture) { user, file in
-            return try user.makeAvatarFuture(with: file, on: req).makeAsset()
+            return try user.makeAvatarFuture(with: file, on: req).map(createAsset)
         }
     }
     
@@ -151,19 +151,22 @@ private extension UsersController {
         let authedUser = try req.requireAuthenticated(User.self)
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }
         let avatarFuture = userFuture.flatMap(to: Avatar.self) { user in
-            return try req.parameters.next(Avatar.self).isBelong(to: user)
+            return try req.parameters.next(Avatar.self).map { try check($0, isBelongTo: user) }
         }
         
-        return avatarFuture.makeDownloadHTTPResponse()
+        return avatarFuture.map { try convertToHTTPResponse(from: $0) }
     }
     
     func deleteAvatarHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let authedUser = try req.requireAuthenticated(User.self)
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }
         let avatarFuture = userFuture.flatMap(to: Avatar.self) { user in
-            return try req.parameters.next(Avatar.self).isBelong(to: user)
+            return try req.parameters.next(Avatar.self).map { try check($0, isBelongTo: user) }
         }
         
-        return avatarFuture.deleteFile(on: req).delete(on: req).transform(to: .noContent)
+        return avatarFuture
+            .map(deleteFile)
+            .delete(on: req)
+            .transform(to: .noContent)
     }
 }
