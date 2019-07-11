@@ -147,6 +147,7 @@ private extension UsersController {
         }
     }
     
+    // TODO: Consider redirecting
     func downloadAvatarHandler(_ req: Request) throws -> Future<HTTPResponse> {
         let authedUser = try req.requireAuthenticated(User.self)
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }

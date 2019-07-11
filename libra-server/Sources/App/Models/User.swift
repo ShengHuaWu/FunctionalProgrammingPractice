@@ -78,6 +78,7 @@ extension User {
         return children(\.userID)
     }
     
+    // TODO: Move to `Helpers.swift`
     static func makeSingleQueryFuture(using id: User.ID, on conn: DatabaseConnectable) -> Future<User?> {
         return User.query(on: conn).filter(.make(\.id, .in, [id])).first()
     }

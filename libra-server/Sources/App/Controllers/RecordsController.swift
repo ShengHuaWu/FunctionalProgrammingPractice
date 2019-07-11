@@ -79,6 +79,7 @@ private extension RecordsController {
         }
     }
     
+    // TODO: Consider redirecting
     func downloadAttachmentHandler(_ req: Request) throws -> Future<HTTPResponse> {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self)
