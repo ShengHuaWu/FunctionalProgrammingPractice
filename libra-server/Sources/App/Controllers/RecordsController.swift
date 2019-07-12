@@ -38,9 +38,9 @@ private extension RecordsController {
         let recordFuture = bodyFuture.map { try createRecord(with: $0, for: user) }
         let companionsFuture = bodyFuture.flatMap { queryCompanions(with: $0.companionIDs, on: req) }
         
-        return flatMap(to: Record.Intact.self, recordFuture, companionsFuture) { record, companions in
-            return try record.makeAddCompanionsFuture(companions, on: req)
-        }
+        return flatMap(to: Record.self, recordFuture, companionsFuture) { record, companions in
+            return append(companions, to: record, on: req)
+        }.flatMap { try convert($0, toIntactOn: req) }
     }
     
     func updateHandler(_ req: Request) throws -> Future<Record.Intact> {
@@ -53,9 +53,9 @@ private extension RecordsController {
             let updateRecordFuture = record.update(with: body).save(on: req).flatMap { removeAllCompanions(of: $0, on: req) }
             let companionsFuture = queryCompanions(with: body.companionIDs, on: req)
             
-            return flatMap(to: Record.Intact.self, updateRecordFuture, companionsFuture) { _, companions in
-                return try record.makeAddCompanionsFuture(companions, on: req)
-            }
+            return flatMap(to: Record.self,updateRecordFuture, companionsFuture) { _, companions in
+                return append(companions, to: record, on: req)
+            }.flatMap { try convert($0, toIntactOn: req) }
         }
     }
     
@@ -74,9 +74,9 @@ private extension RecordsController {
             .map { try authorize(user, hasAccessTo: $0) }
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
-        return flatMap(to: Asset.self, recordFuture, fileFuture) { record, file in
-            return try record.makeAttachmentFuture(with: file, on: req).map(createAsset)
-        }
+        return flatMap(to: Attachment.self,recordFuture, fileFuture) { record, file in
+            return try createAttachment(of: record, with: file, on: req)
+        }.map(createAsset)
     }
     
     // TODO: Consider redirecting

@@ -99,6 +99,17 @@ func mark(_ record: Record, asDeletedOn conn: DatabaseConnectable) -> Future<Rec
     return record.save(on: conn)
 }
 
+func append(_ companions: [User], to record: Record, on conn: DatabaseConnectable) -> Future<Record> {
+    return companions.map { record.companions.attach($0, on: conn) }.flatten(on: conn).map { _ in return record }
+}
+
+func createAttachment(of record: Record, with file: File, on conn: DatabaseConnectable) throws -> Future<Attachment> {
+    let name = UUID().uuidString
+    try Current.resourcePersisting.save(file.data, name)
+    
+    return Attachment(name: name, recordID: try record.requireID()).save(on: conn)
+}
+
 // MARK: - Record Request Body Helpers
 func createRecord(with body: Record.RequestBody, for user: User) throws -> Record {
     return try Record(title: body.title, note: body.note, date: body.date, amount: body.amount, currency: body.currency, mood: body.mood, isDeleted: false, creatorID: user.requireID())

@@ -69,7 +69,6 @@ extension Record {
         return siblings()
     }
     
-    // TODO: Move to `Helpers.swift`
     func update(with body: RequestBody) -> Record {
         title = body.title
         note = body.note
@@ -79,20 +78,5 @@ extension Record {
         mood = body.mood
         
         return self
-    }
-    
-    func makeAddCompanionsFuture(_ companions: [User], on conn: DatabaseConnectable) throws -> Future<Record.Intact> {
-        return companions.map { companion in
-            return self.companions.attach(companion, on: conn)
-        }.flatMap(to: Record.Intact.self, on: conn) { _ in
-            return try convert(self, toIntactOn: conn)
-        }
-    }
-    
-    func makeAttachmentFuture(with file: File, on conn: DatabaseConnectable) throws -> Future<Attachment> {
-        let name = UUID().uuidString
-        try Current.resourcePersisting.save(file.data, name)
-        
-        return Attachment(name: name, recordID: try requireID()).save(on: conn)
     }
 }
