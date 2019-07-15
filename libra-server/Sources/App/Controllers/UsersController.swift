@@ -79,7 +79,7 @@ private extension UsersController {
         let key = try req.query.get(String.self, at: "q")
 
         // Wildcards: https://www.tutorialspoint.com/postgresql/postgresql_like_clause.htm
-        return User.makeSearchQueryFuture(using: "%\(key)%", on: req).flatMap { try convert($0, toPublicsOn: req) }
+        return searchUsers(with: "%\(key)%", on: req).flatMap { try convert($0, toPublicsOn: req) }
     }
     
     func getAllFriendsHandler(_ req: Request) throws -> Future<[User.Public]> {
@@ -109,7 +109,7 @@ private extension UsersController {
         let authedUser = try req.requireAuthenticated(User.self)
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }
         let queryPersonFuture = try req.content.decode(AddFriendBody.self).flatMap(to: User?.self) { body in
-            return User.makeSingleQueryFuture(using: body.personID, on: req)
+            return queryFriend(with: body.personID, on: req)
         }
         
         return flatMap(to: HTTPStatus.self, userFuture, queryPersonFuture) { user, person in

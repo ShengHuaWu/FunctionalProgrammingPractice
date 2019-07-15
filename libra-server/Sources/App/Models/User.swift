@@ -79,18 +79,6 @@ extension User {
     }
     
     // TODO: Move to `Helpers.swift`
-    static func makeSingleQueryFuture(using id: User.ID, on conn: DatabaseConnectable) -> Future<User?> {
-        return User.query(on: conn).filter(.make(\.id, .in, [id])).first()
-    }
-    
-    static func makeSearchQueryFuture(using key: String, on conn: DatabaseConnectable) -> Future<[User]> {
-        return User.query(on: conn).group(.or) { orGroup in
-            orGroup.filter(.make(\.firstName, .like, [key]))
-            orGroup.filter(.make(\.lastName, .like, [key]))
-            orGroup.filter(.make(\.email, .like, [key]))
-        }.all()
-    }
-    
     private func makeQueryTokenFuture(with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<Token?> {
         return try authTokens.query(on: conn).group(.and) { andGroup in
             andGroup.filter(\.isRevoked == false)

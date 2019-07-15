@@ -27,6 +27,18 @@ func convert(_ users: [User], toPublicsOn conn: DatabaseConnectable) throws -> F
     return try users.map { try convert($0, toPublicOn: conn) }.flatten(on: conn)
 }
 
+func searchUsers(with key: String, on conn: DatabaseConnectable) -> Future<[User]> {
+    return User.query(on: conn).group(.or) { orGroup in
+        orGroup.filter(.make(\.firstName, .like, [key]))
+        orGroup.filter(.make(\.lastName, .like, [key]))
+        orGroup.filter(.make(\.email, .like, [key]))
+        }.all()
+}
+
+func queryFriend(with id: User.ID, on conn: DatabaseConnectable) -> Future<User?> {
+    return User.query(on: conn).filter(.make(\.id, .in, [id])).first()
+}
+
 func queryAllFriends(of user: User, on conn: DatabaseConnectable) throws -> Future<[User]> {
     return try user.friends.query(on: conn).all()
 }
