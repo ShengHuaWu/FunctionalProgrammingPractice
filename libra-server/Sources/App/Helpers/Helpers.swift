@@ -37,12 +37,24 @@ func searchUsers(with key: String, on conn: DatabaseConnectable) -> Future<[User
         }.all()
 }
 
+func check(_ user: User, hasFriendshipWith person: User, on conn: DatabaseConnectable) -> Future<Bool> {
+    return user.friends.isAttached(person, on: conn)
+}
+
 func queryFriend(with id: User.ID, on conn: DatabaseConnectable) -> Future<User?> {
     return User.query(on: conn).filter(.make(\.id, .in, [id])).first()
 }
 
 func queryAllFriends(of user: User, on conn: DatabaseConnectable) throws -> Future<[User]> {
     return try user.friends.query(on: conn).all()
+}
+
+func addFriendship(between user: User, and person: User, on conn: DatabaseConnectable) -> Future<HTTPStatus> {
+    return user.friends.attachSameType(person, on: conn).transform(to: .created)
+}
+
+func removeFriendship(between user: User, and person: User, on conn: DatabaseConnectable) -> Future<HTTPStatus> {
+    return user.friends.detach(person, on: conn).transform(to: .noContent)
 }
 
 func queryCompanions(with userIDs: [User.ID], on conn: DatabaseConnectable) -> Future<[User]> {
@@ -63,13 +75,24 @@ func createNewToken(for user: User, with body: AuthenticationBody, on conn: Data
     return try Token(token: random.base64EncodedString(), isRevoked: false, osName: body.osName, timeZone: body.timeZone, userID: user.requireID())
 }
 
+func queryRecords(of user: User, on conn: DatabaseConnectable) throws -> Future<[Record]> {
+    return try user.records.query(on: conn).filter(\.isDeleted == false).all()
+}
+
+func createNewAvatar(of user: User, with file: File, on conn: DatabaseConnectable) throws -> Future<Avatar> {
+    let name = UUID().uuidString
+    try Current.resourcePersisting.save(file.data, name)
+    
+    return try Avatar(name: name, userID: user.requireID()).save(on: conn)
+}
+
 // MARK: - Authentication Body Helpers
 func signUp(with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<User.Public> {
     guard let userInfo = body.userInfo else {
         throw Abort(.badRequest)
     }
     
-    return try userInfo.makeUser().encryptPassword().save(on: conn).flatMap { user in
+    return try User(userInfo: userInfo).encryptPassword().save(on: conn).flatMap { user in
         return try createNewToken(for: user, with: body, on: conn)
             .save(on: conn)
             .flatMap { try convert(user, toPublicOn: conn, with: $0) }

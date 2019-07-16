@@ -103,7 +103,8 @@ private extension UsersController {
         let personFuture = try req.parameters.next(User.self)
         
         return flatMap(to: User.Public.self, userFuture, personFuture) { user, person in
-            return user.makeHasFriendshipFuture(with: person, on: req).flatMap(to: User.Public.self) { isFriend in
+            return check(user, hasFriendshipWith: person, on: req)
+                .flatMap(to: User.Public.self) { isFriend in
                 guard isFriend else { throw Abort(.notFound) }
                 
                 return try convert(person, toPublicOn: req)
@@ -121,8 +122,9 @@ private extension UsersController {
         return flatMap(to: HTTPStatus.self, userFuture, queryPersonFuture) { user, person in
             guard let unwrappedPerson = person else { throw Abort(.badRequest) }
             
-            return user.makeHasFriendshipFuture(with: unwrappedPerson, on: req).flatMap(to: HTTPStatus.self) { isFriend in
-                guard isFriend else { return user.makeAddFriendshipFuture(to: unwrappedPerson, on: req) }
+            return check(user, hasFriendshipWith: unwrappedPerson, on: req)
+                .flatMap(to: HTTPStatus.self) { isFriend in
+                guard isFriend else { return addFriendship(between: user, and: unwrappedPerson, on: req) }
                 
                 return Future.done(on: req).transform(to: .created)
             }
@@ -135,10 +137,11 @@ private extension UsersController {
         let personFuture = try req.parameters.next(User.self)
         
         return flatMap(to: HTTPStatus.self, userFuture, personFuture) { user, person in
-            return user.makeHasFriendshipFuture(with: person, on: req).flatMap(to: HTTPStatus.self) { isFriend in
+            return check(user, hasFriendshipWith: person, on: req)
+                .flatMap(to: HTTPStatus.self) { isFriend in
                 guard isFriend else { return Future.done(on: req).transform(to: .noContent) }
                 
-                return user.makeRemoveFriendshipFuture(to: person, on: req)
+                return removeFriendship(between: user, and: person, on: req)
             }
         }
     }
@@ -149,7 +152,7 @@ private extension UsersController {
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
         return flatMap(to: Asset.self, userFuture, fileFuture) { user, file in
-            return try user.makeAvatarFuture(with: file, on: req).map(createAsset)
+            return try createNewAvatar(of: user, with: file, on: req).map(createAsset)
         }
     }
     

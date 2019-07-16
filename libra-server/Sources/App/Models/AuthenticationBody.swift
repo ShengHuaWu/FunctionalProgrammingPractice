@@ -34,10 +34,3 @@ extension AuthenticationBody {
 extension AuthenticationBody: Content {}
 
 extension AuthenticationBody.UserInfo: Content {}
-
-// MARK: - Helpers
-extension AuthenticationBody.UserInfo {
-    func makeUser() -> User {
-        return User(firstName: firstName, lastName: lastName, username: username, password: password, email: email)
-    }
-}

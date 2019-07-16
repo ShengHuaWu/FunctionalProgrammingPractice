@@ -66,7 +66,7 @@ extension User: TokenAuthenticatable {
 
 // MARK: - Helpers
 extension User {
-    private var records: Children<User, Record> {
+    var records: Children<User, Record> {
         return children(\.creatorID)
     }
     
@@ -78,6 +78,9 @@ extension User {
         return children(\.userID)
     }
     
+    convenience init(userInfo: AuthenticationBody.UserInfo) {
+        self.init(firstName: userInfo.firstName, lastName: userInfo.lastName, username: userInfo.username, password: userInfo.password, email: userInfo.email)
+    }
     
     static func customTokenAuthMiddleware() -> CustomTokenAuthenticationMiddleware {
         return CustomTokenAuthenticationMiddleware()
@@ -94,30 +97,6 @@ extension User {
         email = body.email
         
         return self
-    }
-    
-    // TODO: Move to `Helpers.swift`    
-    func makeAllUndeletedRecordsFuture(on conn: DatabaseConnectable) throws -> Future<[Record]> {
-        return try records.query(on: conn).filter(\.isDeleted == false).all()
-    }
-    
-    func makeHasFriendshipFuture(with person: User, on conn: DatabaseConnectable) -> Future<Bool> {
-        return friends.isAttached(person, on: conn)
-    }
-    
-    func makeAddFriendshipFuture(to person: User, on conn: DatabaseConnectable) -> Future<HTTPStatus> {
-        return friends.attachSameType(person, on: conn).transform(to: .created)
-    }
-    
-    func makeRemoveFriendshipFuture(to person: User, on conn: DatabaseConnectable) -> Future<HTTPStatus> {
-        return friends.detach(person, on: conn).transform(to: .noContent)
-    }
-    
-    func makeAvatarFuture(with file: File, on conn: DatabaseConnectable) throws -> Future<Avatar> {
-        let name = UUID().uuidString
-        try Current.resourcePersisting.save(file.data, name)
-        
-        return Avatar(name: name, userID: try requireID()).save(on: conn)
     }
 }
 
