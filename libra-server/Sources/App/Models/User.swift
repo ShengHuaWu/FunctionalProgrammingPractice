@@ -78,14 +78,6 @@ extension User {
         return children(\.userID)
     }
     
-    // TODO: Move to `Helpers.swift`
-    private func makeQueryTokenFuture(with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<Token?> {
-        return try authTokens.query(on: conn).group(.and) { andGroup in
-            andGroup.filter(\.isRevoked == false)
-            andGroup.filter(.make(\.osName, .in, [body.osName]))
-            andGroup.filter(.make(\.timeZone, .in, [body.timeZone]))
-        }.first()
-    }
     
     static func customTokenAuthMiddleware() -> CustomTokenAuthenticationMiddleware {
         return CustomTokenAuthenticationMiddleware()
@@ -104,19 +96,7 @@ extension User {
         return self
     }
     
-    func makeTokenFuture(with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<Token> {
-        // TODO: Refresh token?
-        return try makeQueryTokenFuture(with: body, on: conn).map { token in
-            guard let unwrappedToken = token else {
-                let random = try CryptoRandom().generateData(count: 16)
-                
-                return try Token(token: random.base64EncodedString(), isRevoked: false, osName: body.osName, timeZone: body.timeZone, userID: self.requireID())
-            }
-            
-            return unwrappedToken
-        }
-    }
-    
+    // TODO: Move to `Helpers.swift`    
     func makeAllUndeletedRecordsFuture(on conn: DatabaseConnectable) throws -> Future<[Record]> {
         return try records.query(on: conn).filter(\.isDeleted == false).all()
     }

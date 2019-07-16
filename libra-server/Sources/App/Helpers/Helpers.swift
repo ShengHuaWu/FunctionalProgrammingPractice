@@ -1,6 +1,8 @@
 // TODO: Separate this file into different files
 
 import Vapor
+import FluentPostgreSQL
+import Authentication
 
 // MARK: - User Helpers
 // TODO: `Accessing` struct
@@ -47,6 +49,20 @@ func queryCompanions(with userIDs: [User.ID], on conn: DatabaseConnectable) -> F
     return User.query(on: conn).filter(.make(\.id, .in, userIDs)).all()
 }
 
+func queryToken(of user: User, with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<Token?> {
+    return try user.authTokens.query(on: conn).group(.and) { andGroup in
+        andGroup.filter(\.isRevoked == false)
+        andGroup.filter(.make(\.osName, .in, [body.osName]))
+        andGroup.filter(.make(\.timeZone, .in, [body.timeZone]))
+    }.first()
+}
+
+func createNewToken(for user: User, with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Token {
+    let random = try CryptoRandom().generateData(count: 16)
+    
+    return try Token(token: random.base64EncodedString(), isRevoked: false, osName: body.osName, timeZone: body.timeZone, userID: user.requireID())
+}
+
 // MARK: - Authentication Body Helpers
 func signUp(with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<User.Public> {
     guard let userInfo = body.userInfo else {
@@ -54,14 +70,20 @@ func signUp(with body: AuthenticationBody, on conn: DatabaseConnectable) throws 
     }
     
     return try userInfo.makeUser().encryptPassword().save(on: conn).flatMap { user in
-        return try user.makeTokenFuture(with: body, on: conn)
+        return try createNewToken(for: user, with: body, on: conn)
             .save(on: conn)
             .flatMap { try convert(user, toPublicOn: conn, with: $0) }
     }
 }
 
 func logIn(for user: User, with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<User.Public> {
-    return try user.makeTokenFuture(with: body, on: conn)
+    return try queryToken(of: user, with: body, on: conn).map { token in
+        guard let unwrappedToken = token else {
+            return try createNewToken(for: user, with: body, on: conn)
+        }
+        
+        return unwrappedToken
+    }
         .save(on: conn)
         .flatMap { try convert(user, toPublicOn: conn, with: $0) }
 }
