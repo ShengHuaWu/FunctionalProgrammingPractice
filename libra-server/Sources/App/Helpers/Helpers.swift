@@ -59,12 +59,6 @@ func queryToken(of user: User, with body: AuthenticationBody, on conn: DatabaseC
     }.first()
 }
 
-func createNewToken(for user: User, with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Token {
-    let random = try CryptoRandom().generateData(count: 16)
-    
-    return try Token(token: random.base64EncodedString(), isRevoked: false, osName: body.osName, timeZone: body.timeZone, userID: user.requireID())
-}
-
 func queryRecords(of user: User, on conn: DatabaseConnectable) throws -> Future<[Record]> {
     return try user.records.query(on: conn).filter(\.isDeleted == false).all()
 }
@@ -76,6 +70,12 @@ func createNewAvatar(of user: User, with file: File, on conn: DatabaseConnectabl
     return try Avatar(name: name, userID: user.requireID()).save(on: conn)
 }
 
+private func createNewToken(for user: User, with body: AuthenticationBody) throws -> Token {
+    let random = try CryptoRandom().generateData(count: 16)
+    
+    return try Token(token: random.base64EncodedString(), isRevoked: false, osName: body.osName, timeZone: body.timeZone, userID: user.requireID())
+}
+
 // MARK: - Authentication Body Helpers
 func signUp(with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<User.Public> {
     guard let userInfo = body.userInfo else {
@@ -83,7 +83,7 @@ func signUp(with body: AuthenticationBody, on conn: DatabaseConnectable) throws 
     }
     
     return try User(userInfo: userInfo).encryptPassword().save(on: conn).flatMap { user in
-        return try createNewToken(for: user, with: body, on: conn)
+        return try createNewToken(for: user, with: body)
             .save(on: conn)
             .flatMap { try convert(user, toPublicOn: conn, with: $0) }
     }
@@ -92,7 +92,7 @@ func signUp(with body: AuthenticationBody, on conn: DatabaseConnectable) throws 
 func logIn(for user: User, with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<User.Public> {
     return try queryToken(of: user, with: body, on: conn).map { token in
         guard let unwrappedToken = token else {
-            return try createNewToken(for: user, with: body, on: conn)
+            return try createNewToken(for: user, with: body)
         }
         
         return unwrappedToken
