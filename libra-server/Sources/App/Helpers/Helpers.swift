@@ -112,7 +112,7 @@ func revoke(_ token: Token, on conn: DatabaseConnectable) -> Future<HTTPStatus> 
 func convert(_ record: Record, toIntactOn conn: DatabaseConnectable) throws -> Future<Record.Intact> {
     let creatorFuture = record.creator.get(on: conn).flatMap { try convert($0, toPublicOn: conn) }
     let companionsFuture = try record.companions.query(on: conn).all().flatMap { try convert($0, toPublicsOn: conn) }
-    let assetsFuture = try record.attachments.query(on: conn).all().map(createAssets)
+    let assetsFuture = try record.attachments.query(on: conn).all().map { try $0.map(Asset.init) }
     
     return map(to: Record.Intact.self, creatorFuture, companionsFuture, assetsFuture) { creator, companions, assets in
         return Record.Intact(id: record.id, title: record.title, note: record.note, date: record.date, amount: record.amount, currency: record.currency, mood: record.mood, creator: creator, companions: companions, assets: assets)
@@ -164,19 +164,6 @@ func deleteFile(of attachment: Attachment) throws -> Attachment {
     return attachment
 }
 
-// TODO: Consider moving to `Attachment`?
-func convertToHTTPResponse(from attachment: Attachment) throws -> HTTPResponse {
-    return HTTPResponse(body: try Current.resourcePersisting.fetch(attachment.name))
-}
-
-func createAsset(from attachment: Attachment) throws -> Asset {
-    return Asset(id: try attachment.requireID())
-}
-
-func createAssets(from attachments: [Attachment]) throws -> [Asset] {
-    return try attachments.map(createAsset)
-}
-
 // MARK: - Avatar Helpers
 func check(_ avatar: Avatar, isBelongTo user: User) throws -> Avatar {
     guard try user.requireID() == avatar.userID else {
@@ -190,13 +177,4 @@ func deleteFile(of avatar: Avatar) throws -> Avatar {
     try Current.resourcePersisting.delete(avatar.name)
     
     return avatar
-}
-
-// TODO: Consider moving to `Avatar`?
-func convertToHTTPResponse(from avatar: Avatar) throws -> HTTPResponse {
-    return HTTPResponse(body: try Current.resourcePersisting.fetch(avatar.name))
-}
-
-func createAsset(from avatar: Avatar) throws -> Asset {
-    return Asset(id: try avatar.requireID())
 }

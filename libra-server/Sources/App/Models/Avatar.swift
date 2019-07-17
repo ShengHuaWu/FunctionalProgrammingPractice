@@ -43,3 +43,9 @@ extension Avatar {
         return parent(\.userID)
     }
 }
+
+extension HTTPResponse {
+    init(avatar: Avatar) throws {
+        try self.init(body: Current.resourcePersisting.fetch(avatar.name))
+    }
+}

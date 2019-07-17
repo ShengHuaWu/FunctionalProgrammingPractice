@@ -152,7 +152,7 @@ private extension UsersController {
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
         return flatMap(to: Asset.self, userFuture, fileFuture) { user, file in
-            return try createNewAvatar(of: user, with: file, on: req).map(createAsset)
+            return try createNewAvatar(of: user, with: file, on: req).map(Asset.init)
         }
     }
     
@@ -164,7 +164,7 @@ private extension UsersController {
             return try req.parameters.next(Avatar.self).map { try check($0, isBelongTo: user) }
         }
         
-        return avatarFuture.map { try convertToHTTPResponse(from: $0) }
+        return avatarFuture.map(HTTPResponse.init)
     }
     
     func deleteAvatarHandler(_ req: Request) throws -> Future<HTTPStatus> {

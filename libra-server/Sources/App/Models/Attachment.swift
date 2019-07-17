@@ -43,3 +43,9 @@ extension Attachment {
         return parent(\.recordID)
     }
 }
+
+extension HTTPResponse {
+    init(attachment: Attachment) throws {
+        try self.init(body: Current.resourcePersisting.fetch(attachment.name))
+    }
+}

@@ -77,7 +77,7 @@ private extension RecordsController {
         
         return flatMap(to: Attachment.self,recordFuture, fileFuture) { record, file in
             return try createAttachment(of: record, with: file, on: req)
-        }.map(createAsset)
+        }.map(Asset.init)
     }
     
     // TODO: Consider redirecting
@@ -89,7 +89,7 @@ private extension RecordsController {
             return try req.parameters.next(Attachment.self).map { try check($0, isAttachedTo: record) }
         }
         
-        return attachmentFuture.map { try convertToHTTPResponse(from: $0) }
+        return attachmentFuture.map(HTTPResponse.init)
     }
     
     func deleteAttachmentHandler(_ req: Request) throws -> Future<HTTPStatus> {
