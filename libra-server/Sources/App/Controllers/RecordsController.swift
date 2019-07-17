@@ -29,7 +29,7 @@ private extension RecordsController {
         let user = try req.requireAuthenticated(User.self)
         
         return try req.parameters.next(Record.self)
-            .map { try authorize(user, hasAccessTo: $0) }
+            .map { try authorize(user, toAccess: $0, as: .creator) }
             .flatMap { try convert($0, toIntactOn: req) }
     }
     
@@ -47,7 +47,7 @@ private extension RecordsController {
     func updateHandler(_ req: Request) throws -> Future<Record.Intact> {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self)
-            .map { try authorize(user, hasAccessTo: $0) }
+            .map { try authorize(user, toAccess: $0, as: .creator) }
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
         
         return flatMap(to: Record.Intact.self, recordFuture, bodyFuture) { record, body in
@@ -64,7 +64,7 @@ private extension RecordsController {
         let user = try req.requireAuthenticated(User.self)
         
         return try req.parameters.next(Record.self)
-            .map { try authorize(user, hasAccessTo: $0) }
+            .map { try authorize(user, toAccess: $0, as: .creator) }
             .flatMap { mark($0, asDeletedOn: req) }
             .transform(to: .noContent)
     }
@@ -72,7 +72,7 @@ private extension RecordsController {
     func uploadAttachmentHandler(_ req: Request) throws -> Future<Asset> {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self)
-            .map { try authorize(user, hasAccessTo: $0) }
+            .map { try authorize(user, toAccess: $0, as: .creator) }
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
         return flatMap(to: Attachment.self,recordFuture, fileFuture) { record, file in
@@ -84,7 +84,7 @@ private extension RecordsController {
     func downloadAttachmentHandler(_ req: Request) throws -> Future<HTTPResponse> {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self)
-            .map { try authorize(user, hasAccessTo: $0) }
+            .map { try authorize(user, toAccess: $0, as: .creator) }
         let attachmentFuture = recordFuture.flatMap(to: Attachment.self) { record in
             return try req.parameters.next(Attachment.self).map { try check($0, isAttachedTo: record) }
         }
@@ -95,7 +95,7 @@ private extension RecordsController {
     func deleteAttachmentHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self)
-            .map { try authorize(user, hasAccessTo: $0) }
+            .map { try authorize(user, toAccess: $0, as: .creator) }
         let attachmentFuture = recordFuture.flatMap(to: Attachment.self) { record in
             return try req.parameters.next(Attachment.self).map { try check($0, isAttachedTo: record) }
         }

@@ -41,13 +41,13 @@ private extension UsersController {
         let authedUser = try req.requireAuthenticated(User.self)
         
         return try req.parameters.next(User.self)
-            .map { try authorize(authedUser, hasAccessTo: $0) }
+            .map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
             .flatMap { try convert($0, toPublicOn: req) }
     }
     
     func updateHandler(_ req: Request) throws -> Future<User.Public> {
         let authedUser = try req.requireAuthenticated(User.self)
-        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }
+        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
         
         return try flatMap(to: User.Public.self, userFuture, req.content.decode(User.UpdateRequestBody.self)) { user, body in
             return user.update(with: body).save(on: req).flatMap { try convert($0, toPublicOn: req) }
@@ -92,14 +92,14 @@ private extension UsersController {
         let authedUser = try req.requireAuthenticated(User.self)
         
         return try req.parameters.next(User.self)
-            .map { try authorize(authedUser, hasAccessTo: $0) }
+            .map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
             .flatMap { try queryAllFriends(of: $0, on: req) }
             .flatMap { try convert($0, toPublicsOn: req) }
     }
     
     func getOneFriendHandler(_ req: Request) throws -> Future<User.Public> {
         let authedUser = try req.requireAuthenticated(User.self)
-        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }
+        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
         let personFuture = try req.parameters.next(User.self)
         
         return flatMap(to: User.Public.self, userFuture, personFuture) { user, person in
@@ -114,7 +114,7 @@ private extension UsersController {
     
     func addFriendHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let authedUser = try req.requireAuthenticated(User.self)
-        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }
+        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
         let queryPersonFuture = try req.content.decode(AddFriendBody.self).flatMap(to: User?.self) { body in
             return queryFriend(with: body.personID, on: req)
         }
@@ -133,7 +133,7 @@ private extension UsersController {
     
     func removeFriendHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let authedUser = try req.requireAuthenticated(User.self)
-        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }
+        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
         let personFuture = try req.parameters.next(User.self)
         
         return flatMap(to: HTTPStatus.self, userFuture, personFuture) { user, person in
@@ -148,7 +148,7 @@ private extension UsersController {
     
     func uploadAvatarHandler(_ req: Request) throws -> Future<Asset> {
         let authedUser = try req.requireAuthenticated(User.self)
-        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }
+        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
         return flatMap(to: Asset.self, userFuture, fileFuture) { user, file in
@@ -159,7 +159,7 @@ private extension UsersController {
     // TODO: Consider redirecting
     func downloadAvatarHandler(_ req: Request) throws -> Future<HTTPResponse> {
         let authedUser = try req.requireAuthenticated(User.self)
-        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }
+        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
         let avatarFuture = userFuture.flatMap(to: Avatar.self) { user in
             return try req.parameters.next(Avatar.self).map { try check($0, isBelongTo: user) }
         }
@@ -169,7 +169,7 @@ private extension UsersController {
     
     func deleteAvatarHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let authedUser = try req.requireAuthenticated(User.self)
-        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, hasAccessTo: $0) }
+        let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
         let avatarFuture = userFuture.flatMap(to: Avatar.self) { user in
             return try req.parameters.next(Avatar.self).map { try check($0, isBelongTo: user) }
         }

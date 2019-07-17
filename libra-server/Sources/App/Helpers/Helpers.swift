@@ -5,16 +5,6 @@ import FluentPostgreSQL
 import Authentication
 
 // MARK: - User Helpers
-// TODO: `Accessing` struct
-// `authorize(_ user: U, toAccess rescourse: R, as accessing: A)`
-func authorize(_ authenticatedUser: User, hasAccessTo user: User) throws -> User {
-    guard authenticatedUser.id == user.id else {
-        throw Abort(.unauthorized)
-    }
-    
-    return user
-}
-
 func convert(_ user: User, toPublicOn conn: DatabaseConnectable, with token: Token? = nil) throws -> Future<User.Public> {
     let avatarFuture = try user.avatar.query(on: conn).first()
     
@@ -34,7 +24,7 @@ func searchUsers(with key: String, on conn: DatabaseConnectable) -> Future<[User
         orGroup.filter(.make(\.firstName, .like, [key]))
         orGroup.filter(.make(\.lastName, .like, [key]))
         orGroup.filter(.make(\.email, .like, [key]))
-        }.all()
+    }.all()
 }
 
 func check(_ user: User, hasFriendshipWith person: User, on conn: DatabaseConnectable) -> Future<Bool> {
@@ -135,19 +125,6 @@ func convert(_ records: [Record], toIntactsOn conn: DatabaseConnectable) throws 
 
 func removeAllCompanions(of record: Record, on conn: DatabaseConnectable) -> Future<Void> {
     return record.companions.detachAll(on: conn)
-}
-
-// Check `creatorID` as well as `isDeleted`
-func authorize(_ authenticatedUser: User, hasAccessTo record: Record) throws -> Record {
-    guard try authenticatedUser.requireID() == record.creatorID else {
-        throw Abort(.unauthorized)
-    }
-    
-    guard !record.isDeleted else {
-        throw Abort(.notFound)
-    }
-    
-    return record
 }
 
 func mark(_ record: Record, asDeletedOn conn: DatabaseConnectable) -> Future<Record> {
