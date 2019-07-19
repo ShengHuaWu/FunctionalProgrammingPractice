@@ -54,7 +54,7 @@ private extension RecordsController {
             let updateRecordFuture = record.update(with: body).save(on: req).flatMap { removeAllCompanions(of: $0, on: req) }
             let companionsFuture = queryCompanions(with: body.companionIDs, on: req)
             
-            return flatMap(to: Record.self,updateRecordFuture, companionsFuture) { _, companions in
+            return flatMap(to: Record.self, updateRecordFuture, companionsFuture) { _, companions in
                 return append(companions, to: record, on: req)
             }.flatMap { try convert($0, toIntactOn: req) }
         }
@@ -80,7 +80,8 @@ private extension RecordsController {
         }.map(Asset.init)
     }
     
-    // TODO: Consider redirecting
+    // TODO: Consider redirecting: `req.redirect`
+    // Only store `Asset` and redirect to `Public/Resource/_asset.name_`
     func downloadAttachmentHandler(_ req: Request) throws -> Future<HTTPResponse> {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self)
