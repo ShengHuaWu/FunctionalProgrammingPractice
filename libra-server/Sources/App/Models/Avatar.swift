@@ -1,7 +1,6 @@
 import Vapor
 import FluentPostgreSQL
 
-// TODO: Can be merged to Asset
 final class Avatar: Codable {
     enum CodingKeys: String, CodingKey {
         case id

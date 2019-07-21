@@ -156,22 +156,20 @@ private extension UsersController {
         }
     }
     
-    // TODO: Consider redirecting
     func downloadAvatarHandler(_ req: Request) throws -> Future<HTTPResponse> {
         let authedUser = try req.requireAuthenticated(User.self)
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
-        let avatarFuture = userFuture.flatMap(to: Avatar.self) { user in
-            return try req.parameters.next(Avatar.self).map { try check($0, isBelongTo: user) }
-        }
         
-        return avatarFuture.map(HTTPResponse.init)
+        return userFuture.flatMap(to: Avatar.self) { user in
+            return try req.parameters.next(Avatar.self).map { try check($0, belongsTo: user) }
+        }.map(HTTPResponse.init)
     }
     
     func deleteAvatarHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let authedUser = try req.requireAuthenticated(User.self)
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
         let avatarFuture = userFuture.flatMap(to: Avatar.self) { user in
-            return try req.parameters.next(Avatar.self).map { try check($0, isBelongTo: user) }
+            return try req.parameters.next(Avatar.self).map { try check($0, belongsTo: user) }
         }
         
         return avatarFuture

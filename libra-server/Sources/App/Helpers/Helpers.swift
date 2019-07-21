@@ -165,7 +165,7 @@ func deleteFile(of attachment: Attachment) throws -> Attachment {
 }
 
 // MARK: - Avatar Helpers
-func check(_ avatar: Avatar, isBelongTo user: User) throws -> Avatar {
+func check(_ avatar: Avatar, belongsTo user: User) throws -> Avatar {
     guard try user.requireID() == avatar.userID else {
         throw Abort(.badRequest)
     }

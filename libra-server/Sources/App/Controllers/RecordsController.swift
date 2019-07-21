@@ -36,7 +36,7 @@ private extension RecordsController {
     func createHandler(_ req: Request) throws -> Future<Record.Intact> {
         let user = try req.requireAuthenticated(User.self)
         let bodyFuture = try req.content.decode(json: Record.RequestBody.self, using: .custom(dates: .millisecondsSince1970))
-        let recordFuture = bodyFuture.map { try createRecord(with: $0, for: user) }
+        let recordFuture = bodyFuture.map { try createRecord(with: $0, for: user) }.save(on: req)
         let companionsFuture = bodyFuture.flatMap { queryCompanions(with: $0.companionIDs, on: req) }
         
         return flatMap(to: Record.self, recordFuture, companionsFuture) { record, companions in
@@ -80,17 +80,14 @@ private extension RecordsController {
         }.map(Asset.init)
     }
     
-    // TODO: Consider redirecting: `req.redirect`
-    // Only store `Asset` and redirect to `Public/Resource/_asset.name_`
     func downloadAttachmentHandler(_ req: Request) throws -> Future<HTTPResponse> {
         let user = try req.requireAuthenticated(User.self)
         let recordFuture = try req.parameters.next(Record.self)
             .map { try authorize(user, toAccess: $0, as: .creator) }
-        let attachmentFuture = recordFuture.flatMap(to: Attachment.self) { record in
-            return try req.parameters.next(Attachment.self).map { try check($0, isAttachedTo: record) }
-        }
         
-        return attachmentFuture.map(HTTPResponse.init)
+        return recordFuture.flatMap(to: Attachment.self) { record in
+            return try req.parameters.next(Attachment.self).map { try check($0, isAttachedTo: record) }
+        }.map(HTTPResponse.init)
     }
     
     func deleteAttachmentHandler(_ req: Request) throws -> Future<HTTPStatus> {

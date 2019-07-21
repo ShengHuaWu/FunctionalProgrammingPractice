@@ -1,7 +1,6 @@
 import Vapor
 import FluentPostgreSQL
 
-// TODO: Can be merged to Asset
 final class Attachment: Codable {
     enum CodingKeys: String, CodingKey {
         case id
