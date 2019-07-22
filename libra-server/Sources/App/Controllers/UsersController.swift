@@ -160,19 +160,14 @@ private extension UsersController {
         let authedUser = try req.requireAuthenticated(User.self)
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
         
-        return userFuture.flatMap(to: Avatar.self) { user in
-            return try req.parameters.next(Avatar.self).map { try check($0, belongsTo: user) }
-        }.map(HTTPResponse.init)
+        return try map(to: Avatar.self, req.parameters.next(Avatar.self), userFuture, check(_:belongsTo:)).map(HTTPResponse.init)
     }
     
     func deleteAvatarHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let authedUser = try req.requireAuthenticated(User.self)
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
-        let avatarFuture = userFuture.flatMap(to: Avatar.self) { user in
-            return try req.parameters.next(Avatar.self).map { try check($0, belongsTo: user) }
-        }
         
-        return avatarFuture
+        return try map(to: Avatar.self, req.parameters.next(Avatar.self), userFuture, check(_:belongsTo:))
             .map(deleteFile)
             .delete(on: req)
             .transform(to: .noContent)
