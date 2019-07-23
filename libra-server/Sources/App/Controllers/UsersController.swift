@@ -49,9 +49,9 @@ private extension UsersController {
         let authedUser = try req.requireAuthenticated(User.self)
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
         
-        return try flatMap(to: User.Public.self, userFuture, req.content.decode(User.UpdateRequestBody.self)) { user, body in
-            return user.update(with: body).save(on: req).flatMap { try convert($0, toPublicOn: req) }
-        }
+        return try map(to: User.self, userFuture, req.content.decode(User.UpdateRequestBody.self)) { $0.update(with: $1) }
+            .save(on: req)
+            .flatMap { try convert($0, toPublicOn: req) }
     }
     
     func signupHandler(_ req: Request) throws -> Future<User.Public> {
@@ -69,9 +69,7 @@ private extension UsersController {
         let bodyFuture = try req.content.decode(AuthenticationBody.self)
         
         return bodyFuture
-            .flatMap(to: Token?.self) { body in
-                return try queryToken(of: user, with: body, on: req)
-            }
+            .flatMap(to: Token?.self) { try queryToken(of: user, with: $0, on: req) }
             .flatMap(to: HTTPStatus.self) { token in
                 guard let unwrappedToken = token else {
                     throw Abort(.internalServerError)
@@ -160,7 +158,8 @@ private extension UsersController {
         let authedUser = try req.requireAuthenticated(User.self)
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
         
-        return try map(to: Avatar.self, req.parameters.next(Avatar.self), userFuture, check(_:belongsTo:)).map(HTTPResponse.init)
+        return try map(to: Avatar.self, req.parameters.next(Avatar.self), userFuture, check(_:belongsTo:))
+            .map(HTTPResponse.init)
     }
     
     func deleteAvatarHandler(_ req: Request) throws -> Future<HTTPStatus> {

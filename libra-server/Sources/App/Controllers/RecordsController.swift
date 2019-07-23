@@ -39,9 +39,8 @@ private extension RecordsController {
         let recordFuture = bodyFuture.map { try createRecord(with: $0, for: user) }.save(on: req)
         let companionsFuture = bodyFuture.flatMap { queryCompanions(with: $0.companionIDs, on: req) }
         
-        return flatMap(to: Record.self, recordFuture, companionsFuture) { record, companions in
-            return append(companions, to: record, on: req)
-        }.flatMap { try convert($0, toIntactOn: req) }
+        return flatMap(to: Record.self, recordFuture, companionsFuture) { append($1, to: $0, on: req) }
+            .flatMap { try convert($0, toIntactOn: req) }
     }
     
     func updateHandler(_ req: Request) throws -> Future<Record.Intact> {
@@ -54,9 +53,8 @@ private extension RecordsController {
             let updateRecordFuture = record.update(with: body).save(on: req).flatMap { removeAllCompanions(of: $0, on: req) }
             let companionsFuture = queryCompanions(with: body.companionIDs, on: req)
             
-            return flatMap(to: Record.self, updateRecordFuture, companionsFuture) { _, companions in
-                return append(companions, to: record, on: req)
-            }.flatMap { try convert($0, toIntactOn: req) }
+            return flatMap(to: Record.self, updateRecordFuture, companionsFuture) { append($1, to: record, on: req) }
+                .flatMap { try convert($0, toIntactOn: req) }
         }
     }
     
@@ -85,7 +83,8 @@ private extension RecordsController {
         let recordFuture = try req.parameters.next(Record.self)
             .map { try authorize(user, toAccess: $0, as: .creator) }
         
-        return try map(to: Attachment.self, req.parameters.next(Attachment.self), recordFuture, check(_:isAttachedTo:)).map(HTTPResponse.init)
+        return try map(to: Attachment.self, req.parameters.next(Attachment.self), recordFuture, check(_:isAttachedTo:))
+            .map(HTTPResponse.init)
     }
     
     func deleteAttachmentHandler(_ req: Request) throws -> Future<HTTPStatus> {
