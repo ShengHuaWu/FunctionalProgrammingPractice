@@ -10,6 +10,8 @@ final class UserTests: XCTestCase {
     override func setUp() {
         super.setUp()
         
+        try! Application.reset() // Reset database
+        
         app = try! Application.testable()
         conn = try! app.newConnection(to: .psql).wait()
     }
@@ -23,7 +25,7 @@ final class UserTests: XCTestCase {
     func testThatSignUpUserSucceeds() throws {
         let userInfo = AuthenticationBody.UserInfo(username: "sheng1", password: "12345678", firstName: "sheng", lastName: "wu", email: "sheng1@libra.co")
         let body = AuthenticationBody(userInfo: userInfo, osName: "mac os", timeZone: "CEST")
-        let signUpResponse = try app.sendRequest(to: "api/v1/users", method: .POST, body: body, isLoggedInRequest: false)
+        let signUpResponse = try app.sendRequest(to: "api/v1/users/signup", method: .POST, headers: ["Content-Type": "application/json"], body: body, isLoggedInRequest: false)
         let receivedUser = try signUpResponse.content.decode(User.Public.self).wait()
         
         XCTAssertNotNil(receivedUser.id)

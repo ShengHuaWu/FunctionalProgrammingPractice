@@ -3,15 +3,27 @@ import Vapor
 import FluentPostgreSQL
 
 extension Application {
-    static func testable() throws -> Application {
+    static func testable(envArgs: [String]? = nil) throws -> Application {
         var config = Config.default()
         var services = Services.default()
         var env = Environment.testing
+        
+        if let environmentArgs = envArgs {
+            env.arguments = environmentArgs
+        }
+        
         try App.configure(&config, &env, &services)
         let app = try Application(config: config, environment: env, services: services)
         try App.boot(app)
         
-        return app
+        return app        
+    }
+    
+    static func reset() throws {
+        let revertEnvironmentArgs = ["vapor", "revert", "--all", "-y"]
+        
+        // Create an app object to run the revert command
+        try Application.testable(envArgs: revertEnvironmentArgs).asyncRun().wait()
     }
     
     // TODO: Fix login
