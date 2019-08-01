@@ -101,11 +101,16 @@ func logIn(for user: User, with body: AuthenticationBody, on conn: DatabaseConne
         .flatMap { try convert(user, toPublicOn: conn, with: $0) }
 }
 
-// MARK: - Token Helpers
-func revoke(_ token: Token, on conn: DatabaseConnectable) -> Future<HTTPStatus> {
-    token.isRevoked = true
-    
-    return token.save(on: conn).transform(to: .noContent)
+func logOut(for user: User, with body: AuthenticationBody, on conn: DatabaseConnectable) throws -> Future<HTTPStatus> {
+    return try queryToken(of: user, with: body, on: conn).flatMap { token in
+        guard let unwrappedToken = token else {
+            throw Abort(.notFound)
+        }
+        
+        unwrappedToken.isRevoked = true
+        
+        return unwrappedToken.save(on: conn).transform(to: .noContent)
+    }
 }
 
 // MARK: - Record Helpers

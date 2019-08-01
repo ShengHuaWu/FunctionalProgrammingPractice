@@ -122,4 +122,52 @@ final class UserTests: XCTestCase {
         
         XCTAssertEqual(loginResponse.http.status, .unauthorized)
     }
+    
+    func testThatLogoutSucceeds() throws {
+        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: "12345678", email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
+        let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: false, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
+        
+        let body = AuthenticationBody(userInfo: nil, osName: "mac os", timeZone: "CEST")
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let logoutResponse = try app.sendRequest(to: "api/v1/users/logout", method: .DELETE, headers: headers, body: body)
+        
+        XCTAssertEqual(logoutResponse.http.status, .noContent)
+        
+        let revokedToken = try user.authTokens.query(on: conn).filter(\.isRevoked == true).first().wait()
+        XCTAssertTrue(revokedToken!.isRevoked)
+    }
+    
+    func testThatLogoutThrowsUnauthorizedIfTokenIsWrong() throws {
+        let body = AuthenticationBody(userInfo: nil, osName: "mac os", timeZone: "CEST")
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "ABC")
+        let logoutResponse = try app.sendRequest(to: "api/v1/users/logout", method: .DELETE, headers: headers, body: body)
+        
+        XCTAssertEqual(logoutResponse.http.status, .unauthorized)
+    }
+    
+    func testThatLogoutThrowsNotFoundIfOSNameIsWrong() throws {
+        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: "12345678", email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
+        let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: false, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
+        
+        let body = AuthenticationBody(userInfo: nil, osName: "ios", timeZone: "CEST")
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let logoutResponse = try app.sendRequest(to: "api/v1/users/logout", method: .DELETE, headers: headers, body: body)
+        
+        XCTAssertEqual(logoutResponse.http.status, .notFound)
+    }
+    
+    func testThatLogoutThrowsNotFoundIfTimeZoneIsWrong() throws {
+        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: "12345678", email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
+        let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: false, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
+        
+        let body = AuthenticationBody(userInfo: nil, osName: "mac os", timeZone: "CET")
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let logoutResponse = try app.sendRequest(to: "api/v1/users/logout", method: .DELETE, headers: headers, body: body)
+        
+        XCTAssertEqual(logoutResponse.http.status, .notFound)
+    }
 }
