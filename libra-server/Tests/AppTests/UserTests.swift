@@ -44,7 +44,7 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(signupResponse.http.status, .badRequest)
     }
     
-    func testThatLoginSucceeds() throws {
+    func testThatLoginSucceedsWithAnExistingToken() throws {
         let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: "12345678", email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
         let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: false, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
         let avatar = try Avatar(name: "XYZ", userID: user.requireID()).save(on: conn).wait()
@@ -62,6 +62,28 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(receivedUser.username, user.username)
         XCTAssertEqual(receivedUser.email, user.email)
         XCTAssertEqual(receivedUser.token, token.token)
+        XCTAssertEqual(receivedUser.asset?.id, avatar.id)
+    }
+    
+    func testThatLoginSucceedsWithANewToken() throws {
+        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: "12345678", email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
+        let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: true, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
+        let avatar = try Avatar(name: "XYZ", userID: user.requireID()).save(on: conn).wait()
+        
+        let body = AuthenticationBody(userInfo: nil, osName: "mac os", timeZone: "CEST")
+        let credentials = BasicAuthorization(username: "sheng1", password: "12345678")
+        var headers = HTTPHeaders()
+        headers.basicAuthorization = credentials
+        let loginResponse = try app.sendRequest(to: "api/v1/users/login", method: .POST, headers: headers, body: body)
+        let receivedUser = try loginResponse.content.decode(User.Public.self).wait()
+        
+        XCTAssertEqual(receivedUser.id, user.id)
+        XCTAssertEqual(receivedUser.firstName, user.firstName)
+        XCTAssertEqual(receivedUser.lastName, user.lastName)
+        XCTAssertEqual(receivedUser.username, user.username)
+        XCTAssertEqual(receivedUser.email, user.email)
+        XCTAssertTrue(!receivedUser.token!.isEmpty)
+        XCTAssertNotEqual(receivedUser.token, token.token)
         XCTAssertEqual(receivedUser.asset?.id, avatar.id)
     }
     
