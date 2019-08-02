@@ -6,6 +6,7 @@ import XCTest
 final class UserTests: XCTestCase {
     var app: Application!
     var conn: PostgreSQLConnection!
+    var password = "12345678"
 
     override func setUp() {
         super.setUp()
@@ -45,12 +46,10 @@ final class UserTests: XCTestCase {
     }
     
     func testThatLoginSucceedsWithAnExistingToken() throws {
-        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: "12345678", email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
-        let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: false, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
-        let avatar = try Avatar(name: "XYZ", userID: user.requireID()).save(on: conn).wait()
+        let (user, token, avatar) = try seedData()
         
-        let body = AuthenticationBody(userInfo: nil, osName: "mac os", timeZone: "CEST")
-        let credentials = BasicAuthorization(username: "sheng1", password: "12345678")
+        let body = AuthenticationBody(userInfo: nil, osName: token.osName, timeZone: token.timeZone)
+        let credentials = BasicAuthorization(username: user.username, password: password)
         var headers = HTTPHeaders()
         headers.basicAuthorization = credentials
         let loginResponse = try app.sendRequest(to: "api/v1/users/login", method: .POST, headers: headers, body: body)
@@ -66,12 +65,10 @@ final class UserTests: XCTestCase {
     }
     
     func testThatLoginSucceedsWithANewToken() throws {
-        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: "12345678", email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
-        let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: true, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
-        let avatar = try Avatar(name: "XYZ", userID: user.requireID()).save(on: conn).wait()
+        let (user, token, avatar) = try seedData(isTokenRevoked: true)
         
-        let body = AuthenticationBody(userInfo: nil, osName: "mac os", timeZone: "CEST")
-        let credentials = BasicAuthorization(username: "sheng1", password: "12345678")
+        let body = AuthenticationBody(userInfo: nil, osName: token.osName, timeZone: token.timeZone)
+        let credentials = BasicAuthorization(username: user.username, password: password)
         var headers = HTTPHeaders()
         headers.basicAuthorization = credentials
         let loginResponse = try app.sendRequest(to: "api/v1/users/login", method: .POST, headers: headers, body: body)
@@ -98,11 +95,10 @@ final class UserTests: XCTestCase {
     }
     
     func testThatLoginThrowsUnauthorizedIfUsernameIsWrong() throws {
-        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: "12345678", email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
-        _ = try Token(token: "4rfv5tgb6yhn==", isRevoked: false, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
-        
-        let body = AuthenticationBody(userInfo: nil, osName: "mac os", timeZone: "CEST")
-        let credentials = BasicAuthorization(username: "sheng2", password: "12345678")
+        let (_, token, _) = try seedData()
+
+        let body = AuthenticationBody(userInfo: nil, osName: token.token, timeZone: token.timeZone)
+        let credentials = BasicAuthorization(username: "sheng2", password: password)
         var headers = HTTPHeaders()
         headers.basicAuthorization = credentials
         let loginResponse = try app.sendRequest(to: "api/v1/users/login", method: .POST, headers: headers, body: body)
@@ -111,11 +107,10 @@ final class UserTests: XCTestCase {
     }
     
     func testThatLoginThrowsUnauthorizedIfPasswordIsWrong() throws {
-        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: "12345678", email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
-        _ = try Token(token: "4rfv5tgb6yhn==", isRevoked: false, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
-        
-        let body = AuthenticationBody(userInfo: nil, osName: "mac os", timeZone: "CEST")
-        let credentials = BasicAuthorization(username: "sheng1", password: "87654321")
+        let (user, token, _) = try seedData()
+
+        let body = AuthenticationBody(userInfo: nil, osName: token.osName, timeZone: token.timeZone)
+        let credentials = BasicAuthorization(username: user.username, password: "87654321")
         var headers = HTTPHeaders()
         headers.basicAuthorization = credentials
         let loginResponse = try app.sendRequest(to: "api/v1/users/login", method: .POST, headers: headers, body: body)
@@ -124,10 +119,9 @@ final class UserTests: XCTestCase {
     }
     
     func testThatLogoutSucceeds() throws {
-        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: "12345678", email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
-        let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: false, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
+        let (user, token, _) = try seedData()
         
-        let body = AuthenticationBody(userInfo: nil, osName: "mac os", timeZone: "CEST")
+        let body = AuthenticationBody(userInfo: nil, osName: token.osName, timeZone: token.timeZone)
         var headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: token.token)
         let logoutResponse = try app.sendRequest(to: "api/v1/users/logout", method: .DELETE, headers: headers, body: body)
@@ -139,7 +133,9 @@ final class UserTests: XCTestCase {
     }
     
     func testThatLogoutThrowsUnauthorizedIfTokenIsWrong() throws {
-        let body = AuthenticationBody(userInfo: nil, osName: "mac os", timeZone: "CEST")
+        let (_, token, _) = try seedData()
+
+        let body = AuthenticationBody(userInfo: nil, osName: token.osName, timeZone: token.timeZone)
         var headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: "ABC")
         let logoutResponse = try app.sendRequest(to: "api/v1/users/logout", method: .DELETE, headers: headers, body: body)
@@ -148,10 +144,9 @@ final class UserTests: XCTestCase {
     }
     
     func testThatLogoutThrowsNotFoundIfOSNameIsWrong() throws {
-        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: "12345678", email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
-        let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: false, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
+        let (_, token, _) = try seedData()
         
-        let body = AuthenticationBody(userInfo: nil, osName: "ios", timeZone: "CEST")
+        let body = AuthenticationBody(userInfo: nil, osName: "ios", timeZone: token.timeZone)
         var headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: token.token)
         let logoutResponse = try app.sendRequest(to: "api/v1/users/logout", method: .DELETE, headers: headers, body: body)
@@ -160,14 +155,24 @@ final class UserTests: XCTestCase {
     }
     
     func testThatLogoutThrowsNotFoundIfTimeZoneIsWrong() throws {
-        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: "12345678", email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
-        let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: false, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
+        let (_, token, _) = try seedData()
         
-        let body = AuthenticationBody(userInfo: nil, osName: "mac os", timeZone: "CET")
+        let body = AuthenticationBody(userInfo: nil, osName: token.osName, timeZone: "CET")
         var headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: token.token)
         let logoutResponse = try app.sendRequest(to: "api/v1/users/logout", method: .DELETE, headers: headers, body: body)
         
         XCTAssertEqual(logoutResponse.http.status, .notFound)
+    }
+}
+
+// MARK: - Private
+private extension UserTests {
+    func seedData(isTokenRevoked: Bool = false) throws -> (User, Token, Avatar) {
+        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: password, email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
+        let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: isTokenRevoked, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
+        let avatar = try Avatar(name: "XYZ", userID: user.requireID()).save(on: conn).wait()
+        
+        return (user, token, avatar)
     }
 }
