@@ -24,6 +24,7 @@ final class UserTests: XCTestCase {
     }
     
     // TODO: Clean up code
+    // Remove `wait()` from `sendRequest`
     func testThatSignupSucceeds() throws {
         let userInfo = AuthenticationBody.UserInfo(username: "sheng1", password: "12345678", firstName: "sheng", lastName: "wu", email: "sheng1@libra.co")
         let body = AuthenticationBody(userInfo: userInfo, osName: "mac os", timeZone: "CEST")
@@ -164,6 +165,8 @@ final class UserTests: XCTestCase {
         
         XCTAssertEqual(logoutResponse.http.status, .notFound)
     }
+    
+    // TODO: Unit tests
 }
 
 // MARK: - Private
