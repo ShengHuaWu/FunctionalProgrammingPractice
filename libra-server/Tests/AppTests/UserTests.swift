@@ -24,7 +24,6 @@ final class UserTests: XCTestCase {
     }
     
     // TODO: Clean up code
-    // Remove `wait()` from `sendRequest`
     func testThatSignupSucceeds() throws {
         let userInfo = AuthenticationBody.UserInfo(username: "sheng1", password: "12345678", firstName: "sheng", lastName: "wu", email: "sheng1@libra.co")
         let body = AuthenticationBody(userInfo: userInfo, osName: "mac os", timeZone: "CEST")
@@ -164,6 +163,24 @@ final class UserTests: XCTestCase {
         let logoutResponse = try app.sendRequest(to: "api/v1/users/logout", method: .DELETE, headers: headers, body: body)
         
         XCTAssertEqual(logoutResponse.http.status, .notFound)
+    }
+    
+    func testThatGetOneUserSucceeds() throws {
+        let (user, token, avatar) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let getOneResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        let receivedUser = try getOneResponse.content.decode(User.Public.self).wait()
+        
+        XCTAssertEqual(receivedUser.id, user.id)
+        XCTAssertEqual(receivedUser.firstName, user.firstName)
+        XCTAssertEqual(receivedUser.lastName, user.lastName)
+        XCTAssertEqual(receivedUser.username, user.username)
+        XCTAssertEqual(receivedUser.email, user.email)
+        XCTAssertNil(receivedUser.token)
+        XCTAssertNotEqual(receivedUser.token, token.token)
+        XCTAssertEqual(receivedUser.asset?.id, avatar.id)
     }
     
     // TODO: Unit tests
