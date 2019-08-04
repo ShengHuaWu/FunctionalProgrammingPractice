@@ -183,6 +183,27 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(receivedUser.asset?.id, avatar.id)
     }
     
+    func testThatGetOneUserThrowsUnauthorizedIfTokenIsWrong() throws {
+        let (user, _, _) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let getOneResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(getOneResponse.http.status, .unauthorized)
+    }
+    
+    func testThatGetOneUserThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        let (_, token, _) = try seedData()
+        
+        let anotherUser = try User(firstName: "sheng", lastName: "wu", username: "sheng2", password: password, email: "sheng2@libra.co").encryptPassword().save(on: conn).wait()
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let getOneResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(getOneResponse.http.status, .unauthorized)
+    }
+    
     // TODO: Unit tests
 }
 
