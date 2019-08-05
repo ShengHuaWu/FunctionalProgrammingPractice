@@ -204,6 +204,46 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(getOneResponse.http.status, .unauthorized)
     }
     
+    func testThatUpdateUserSucceeds() throws {
+        let (user, token, avatar) = try seedData()
+        
+        let body = User.UpdateRequestBody(firstName: "shenghua", lastName: "wu", email: "shenghua@libra.co")
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let updateUserResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())", method: .PUT, headers: headers, body: body)
+        let receivedUser = try updateUserResponse.content.decode(User.Public.self).wait()
+        
+        XCTAssertEqual(receivedUser.id, user.id)
+        XCTAssertEqual(receivedUser.firstName, body.firstName)
+        XCTAssertEqual(receivedUser.lastName, body.lastName)
+        XCTAssertEqual(receivedUser.email, receivedUser.email)
+        XCTAssertEqual(receivedUser.asset?.id, avatar.id)
+        XCTAssertNil(receivedUser.token)
+    }
+    
+    func testThatUpdateUserThrowsUnauthorizedIfTokenIsWrong() throws {
+        let (user, _, _) = try seedData()
+        
+        let body = User.UpdateRequestBody(firstName: "shenghua", lastName: "wu", email: "shenghua@libra.co")
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let updateUserResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())", method: .PUT, headers: headers, body: body)
+        
+        XCTAssertEqual(updateUserResponse.http.status, .unauthorized)
+    }
+    
+    func testThatUdpateUserThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        let (_, token, _) = try seedData()
+        
+        let anotherUser = try User(firstName: "sheng", lastName: "wu", username: "sheng2", password: password, email: "sheng2@libra.co").encryptPassword().save(on: conn).wait()
+        let body = User.UpdateRequestBody(firstName: "shenghua", lastName: "wu", email: "shenghua@libra.co")
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let updateUserResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())", method: .PUT, headers: headers, body: body)
+        
+        XCTAssertEqual(updateUserResponse.http.status, .unauthorized)
+    }
+    
     // TODO: Unit tests
 }
 
