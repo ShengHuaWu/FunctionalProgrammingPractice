@@ -262,6 +262,27 @@ final class UserTests: XCTestCase {
         XCTAssertNil(receivedUsers.first?.token)
     }
     
+    func testThatSearchUsersSucceedsWithEmptyResult() throws {
+        let (_, token, _) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let key = "facebook"
+        let searchUsersResponse = try app.sendRequest(to: "api/v1/users/search?q=\(key)", method: .GET, headers: headers, body: EmptyBody())
+        let receivedUsers = try searchUsersResponse.content.decode([User.Public].self).wait()
+        
+        XCTAssertEqual(receivedUsers.count, 0)
+    }
+    
+    func testThatSearchUserThrowsUnauthorizedIfTokenIsWrong() throws {
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let key = "shen"
+        let searchUsersResponse = try app.sendRequest(to: "api/v1/users/search?q=\(key)", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(searchUsersResponse.http.status, .unauthorized)
+    }
+    
     // TODO: Unit tests
 }
 
