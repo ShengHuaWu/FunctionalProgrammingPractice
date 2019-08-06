@@ -216,7 +216,7 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(receivedUser.id, user.id)
         XCTAssertEqual(receivedUser.firstName, body.firstName)
         XCTAssertEqual(receivedUser.lastName, body.lastName)
-        XCTAssertEqual(receivedUser.email, receivedUser.email)
+        XCTAssertEqual(receivedUser.email, body.email)
         XCTAssertEqual(receivedUser.asset?.id, avatar.id)
         XCTAssertNil(receivedUser.token)
     }
@@ -242,6 +242,24 @@ final class UserTests: XCTestCase {
         let updateUserResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())", method: .PUT, headers: headers, body: body)
         
         XCTAssertEqual(updateUserResponse.http.status, .unauthorized)
+    }
+    
+    func testThatSearchUsersSucceeds() throws {
+        let (user, token, avatar) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let key = "shen"
+        let searchUsersResponse = try app.sendRequest(to: "api/v1/users/search?q=\(key)", method: .GET, headers: headers, body: EmptyBody())
+        let receivedUsers = try searchUsersResponse.content.decode([User.Public].self).wait()
+        
+        XCTAssertEqual(receivedUsers.count, 1)
+        XCTAssertEqual(receivedUsers.first?.id, user.id)
+        XCTAssertEqual(receivedUsers.first?.firstName, user.firstName)
+        XCTAssertEqual(receivedUsers.first?.lastName, user.lastName)
+        XCTAssertEqual(receivedUsers.first?.email, user.email)
+        XCTAssertEqual(receivedUsers.first?.asset?.id, avatar.id)
+        XCTAssertNil(receivedUsers.first?.token)
     }
     
     // TODO: Unit tests
