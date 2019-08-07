@@ -283,13 +283,68 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(searchUsersResponse.http.status, .unauthorized)
     }
     
+    func testThatGetOneFriendSucceeds() throws {
+        let (user, token, _) = try seedData()
+        let (person, _, avatar) = try seedData(username: "sheng2")
+        _ = try addFriendship(between: user, and: person, on: conn).wait()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let getOneFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends/\(person.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        let receivedFriend = try getOneFriendResponse.content.decode(User.Public.self).wait()
+        
+        XCTAssertEqual(receivedFriend.id, person.id)
+        XCTAssertEqual(receivedFriend.firstName, person.firstName)
+        XCTAssertEqual(receivedFriend.lastName, person.lastName)
+        XCTAssertEqual(receivedFriend.email, person.email)
+        XCTAssertEqual(receivedFriend.asset?.id, avatar.id)
+        XCTAssertNil(receivedFriend.token)
+    }
+    
+    func testThatGetOneFriendThrowsUnauthorizedIfTokenIsWrong() throws {
+        let (user, _, _) = try seedData()
+        let (person, _, _) = try seedData(username: "sheng2")
+        _ = try addFriendship(between: user, and: person, on: conn).wait()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let getOneFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends/\(person.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(getOneFriendResponse.http.status, .unauthorized)
+    }
+    
+    func testThatGetOneFriendThrowsNotFoundIfThereIsNoFriendship() throws {
+        let (user, token, _) = try seedData()
+        let (person, _, _) = try seedData(username: "sheng2")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let getOneFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends/\(person.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(getOneFriendResponse.http.status, .notFound)
+    }
+    
+    func testThatGetOneFriendThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        let (_, token, _) = try seedData()
+        let (person, _, _) = try seedData(username: "sheng2")
+        let anotherUser = try User(firstName: "sheng", lastName: "wu", username: "sheng3", password: password, email: "sheng3@libra.co").encryptPassword().save(on: conn).wait()
+        _ = try addFriendship(between: anotherUser, and: person, on: conn).wait()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let getOneFriendResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())/friends/\(person.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(getOneFriendResponse.http.status, .unauthorized)
+    }
+    
     // TODO: Unit tests
 }
 
 // MARK: - Private
 private extension UserTests {
-    func seedData(isTokenRevoked: Bool = false) throws -> (User, Token, Avatar) {
-        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng1", password: password, email: "sheng1@libra.co").encryptPassword().save(on: conn).wait()
+    // TODO: Clean up
+    func seedData(username: String = "sheng1", isTokenRevoked: Bool = false) throws -> (User, Token, Avatar) {
+        let user = try User(firstName: "sheng", lastName: "wu", username: username, password: password, email: "\(username)@libra.co").encryptPassword().save(on: conn).wait()
         let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: isTokenRevoked, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
         let avatar = try Avatar(name: "XYZ", userID: user.requireID()).save(on: conn).wait()
         
