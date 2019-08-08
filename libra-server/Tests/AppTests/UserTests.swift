@@ -283,6 +283,37 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(searchUsersResponse.http.status, .unauthorized)
     }
     
+    func testThatGetAllFriendsSucceeds() throws {
+        let (user, token, _) = try seedData()
+        let (person, _, avatar) = try seedData(username: "sheng2")
+        _ = try addFriendship(between: user, and: person, on: conn).wait()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let getAllFriendsResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .GET, headers: headers, body: EmptyBody())
+        let receivedFriends = try getAllFriendsResponse.content.decode([User.Public].self).wait()
+        
+        XCTAssertEqual(receivedFriends.count, 1)
+        XCTAssertEqual(receivedFriends.first?.id, person.id)
+        XCTAssertEqual(receivedFriends.first?.firstName, person.firstName)
+        XCTAssertEqual(receivedFriends.first?.lastName, person.lastName)
+        XCTAssertEqual(receivedFriends.first?.email, person.email)
+        XCTAssertEqual(receivedFriends.first?.asset?.id, avatar.id)
+        XCTAssertNil(receivedFriends.first?.token)
+    }
+    
+    func testThatGetAllFriendsThrowsUnauthorizedIfTokenIsWrong() throws {
+        let (user, _, _) = try seedData()
+        let (person, _, _) = try seedData(username: "sheng2")
+        _ = try addFriendship(between: user, and: person, on: conn).wait()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let getOneFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(getOneFriendResponse.http.status, .unauthorized)
+    }
+    
     func testThatGetOneFriendSucceeds() throws {
         let (user, token, _) = try seedData()
         let (person, _, avatar) = try seedData(username: "sheng2")
