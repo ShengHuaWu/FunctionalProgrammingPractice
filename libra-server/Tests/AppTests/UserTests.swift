@@ -24,6 +24,8 @@ final class UserTests: XCTestCase {
     }
     
     // TODO: Clean up code
+    // Consider using environment to set up middleware
+    // so that unauthorized tests can be merged, for example, wrong token & inaccessible
     func testThatSignupSucceeds() throws {
         let userInfo = AuthenticationBody.UserInfo(username: "sheng1", password: "12345678", firstName: "sheng", lastName: "wu", email: "sheng1@libra.co")
         let body = AuthenticationBody(userInfo: userInfo, osName: "mac os", timeZone: "CEST")
@@ -309,9 +311,22 @@ final class UserTests: XCTestCase {
         
         var headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
-        let getOneFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .GET, headers: headers, body: EmptyBody())
+        let getAllFriendsResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .GET, headers: headers, body: EmptyBody())
         
-        XCTAssertEqual(getOneFriendResponse.http.status, .unauthorized)
+        XCTAssertEqual(getAllFriendsResponse.http.status, .unauthorized)
+    }
+    
+    func testThatGetAllFriendsThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        let (_, token, _) = try seedData()
+        let (person, _, _) = try seedData(username: "sheng2")
+        let anotherUser = try User(firstName: "sheng", lastName: "wu", username: "sheng3", password: password, email: "sheng3@libra.co").encryptPassword().save(on: conn).wait()
+        _ = try addFriendship(between: anotherUser, and: person, on: conn).wait()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let getAllFriendsResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())/friends", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(getAllFriendsResponse.http.status, .unauthorized)
     }
     
     func testThatGetOneFriendSucceeds() throws {
