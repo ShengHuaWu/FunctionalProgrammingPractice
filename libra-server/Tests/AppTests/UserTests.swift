@@ -304,6 +304,17 @@ final class UserTests: XCTestCase {
         XCTAssertNil(receivedFriends.first?.token)
     }
     
+    func testThatGetAllFriendsSucceedsWithEmptyResult() throws {
+        let (user, token, _) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let getAllFriendsResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .GET, headers: headers, body: EmptyBody())
+        let receivedFriends = try getAllFriendsResponse.content.decode([User.Public].self).wait()
+        
+        XCTAssertEqual(receivedFriends.count, 0)
+    }
+    
     func testThatGetAllFriendsThrowsUnauthorizedIfTokenIsWrong() throws {
         let (user, _, _) = try seedData()
         let (person, _, _) = try seedData(username: "sheng2")
