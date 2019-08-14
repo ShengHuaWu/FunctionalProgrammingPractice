@@ -23,9 +23,7 @@ final class UserTests: XCTestCase {
         conn.close()
     }
     
-    // TODO: Clean up code
-    // Consider using environment to set up middleware
-    // so that unauthorized tests can be merged, for example, wrong token & inaccessible
+    // TODO: Clean up code. Consider separating into different files
     func testThatSignupSucceeds() throws {
         let userInfo = AuthenticationBody.UserInfo(username: "sheng1", password: "12345678", firstName: "sheng", lastName: "wu", email: "sheng1@libra.co")
         let body = AuthenticationBody(userInfo: userInfo, osName: "mac os", timeZone: "CEST")
