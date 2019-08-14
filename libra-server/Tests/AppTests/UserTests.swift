@@ -285,14 +285,16 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(searchUsersResponse.http.status, .unauthorized)
     }
     
-    // TODO: Fix this test
-    func disable_testThatGetAllFriendsSucceeds() throws {
+    func testThatGetAllFriendsSucceeds() throws {
         let (user, token, _) = try seedData()
         let (person, _, avatar) = try seedData(username: "sheng2")
-        _ = try addFriendship(between: user, and: person, on: conn).wait()
         
         var headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = try AddFriendBody(personID: person.requireID())
+        let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .POST, headers: headers, body: body)
+        XCTAssertEqual(addFriendResponse.http.status, .created)
+        
         let getAllFriendsResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .GET, headers: headers, body: EmptyBody())
         let receivedFriends = try getAllFriendsResponse.content.decode([User.Public].self).wait()
         
@@ -317,11 +319,16 @@ final class UserTests: XCTestCase {
     }
     
     func testThatGetAllFriendsThrowsUnauthorizedIfTokenIsWrong() throws {
-        let (user, _, _) = try seedData()
+        let (user, token, _) = try seedData()
         let (person, _, _) = try seedData(username: "sheng2")
-        _ = try addFriendship(between: user, and: person, on: conn).wait()
         
         var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = try AddFriendBody(personID: person.requireID())
+        let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .POST, headers: headers, body: body)
+        XCTAssertEqual(addFriendResponse.http.status, .created)
+        
+        headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
         let getAllFriendsResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .GET, headers: headers, body: EmptyBody())
         
@@ -329,12 +336,17 @@ final class UserTests: XCTestCase {
     }
     
     func testThatGetAllFriendsThrowsUnauthorizedIfUserCannotAccessResource() throws {
-        let (_, token, _) = try seedData()
+        let (user, token, _) = try seedData()
         let (person, _, _) = try seedData(username: "sheng2")
-        let anotherUser = try User(firstName: "sheng", lastName: "wu", username: "sheng3", password: password, email: "sheng3@libra.co").encryptPassword().save(on: conn).wait()
-        _ = try addFriendship(between: anotherUser, and: person, on: conn).wait()
         
         var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = try AddFriendBody(personID: person.requireID())
+        let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .POST, headers: headers, body: body)
+        XCTAssertEqual(addFriendResponse.http.status, .created)
+
+        let anotherUser = try User(firstName: "sheng", lastName: "wu", username: "sheng3", password: password, email: "sheng3@libra.co").encryptPassword().save(on: conn).wait()
+        headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: token.token)
         let getAllFriendsResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())/friends", method: .GET, headers: headers, body: EmptyBody())
         
@@ -344,10 +356,13 @@ final class UserTests: XCTestCase {
     func testThatGetOneFriendSucceeds() throws {
         let (user, token, _) = try seedData()
         let (person, _, avatar) = try seedData(username: "sheng2")
-        _ = try addFriendship(between: user, and: person, on: conn).wait()
         
         var headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = try AddFriendBody(personID: person.requireID())
+        let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .POST, headers: headers, body: body)
+        XCTAssertEqual(addFriendResponse.http.status, .created)
+        
         let getOneFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends/\(person.requireID())", method: .GET, headers: headers, body: EmptyBody())
         let receivedFriend = try getOneFriendResponse.content.decode(User.Public.self).wait()
         
@@ -360,11 +375,16 @@ final class UserTests: XCTestCase {
     }
     
     func testThatGetOneFriendThrowsUnauthorizedIfTokenIsWrong() throws {
-        let (user, _, _) = try seedData()
+        let (user, token, _) = try seedData()
         let (person, _, _) = try seedData(username: "sheng2")
-        _ = try addFriendship(between: user, and: person, on: conn).wait()
         
         var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = try AddFriendBody(personID: person.requireID())
+        let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .POST, headers: headers, body: body)
+        XCTAssertEqual(addFriendResponse.http.status, .created)
+        
+        headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
         let getOneFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends/\(person.requireID())", method: .GET, headers: headers, body: EmptyBody())
         
@@ -383,12 +403,17 @@ final class UserTests: XCTestCase {
     }
     
     func testThatGetOneFriendThrowsUnauthorizedIfUserCannotAccessResource() throws {
-        let (_, token, _) = try seedData()
+        let (user, token, _) = try seedData()
         let (person, _, _) = try seedData(username: "sheng2")
-        let anotherUser = try User(firstName: "sheng", lastName: "wu", username: "sheng3", password: password, email: "sheng3@libra.co").encryptPassword().save(on: conn).wait()
-        _ = try addFriendship(between: anotherUser, and: person, on: conn).wait()
         
         var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = try AddFriendBody(personID: person.requireID())
+        let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .POST, headers: headers, body: body)
+        XCTAssertEqual(addFriendResponse.http.status, .created)
+        
+        let anotherUser = try User(firstName: "sheng", lastName: "wu", username: "sheng3", password: password, email: "sheng3@libra.co").encryptPassword().save(on: conn).wait()
+        headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: token.token)
         let getOneFriendResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())/friends/\(person.requireID())", method: .GET, headers: headers, body: EmptyBody())
         
