@@ -438,6 +438,18 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(friends.first?.email, person.email)
     }
     
+    func testThatAddFriendThrowsUnauthorizedIfTokenIsWrong() throws {
+        let (user, _, _) = try seedData()
+        let (person, _, _) = try seedData(username: "sheng2")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let body = try AddFriendBody(personID: person.requireID())
+        let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .POST, headers: headers, body: body)
+        
+        XCTAssertEqual(addFriendResponse.http.status, .unauthorized)
+    }
+    
     // TODO: Unit tests
 }
 
