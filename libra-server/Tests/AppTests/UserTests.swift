@@ -450,6 +450,17 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(addFriendResponse.http.status, .unauthorized)
     }
     
+    func testThatAddFriendThrowsBadRequestIfFriendDoesNotExist() throws {
+        let (user, token, _) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = AddFriendBody(personID: 999)
+        let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .POST, headers: headers, body: body)
+        
+        XCTAssertEqual(addFriendResponse.http.status, .badRequest)
+    }
+    
     // TODO: Unit tests
 }
 
