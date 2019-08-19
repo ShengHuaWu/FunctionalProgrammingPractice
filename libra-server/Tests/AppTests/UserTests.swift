@@ -461,6 +461,37 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(addFriendResponse.http.status, .badRequest)
     }
     
+    func testThatRemoveFriendSucceeds() throws {
+        let (user, token, _) = try seedData()
+        let (person, _, _) = try seedData(username: "sheng2")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = try AddFriendBody(personID: person.requireID())
+        let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .POST, headers: headers, body: body)
+        XCTAssertEqual(addFriendResponse.http.status, .created)
+        
+        let removeFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends/\(person.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(removeFriendResponse.http.status, .noContent)
+    }
+    
+    func testThatRemoveFriendThrowsUnauthorizedIfTokenIsWrong() throws {
+        let (user, token, _) = try seedData()
+        let (person, _, _) = try seedData(username: "sheng2")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = try AddFriendBody(personID: person.requireID())
+        let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .POST, headers: headers, body: body)
+        XCTAssertEqual(addFriendResponse.http.status, .created)
+        
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let removeFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends/\(person.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(removeFriendResponse.http.status, .unauthorized)
+    }
+    
     // TODO: Unit tests
 }
 
