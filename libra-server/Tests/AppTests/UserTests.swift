@@ -461,6 +461,19 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(addFriendResponse.http.status, .badRequest)
     }
     
+    func testThatAddFriendThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        let (_, token, _) = try seedData()
+        let (person, _, _) = try seedData(username: "sheng2")
+        let anotherUser = try User(firstName: "sheng", lastName: "wu", username: "sheng3", password: password, email: "sheng3@libra.co").encryptPassword().save(on: conn).wait()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = try AddFriendBody(personID: person.requireID())
+        let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())/friends", method: .POST, headers: headers, body: body)
+        
+        XCTAssertEqual(addFriendResponse.http.status, .unauthorized)
+    }
+    
     func testThatRemoveFriendSucceeds() throws {
         let (user, token, _) = try seedData()
         let (person, _, _) = try seedData(username: "sheng2")
@@ -492,6 +505,24 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(removeFriendResponse.http.status, .unauthorized)
     }
     
+    func testThatRemoveFriendThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        let (_, token, _) = try seedData()
+        let (person, _, _) = try seedData(username: "sheng2")
+        let (anotherUser, anotherToken, _) = try seedData(username: "sheng3")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: anotherToken.token)
+        let body = try AddFriendBody(personID: person.requireID())
+        let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())/friends", method: .POST, headers: headers, body: body)
+        XCTAssertEqual(addFriendResponse.http.status, .created)
+        
+        headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let removeFriendResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())/friends/\(person.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(removeFriendResponse.http.status, .unauthorized)
+    }
+    
     // TODO: Unit tests
 }
 
@@ -500,7 +531,7 @@ private extension UserTests {
     // TODO: Clean up
     func seedData(username: String = "sheng1", isTokenRevoked: Bool = false) throws -> (User, Token, Avatar) {
         let user = try User(firstName: "sheng", lastName: "wu", username: username, password: password, email: "\(username)@libra.co").encryptPassword().save(on: conn).wait()
-        let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: isTokenRevoked, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait()
+        let token = try Token(token: "4rfv5t\(username)gb6yhn==", isRevoked: isTokenRevoked, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait() // token should be different from user to user
         let avatar = try Avatar(name: "XYZ", userID: user.requireID()).save(on: conn).wait()
         
         return (user, token, avatar)

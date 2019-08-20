@@ -13,4 +13,4 @@
 10. There is a default limit of 1 million bytes for incoming requests, but we can override it by registering a custom `NIOServerConfig` instance `configure.swift`. For example, `services.register(NIOServerConfig.default(maxBodySize: 20_000_000))`.
 11. Use `HTTPResponse` to return data directly instead of JSON.
 12. Remember to encrypt user's password in unit tests.
-13. Avoid using global helper functions in unit testing.
+13. Generate different tokens for different users respectively while testing. Otherwise, the `requireAuthenticated` method could return an unexpected user.
