@@ -23,7 +23,9 @@ extension Application {
         let revertEnvironmentArgs = ["vapor", "revert", "--all", "-y"]
         
         // Create an app object to run the revert command
-        try Application.testable(envArgs: revertEnvironmentArgs).asyncRun().wait()
+        let app = try Application.testable(envArgs: revertEnvironmentArgs)
+        try app.asyncRun().wait()
+        try app.syncShutdownGracefully()
     }
     
     func sendRequest<Body>(to path: String, method: HTTPMethod, headers: HTTPHeaders = .init(), body: Body?) throws -> Response where Body: Content {

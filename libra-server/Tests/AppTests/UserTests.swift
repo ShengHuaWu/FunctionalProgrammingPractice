@@ -21,6 +21,7 @@ final class UserTests: XCTestCase {
         super.tearDown()
         
         conn.close()
+        try! app.syncShutdownGracefully()
     }
     
     // TODO: Clean up code. Consider separating into different files
@@ -484,6 +485,17 @@ final class UserTests: XCTestCase {
         let addFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends", method: .POST, headers: headers, body: body)
         XCTAssertEqual(addFriendResponse.http.status, .created)
         
+        let removeFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends/\(person.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(removeFriendResponse.http.status, .noContent)
+    }
+    
+    func testThatRemoveFriendSucceedsIfThereIsNoFriendship() throws {
+        let (user, token, _) = try seedData()
+        let (person, _, _) = try seedData(username: "sheng2")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
         let removeFriendResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/friends/\(person.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
         
         XCTAssertEqual(removeFriendResponse.http.status, .noContent)

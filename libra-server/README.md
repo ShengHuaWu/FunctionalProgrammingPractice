@@ -14,3 +14,4 @@
 11. Use `HTTPResponse` to return data directly instead of JSON.
 12. Remember to encrypt user's password in unit tests.
 13. Generate different tokens for different users respectively while testing. Otherwise, the `requireAuthenticated` method could return an unexpected user.
+14. Use `syncShutdownGracefully` to avoid `Sorry, too many clients already` issue on PostgreSQL database while testing. 
