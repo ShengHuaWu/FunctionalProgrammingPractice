@@ -535,8 +535,23 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(removeFriendResponse.http.status, .unauthorized)
     }
     
+    func testThatUploadAvatarSucceeds() throws {
+        let (user, token, _) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = File(data: "0okm5tgbrfdsawer", filename: "new_avatar")
+        let uploadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/avatars", method: .POST, headers: headers, body: body)
+        let receivedAsset = try uploadAvatarResponse.content.decode(Asset.self).wait()
+        
+        XCTAssertNotNil(receivedAsset.id)
+    }
+    
+    
     // TODO: Unit tests
 }
+
+extension File: Content {} // TODO: This is used for creating the body of the avatar requests
 
 // MARK: - Private
 private extension UserTests {

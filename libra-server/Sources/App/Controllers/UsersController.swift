@@ -142,6 +142,7 @@ private extension UsersController {
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
         return flatMap(to: Asset.self, userFuture, fileFuture) { user, file in
+            // TODO: Remove existing avatar before creating a new one
             return try createNewAvatar(of: user, with: file, on: req).map(Asset.init)
         }
     }
