@@ -547,6 +547,17 @@ final class UserTests: XCTestCase {
         XCTAssertNotNil(receivedAsset.id)
     }
     
+    func testThatUploadAvatarThrowsUnauthorizedIfTokenIsWrong() throws {
+        let (user, _, _) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let body = File(data: "0okm5tgbrfdsawer", filename: "new_avatar")
+        let uploadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/avatars", method: .POST, headers: headers, body: body)
+        
+        XCTAssertEqual(uploadAvatarResponse.http.status, .unauthorized)
+    }
+    
     
     // TODO: Unit tests
 }
