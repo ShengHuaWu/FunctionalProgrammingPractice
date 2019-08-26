@@ -21,7 +21,7 @@ final class UserTests: XCTestCase {
         super.tearDown()
         
         conn.close()
-        try! app.syncShutdownGracefully()
+        try! app.syncShutdownGracefully() // This is necessary to resolve the too many thread usages
     }
     
     // TODO: Clean up code. Consider separating into different files
@@ -558,11 +558,37 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(uploadAvatarResponse.http.status, .unauthorized)
     }
     
+    func testThatUploadAvatarThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        let (_, token, _) = try seedData()
+        let (anotherUser, _, _) = try seedData(username: "Sheng2")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = File(data: "0okm5tgbrfdsawer", filename: "new_avatar")
+        let uploadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())/avatars", method: .POST, headers: headers, body: body)
+        
+        XCTAssertEqual(uploadAvatarResponse.http.status, .unauthorized)
+    }
+
+    func testThatDownloadAvatarSucceeds() throws {
+        Current.resourcePersisting.fetch = { name in
+            return name.data(using: .utf8)!
+        }
+        
+        let (user, token, avatar) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let downloadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/avatars/\(avatar.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(downloadAvatarResponse.http.status, .ok)
+        XCTAssertNotNil(downloadAvatarResponse.http.body.data)
+    }
     
     // TODO: Unit tests
 }
 
-extension File: Content {} // TODO: This is used for creating the body of the avatar requests
+extension File: Content {} // TODO: This is used for creating the body of the avatar requests (TBD)
 
 // MARK: - Private
 private extension UserTests {

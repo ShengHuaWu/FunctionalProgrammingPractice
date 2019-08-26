@@ -2,9 +2,9 @@ import Foundation
 import Vapor
 
 struct ResourcePersisting {
-    let save = { try saveData($0, to: makeResourcesURL(with: $1)) }
-    let delete = makeResourcesURL(with:) >>> deleteData(at:)
-    let fetch = makeResourcesURL(with:) >>> fetchData(from:)
+    var save = { try saveData($0, to: makeResourcesURL(with: $1)) }
+    var delete = makeResourcesURL(with:) >>> deleteData(at:)
+    var fetch = makeResourcesURL(with:) >>> fetchData(from:)
 }
 
 // MARK: - Private

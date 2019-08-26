@@ -25,7 +25,7 @@ extension Application {
         // Create an app object to run the revert command
         let app = try Application.testable(envArgs: revertEnvironmentArgs)
         try app.asyncRun().wait()
-        try app.syncShutdownGracefully()
+        try app.syncShutdownGracefully() // This is necessary to resolve the too many thread usages
     }
     
     func sendRequest<Body>(to path: String, method: HTTPMethod, headers: HTTPHeaders = .init(), body: Body?) throws -> Response where Body: Content {
