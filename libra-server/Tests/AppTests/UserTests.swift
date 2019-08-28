@@ -595,6 +595,17 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(downloadAvatarResponse.http.status, .unauthorized)
     }
     
+    func testThatDownloadAvatarThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        let (_, token, _) = try seedData()
+        let (anotherUser, _, anotherAvatar) = try seedData(username: "sheng2")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let downloadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())/avatars/\(anotherAvatar.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(downloadAvatarResponse.http.status, .unauthorized)
+    }
+    
     // TODO: Unit tests
 }
 
