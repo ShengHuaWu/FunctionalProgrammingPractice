@@ -606,6 +606,20 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(downloadAvatarResponse.http.status, .unauthorized)
     }
     
+    func testThatDownloadAvatarThrowsNotFoundIfFetchingDataThrowsNotFound() throws {
+        Current.resourcePersisting.fetch = { _ in
+            throw Abort(.notFound)
+        }
+        
+        let (user, token, avatar) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let downloadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/avatars/\(avatar.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(downloadAvatarResponse.http.status, .notFound)
+    }
+    
     // TODO: Unit tests
 }
 
