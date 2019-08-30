@@ -620,6 +620,28 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(downloadAvatarResponse.http.status, .notFound)
     }
     
+    func testThatDeleteAvatarSucceeds() throws {
+        Current.resourcePersisting.delete = { _ in }
+        
+        let (user, token, avatar) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let deleteAvatarResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/avatars/\(avatar.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(deleteAvatarResponse.http.status, .noContent)
+    }
+    
+    func testThatDeleteAvatarThrowsUnauthorizedIfTokenIsWrong() throws {
+        let (user, _, avatar) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let deleteAvatarResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/avatars/\(avatar.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(deleteAvatarResponse.http.status, .unauthorized)
+    }
+    
     // TODO: Unit tests
 }
 
