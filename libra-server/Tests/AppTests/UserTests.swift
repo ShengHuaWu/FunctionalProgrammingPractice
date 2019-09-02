@@ -642,7 +642,30 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(deleteAvatarResponse.http.status, .unauthorized)
     }
     
-    // TODO: Unit tests
+    func testThatDeleteAvatarThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        let (_, token, _) = try seedData()
+        let (anotherUser, _, anotherAvatar) = try seedData(username: "sheng2")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let deleteAvatarResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())/avatars/\(anotherAvatar.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(deleteAvatarResponse.http.status, .unauthorized)
+    }
+    
+    func testThatDeleteAvatarThrowsNotFoundIfDeletingDataThrowsNotFound() throws {
+        Current.resourcePersisting.delete = { _ in
+            throw Abort(.notFound)
+        }
+        
+        let (user, token, avatar) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let deleteAvatarResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/avatars/\(avatar.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(deleteAvatarResponse.http.status, .notFound)
+    }
 }
 
 extension File: Content {} // TODO: This is used for creating the body of the avatar requests (TBD)
