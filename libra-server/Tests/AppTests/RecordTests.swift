@@ -45,6 +45,14 @@ final class RecordTests: XCTestCase {
         XCTAssertEqual(receivedRecords.first?.assets.count, 1)
         XCTAssertEqual(receivedRecords.first?.assets.first?.id, attachment.id)
     }
+    
+    func testThatGetAllRecordsThrowsUnauthorizedIfTokenIsWrong() throws {        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let getAllRecordsResponse = try app.sendRequest(to: "api/v1/records", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(getAllRecordsResponse.http.status, .unauthorized)
+    }
 }
 
 // MARK: - Private
