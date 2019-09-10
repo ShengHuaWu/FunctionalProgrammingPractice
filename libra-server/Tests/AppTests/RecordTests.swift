@@ -58,6 +58,18 @@ final class RecordTests: XCTestCase {
         XCTAssertEqual(receivedRecords.count, 0)
     }
     
+    func testThatGetAllRecordsSucceedsWithEmptyResponseIfRecordIsDeleted() throws {
+        let (_, token, _, _, _) = try seedDataIncludingRecord(isDeleted: true)
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let getAllRecordsResponse = try app.sendRequest(to: "api/v1/records", method: .GET, headers: headers, body: EmptyBody())
+        let receivedRecords = try getAllRecordsResponse.content.decode([Record.Intact].self).wait()
+        
+        XCTAssertEqual(getAllRecordsResponse.http.status, .ok)
+        XCTAssertEqual(receivedRecords.count, 0)
+    }
+    
     func testThatGetAllRecordsThrowsUnauthorizedIfTokenIsWrong() throws {        
         var headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
@@ -78,9 +90,9 @@ private extension RecordTests {
         return (user, token, avatar)
     }
     
-    func seedDataIncludingRecord() throws -> (User, Token, Avatar, Record, Attachment) {
+    func seedDataIncludingRecord(isDeleted: Bool = false) throws -> (User, Token, Avatar, Record, Attachment) {
         let (user, token, avatar) = try seedDataWithoutRecord()
-        let record = try Record(title: "First Record", note: "This is my first record", date: Date(), currency: "usd", mood: "good", isDeleted: false, creatorID: user.requireID()).save(on: conn).wait()
+        let record = try Record(title: "First Record", note: "This is my first record", date: Date(), currency: "usd", mood: "good", isDeleted: isDeleted, creatorID: user.requireID()).save(on: conn).wait()
         let attachment = try Attachment(name: "ABC", recordID: record.requireID()).save(on: conn).wait()
         
         return (user, token, avatar, record, attachment)
