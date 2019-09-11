@@ -77,6 +77,28 @@ final class RecordTests: XCTestCase {
         
         XCTAssertEqual(getAllRecordsResponse.http.status, .unauthorized)
     }
+    
+    func testThatGetOneRecordSucceeds() throws {
+        let (user, token, _, record, attachment) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let getAllRecordsResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        let receivedRecord = try getAllRecordsResponse.content.decode(Record.Intact.self).wait()
+        
+        XCTAssertEqual(receivedRecord.id, record.id)
+        XCTAssertEqual(receivedRecord.title, record.title)
+        XCTAssertEqual(receivedRecord.note, record.note)
+        
+        // TODO: Investigate why thist work
+        //        XCTAssertEqual(receivedReceord.date, record.date)
+        XCTAssertEqual(receivedRecord.amount, record.amount)
+        XCTAssertEqual(receivedRecord.currency, record.currency)
+        XCTAssertEqual(receivedRecord.mood, record.mood)
+        XCTAssertEqual(receivedRecord.creator.id, user.id)
+        XCTAssertEqual(receivedRecord.assets.count, 1)
+        XCTAssertEqual(receivedRecord.assets.first?.id, attachment.id)
+    }
 }
 
 // MARK: - Private
