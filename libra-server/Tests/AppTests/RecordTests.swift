@@ -83,8 +83,8 @@ final class RecordTests: XCTestCase {
         
         var headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: token.token)
-        let getAllRecordsResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .GET, headers: headers, body: EmptyBody())
-        let receivedRecord = try getAllRecordsResponse.content.decode(Record.Intact.self).wait()
+        let getOneRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        let receivedRecord = try getOneRecordResponse.content.decode(Record.Intact.self).wait()
         
         XCTAssertEqual(receivedRecord.id, record.id)
         XCTAssertEqual(receivedRecord.title, record.title)
@@ -99,14 +99,55 @@ final class RecordTests: XCTestCase {
         XCTAssertEqual(receivedRecord.assets.count, 1)
         XCTAssertEqual(receivedRecord.assets.first?.id, attachment.id)
     }
+    
+    func testThatGetOneRecordThrowsUnauthorizedIfTokenIsWrong() throws {
+        let (_, _, _, record, _) = try seedDataIncludingRecord()
+
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let getOneRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(getOneRecordResponse.http.status, .unauthorized)
+    }
+    
+    func testThatGetOneRecordThrowsNotFoundIfRecordDoesNotExist() throws {
+        let (_, token, _) = try seedDataWithoutRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let getOneRecordResponse = try app.sendRequest(to: "api/v1/records/999", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(getOneRecordResponse.http.status, .notFound)
+    }
+    
+    func testThatGetOneRecordThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        let (_, _, _, record, _) = try seedDataIncludingRecord()
+        let (_, anotherToken, _) = try seedDataWithoutRecord(username: "sheng1")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: anotherToken.token)
+        let getOneRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(getOneRecordResponse.http.status, .unauthorized)
+    }
+    
+    func testThatGetOneRecordThrowsNotFoundIfRecordIsDeleted() throws {
+        let (_, token, _, record, _) = try seedDataIncludingRecord(isDeleted: true)
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let getOneRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(getOneRecordResponse.http.status, .notFound)
+    }
 }
 
 // MARK: - Private
 private extension RecordTests {
     // TODO: Clean up with randomness
-    func seedDataWithoutRecord() throws -> (User, Token, Avatar) {
-        let user = try User(firstName: "sheng", lastName: "wu", username: "sheng", password: "12345678", email: "sheng@libra.co").encryptPassword().save(on: conn).wait()
-        let token = try Token(token: "4rfv5tgb6yhn==", isRevoked: false, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait() // token should be different from user to user
+    func seedDataWithoutRecord(username: String = "sheng") throws -> (User, Token, Avatar) {
+        let user = try User(firstName: "sheng", lastName: "wu", username: username, password: "12345678", email: "\(username)@libra.co").encryptPassword().save(on: conn).wait()
+        let token = try Token(token: "4rfv5t\(username)gb6yhn==", isRevoked: false, osName: "mac os", timeZone: "CEST", userID: user.requireID()).save(on: conn).wait() // token should be different from user to user
         let avatar = try Avatar(name: "XYZ", userID: user.requireID()).save(on: conn).wait()
         
         return (user, token, avatar)
