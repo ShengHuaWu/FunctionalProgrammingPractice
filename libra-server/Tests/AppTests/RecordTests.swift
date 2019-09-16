@@ -140,6 +140,33 @@ final class RecordTests: XCTestCase {
         
         XCTAssertEqual(getOneRecordResponse.http.status, .notFound)
     }
+    
+    /*
+     TODO: Pass a custom encoder to `app.send` method because `Record.RequestBody` is decoded with `millisecondsSince1970`.
+    func testThatCreateRecordSucceeds() throws {
+        let (user, token, _) = try seedDataWithoutRecord()
+        let (companion, _, _) = try seedDataWithoutRecord(username: "sheng1")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = try Record.RequestBody(title: "First Record", note: "this is a record", date: Date(), amount: 999, currency: "usd", mood: "good", companionIDs: [companion.requireID()])
+        let createRecordResponse = try app.sendRequest(to: "api/v1/records", method: .POST, headers: headers, body: body)
+        let receivedRecord = try createRecordResponse.content.decode(json: Record.Intact.self).wait()
+        
+        XCTAssertNotNil(receivedRecord.id)
+        XCTAssertEqual(receivedRecord.title, body.title)
+        XCTAssertEqual(receivedRecord.note, body.note)
+        
+        // TODO: Investigate why thist work
+        //        XCTAssertEqual(receivedReceord.date, body.date)
+        XCTAssertEqual(receivedRecord.amount, body.amount)
+        XCTAssertEqual(receivedRecord.currency, body.currency)
+        XCTAssertEqual(receivedRecord.mood, body.mood)
+        XCTAssertEqual(receivedRecord.creator.id, user.id)
+        XCTAssertEqual(receivedRecord.assets.count, 0)
+        XCTAssertEqual(receivedRecord.companions.count, 1)
+        XCTAssertEqual(receivedRecord.companions.first?.id, companion.id)
+    }*/
 }
 
 // MARK: - Private
