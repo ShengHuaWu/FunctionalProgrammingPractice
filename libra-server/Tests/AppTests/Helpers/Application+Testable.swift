@@ -28,11 +28,11 @@ extension Application {
         try app.syncShutdownGracefully() // This is necessary to resolve the too many thread usages
     }
     
-    func sendRequest<Body>(to path: String, method: HTTPMethod, headers: HTTPHeaders = .init(), body: Body?) throws -> Response where Body: Content {
+    func sendRequest<Body>(to path: String, method: HTTPMethod, headers: HTTPHeaders = .init(), body: Body?, bodyEncoder: JSONEncoder = .init()) throws -> Response where Body: Content {
         let httpRequest = HTTPRequest(method: method, url: URL(string: path)!, headers: headers)
         let wrappedRequest = Request(http: httpRequest, using: self)
         if let body = body {
-            try wrappedRequest.content.encode(body)
+            try wrappedRequest.content.encode(json: body, using: bodyEncoder)
         }
         let responder = try make(Responder.self)
         
