@@ -173,6 +173,30 @@ final class RecordTests: XCTestCase {
         
         XCTAssertEqual(createRecordResponse.http.status, .unauthorized)
     }
+    
+    func testThatUpdateRecordSucceeds() throws {
+        let (user, token, _, record, attachment) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = Record.RequestBody(title: "New Title", note: "New Note", date: Date(), amount: 1999, currency: "euro", mood: "bad", companionIDs: [])
+        let updateRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .PUT, headers: headers, body: body, bodyEncoder: .custom(dates: .millisecondsSince1970))
+        let receivedRecord = try updateRecordResponse.content.decode(Record.Intact.self).wait()
+        
+        XCTAssertNotNil(receivedRecord.id)
+        XCTAssertEqual(receivedRecord.title, body.title)
+        XCTAssertEqual(receivedRecord.note, body.note)
+        
+        // TODO: Investigate why thist work
+        //        XCTAssertEqual(receivedReceord.date, body.date)
+        XCTAssertEqual(receivedRecord.amount, body.amount)
+        XCTAssertEqual(receivedRecord.currency, body.currency)
+        XCTAssertEqual(receivedRecord.mood, body.mood)
+        XCTAssertEqual(receivedRecord.creator.id, user.id)
+        XCTAssertEqual(receivedRecord.assets.count, 1)
+        XCTAssertEqual(receivedRecord.assets.first?.id, attachment.id)
+        XCTAssertEqual(receivedRecord.companions.count, 0)
+    }
 }
 
 // MARK: - Private
