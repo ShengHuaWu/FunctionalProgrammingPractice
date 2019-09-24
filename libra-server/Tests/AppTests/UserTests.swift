@@ -536,6 +536,7 @@ final class UserTests: XCTestCase {
     }
     
     func testThatUploadAvatarSucceeds() throws {
+        Current.resourcePersisting.save = { _, _ in }
         let (user, token, _) = try seedData()
         
         var headers = HTTPHeaders()

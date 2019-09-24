@@ -197,6 +197,17 @@ final class RecordTests: XCTestCase {
         XCTAssertEqual(receivedRecord.assets.first?.id, attachment.id)
         XCTAssertEqual(receivedRecord.companions.count, 0)
     }
+    
+    func testThatUpdateRecordThrowsUnauthorizedIfTokenIsWrong() throws {
+        let (_, _, _, record, _) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let body = Record.RequestBody(title: "New Title", note: "New Note", date: Date(), amount: 1999, currency: "euro", mood: "bad", companionIDs: [])
+        let updateRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .PUT, headers: headers, body: body, bodyEncoder: .custom(dates: .millisecondsSince1970))
+        
+        XCTAssertEqual(updateRecordResponse.http.status, .unauthorized)
+    }
 }
 
 // MARK: - Private
