@@ -208,6 +208,29 @@ final class RecordTests: XCTestCase {
         
         XCTAssertEqual(updateRecordResponse.http.status, .unauthorized)
     }
+    
+    func testThatUpdateRecordThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        let (_, _, _, record, _) = try seedDataIncludingRecord()
+        let (_, anotherToken, _) = try seedDataWithoutRecord(username: "sheng1")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: anotherToken.token)
+        let body = Record.RequestBody(title: "New Title", note: "New Note", date: Date(), amount: 1999, currency: "euro", mood: "bad", companionIDs: [])
+        let updateRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .PUT, headers: headers, body: body, bodyEncoder: .custom(dates: .millisecondsSince1970))
+        
+        XCTAssertEqual(updateRecordResponse.http.status, .unauthorized)
+    }
+    
+    func testThatUpdateRecordThrowsNotFoundIfRecordIsDeleted() throws {
+        let (_, token, _, record, _) = try seedDataIncludingRecord(isDeleted: true)
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = Record.RequestBody(title: "New Title", note: "New Note", date: Date(), amount: 1999, currency: "euro", mood: "bad", companionIDs: [])
+        let updateRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .PUT, headers: headers, body: body, bodyEncoder: .custom(dates: .millisecondsSince1970))
+        
+        XCTAssertEqual(updateRecordResponse.http.status, .notFound)
+    }
 }
 
 // MARK: - Private
