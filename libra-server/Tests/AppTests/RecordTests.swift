@@ -231,6 +231,26 @@ final class RecordTests: XCTestCase {
         
         XCTAssertEqual(updateRecordResponse.http.status, .notFound)
     }
+    
+    func testThatDeleteRecordSucceeds() throws {
+        let (_, token, _, record, _) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let deleteRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(deleteRecordResponse.http.status, .noContent)
+    }
+    
+    func testThatDeleteRecordThrowsUnauthorizedIfTokenIsWrong() throws {
+        let (_, _, _, record, _) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let deleteRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(deleteRecordResponse.http.status, .unauthorized)
+    }
 }
 
 // MARK: - Private
