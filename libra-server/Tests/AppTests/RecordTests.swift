@@ -272,6 +272,19 @@ final class RecordTests: XCTestCase {
         
         XCTAssertEqual(deleteRecordResponse.http.status, .notFound)
     }
+    
+    func testThatUploadAttachmentSucceeds() throws {
+        Current.resourcePersisting.save = { _, _ in }
+        let (_, token, _, record, _) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = File(data: "0okm5tgbrfdsawer", filename: "new_avatar")
+        let uploadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments", method: .POST, headers: headers, body: body)
+        let receivedAsset = try uploadAttachmentResponse.content.decode(Asset.self).wait()
+        
+        XCTAssertNotNil(receivedAsset.id)
+    }
 }
 
 // MARK: - Private
