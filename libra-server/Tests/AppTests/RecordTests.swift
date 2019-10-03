@@ -279,11 +279,36 @@ final class RecordTests: XCTestCase {
         
         var headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: token.token)
-        let body = File(data: "0okm5tgbrfdsawer", filename: "new_avatar")
+        let body = File(data: "0okm5tgbrfdsawer", filename: "new_attachment")
         let uploadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments", method: .POST, headers: headers, body: body)
         let receivedAsset = try uploadAttachmentResponse.content.decode(Asset.self).wait()
         
         XCTAssertNotNil(receivedAsset.id)
+    }
+    
+    func testThatUploadAttachmentThrowsUnauthorizedIfTokenIsWrong() throws {
+        Current.resourcePersisting.save = { _, _ in }
+        let (_, _, _, record, _) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let body = File(data: "0okm5tgbrfdsawer", filename: "new_attachment")
+        let uploadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments", method: .POST, headers: headers, body: body)
+        
+        XCTAssertEqual(uploadAttachmentResponse.http.status, .unauthorized)
+    }
+    
+    func testThatUploadAttachmentThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        Current.resourcePersisting.save = { _, _ in }
+        let (_, _, _, record, _) = try seedDataIncludingRecord()
+        let (_, anotherToken, _) = try seedDataWithoutRecord(username: "sheng1")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: anotherToken.token)
+        let body = File(data: "0okm5tgbrfdsawer", filename: "new_attachment")
+        let uploadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments", method: .POST, headers: headers, body: body)
+        
+        XCTAssertEqual(uploadAttachmentResponse.http.status, .unauthorized)
     }
 }
 
