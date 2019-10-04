@@ -310,6 +310,32 @@ final class RecordTests: XCTestCase {
         
         XCTAssertEqual(uploadAttachmentResponse.http.status, .unauthorized)
     }
+    
+    func testThatUploadAttachmentThrowsNotFoundIfRecordIsDeleted() throws {
+        Current.resourcePersisting.save = { _, _ in }
+        let (_, token, _, record, _) = try seedDataIncludingRecord(isDeleted: true)
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = File(data: "0okm5tgbrfdsawer", filename: "new_attachment")
+        let uploadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments", method: .POST, headers: headers, body: body)
+        
+        XCTAssertEqual(uploadAttachmentResponse.http.status, .notFound)
+    }
+    
+    func testThatUploadAttachmentThrowsBadRequestIfSavingDataThrowsBadRequest() throws {
+        Current.resourcePersisting.save = { _, _ in
+            throw Abort(.badRequest)
+        }
+        let (_, token, _, record, _) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = File(data: "0okm5tgbrfdsawer", filename: "new_attachment")
+        let uploadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments", method: .POST, headers: headers, body: body)
+        
+        XCTAssertEqual(uploadAttachmentResponse.http.status, .badRequest)
+    }
 }
 
 // MARK: - Private
