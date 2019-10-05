@@ -336,6 +336,17 @@ final class RecordTests: XCTestCase {
         
         XCTAssertEqual(uploadAttachmentResponse.http.status, .badRequest)
     }
+    
+    func testThatDownloadAttachmentSucceeds() throws {
+        Current.resourcePersisting.fetch = { _ in return "0okm5tgbrfdsawer".data(using: .utf8)! }
+        let (_, token, _, record, attachment) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let downloadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachment/\(attachment.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertNotNil(downloadAttachmentResponse.http.body.data)
+    }
 }
 
 // MARK: - Private
