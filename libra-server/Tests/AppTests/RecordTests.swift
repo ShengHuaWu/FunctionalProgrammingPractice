@@ -343,9 +343,54 @@ final class RecordTests: XCTestCase {
         
         var headers = HTTPHeaders()
         headers.bearerAuthorization = BearerAuthorization(token: token.token)
-        let downloadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachment/\(attachment.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        let downloadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments/\(attachment.requireID())", method: .GET, headers: headers, body: EmptyBody())
         
         XCTAssertNotNil(downloadAttachmentResponse.http.body.data)
+    }
+    
+    func testThatDownloadAttachmentThrowsUnauthorizedIfTokenIsWrong() throws {
+        Current.resourcePersisting.fetch = { _ in return "0okm5tgbrfdsawer".data(using: .utf8)! }
+        let (_, _, _, record, attachment) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: "XYZ")
+        let downloadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments/\(attachment.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(downloadAttachmentResponse.http.status, .unauthorized)
+    }
+    
+    func testThatDownloadAttachmentThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        Current.resourcePersisting.fetch = { _ in return "0okm5tgbrfdsawer".data(using: .utf8)! }
+        let (_, _, _, record, attachment) = try seedDataIncludingRecord()
+        let (_, anothetToken, _) = try seedDataWithoutRecord(username: "sheng1")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: anothetToken.token)
+        let downloadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments/\(attachment.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(downloadAttachmentResponse.http.status, .unauthorized)
+    }
+    
+    func testThatDownloadAttachmentThrowsNotFoundIfRecordIsDeleted() throws {
+        Current.resourcePersisting.fetch = { _ in return "0okm5tgbrfdsawer".data(using: .utf8)! }
+        let (_, token, _, record, attachment) = try seedDataIncludingRecord(isDeleted: true)
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let downloadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments/\(attachment.requireID())", method: .GET, headers: headers, body: EmptyBody())
+     
+        XCTAssertEqual(downloadAttachmentResponse.http.status, .notFound)
+    }
+    
+    func testThatDownloadAttachmentThrowsNotFoundIfFetchingDataThrowsNotFound() throws {
+        Current.resourcePersisting.fetch = { _ in throw Abort(.notFound) }
+        let (_, token, _, record, attachment) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let downloadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments/\(attachment.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(downloadAttachmentResponse.http.status, .notFound)
     }
 }
 
