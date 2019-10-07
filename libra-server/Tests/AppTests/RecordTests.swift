@@ -392,6 +392,18 @@ final class RecordTests: XCTestCase {
         
         XCTAssertEqual(downloadAttachmentResponse.http.status, .notFound)
     }
+    
+    func testThatDownloadAttachmentThrowsBadRequestIfAttachmentDoesNotBelongToRecord() throws {
+        Current.resourcePersisting.fetch = { _ in return "0okm5tgbrfdsawer".data(using: .utf8)! }
+        let (_, token, _, record, _) = try seedDataIncludingRecord()
+        let (_, _, _, _, anotherAttachment) = try seedDataIncludingRecord(username: "sheng1")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let downloadAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments/\(anotherAttachment.requireID())", method: .GET, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(downloadAttachmentResponse.http.status, .badRequest)
+    }
 }
 
 // MARK: - Private
@@ -405,8 +417,8 @@ private extension RecordTests {
         return (user, token, avatar)
     }
     
-    func seedDataIncludingRecord(isDeleted: Bool = false) throws -> (User, Token, Avatar, Record, Attachment) {
-        let (user, token, avatar) = try seedDataWithoutRecord()
+    func seedDataIncludingRecord(username: String = "sheng", isDeleted: Bool = false) throws -> (User, Token, Avatar, Record, Attachment) {
+        let (user, token, avatar) = try seedDataWithoutRecord(username: username)
         let record = try Record(title: "First Record", note: "This is my first record", date: Date(), currency: "usd", mood: "good", isDeleted: isDeleted, creatorID: user.requireID()).save(on: conn).wait()
         let attachment = try Attachment(name: "ABC", recordID: record.requireID()).save(on: conn).wait()
         
