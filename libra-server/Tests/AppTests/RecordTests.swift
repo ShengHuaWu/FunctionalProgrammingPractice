@@ -404,6 +404,17 @@ final class RecordTests: XCTestCase {
         
         XCTAssertEqual(downloadAttachmentResponse.http.status, .badRequest)
     }
+    
+    func testThatDeleteAttachmentSucceeds() throws {
+        Current.resourcePersisting.delete = { _ in }
+        let (_, token, _, record, attachment) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let deleteAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments/\(attachment.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(deleteAttachmentResponse.http.status, .noContent)
+    }
 }
 
 // MARK: - Private
