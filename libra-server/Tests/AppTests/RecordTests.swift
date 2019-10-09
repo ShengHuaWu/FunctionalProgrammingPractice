@@ -438,6 +438,40 @@ final class RecordTests: XCTestCase {
         
         XCTAssertEqual(deleteAttachmentResponse.http.status, .unauthorized)
     }
+    
+    func testThatDeleteAttachmentThrowsNotFoundIfRecordIsDeleted() throws {
+        Current.resourcePersisting.delete = { _ in }
+        let (_, token, _, record, attachment) = try seedDataIncludingRecord(isDeleted: true)
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let deleteAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments/\(attachment.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(deleteAttachmentResponse.http.status, .notFound)
+    }
+    
+    func testThatDeleteAttachmentThrowsNotFoundIfDeletingDataThrowsNotFound() throws {
+        Current.resourcePersisting.delete = { _ in throw Abort(.notFound) }
+        let (_, token, _, record, attachment) = try seedDataIncludingRecord()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let deleteAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments/\(attachment.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(deleteAttachmentResponse.http.status, .notFound)
+    }
+    
+    func testThatDeleteAttachmentThrowsBadRequestIfAttachmentDoesNotBelongToRecord() throws {
+        Current.resourcePersisting.delete = { _ in }
+        let (_, token, _, record, _) = try seedDataIncludingRecord()
+        let (_, _, _, _, anotherAttachment) = try seedDataIncludingRecord(username: "sheng1")
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let deleteAttachmentResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())/attachments/\(anotherAttachment.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
+        
+        XCTAssertEqual(deleteAttachmentResponse.http.status, .badRequest)
+    }
 }
 
 // MARK: - Private
