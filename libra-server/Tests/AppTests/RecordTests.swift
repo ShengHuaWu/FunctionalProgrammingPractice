@@ -474,6 +474,46 @@ final class RecordTests: XCTestCase {
     }
 }
 
+extension RecordTests {
+    static let allTests = [
+        ("testThatGetAllRecordsSucceeds", testThatGetAllRecordsSucceeds),
+        ("testThatGetAllRecordsSucceedsWithEmptyResponse", testThatGetAllRecordsSucceedsWithEmptyResponse),
+        ("testThatGetAllRecordsSucceedsWithEmptyResponseIfRecordIsDeleted", testThatGetAllRecordsSucceedsWithEmptyResponseIfRecordIsDeleted),
+        ("testThatGetAllRecordsThrowsUnauthorizedIfTokenIsWrong", testThatGetAllRecordsThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatGetOneRecordSucceeds", testThatGetOneRecordSucceeds),
+        ("testThatGetOneRecordThrowsUnauthorizedIfTokenIsWrong", testThatGetOneRecordThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatGetOneRecordThrowsUnauthorizedIfUserCannotAccessResource", testThatGetOneRecordThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatGetOneRecordThrowsNotFoundIfRecordIsDeleted", testThatGetOneRecordThrowsNotFoundIfRecordIsDeleted),
+        ("testThatCreateRecordSucceeds", testThatCreateRecordSucceeds),
+        ("testThatCreateRecordThrowsUnauthorizedIfTokenIsWrong", testThatCreateRecordThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatUpdateRecordSucceeds", testThatUpdateRecordSucceeds),
+        ("testThatUpdateRecordThrowsUnauthorizedIfTokenIsWrong", testThatUpdateRecordThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatUpdateRecordThrowsUnauthorizedIfUserCannotAccessResource", testThatUpdateRecordThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatUpdateRecordThrowsNotFoundIfRecordIsDeleted", testThatUpdateRecordThrowsNotFoundIfRecordIsDeleted),
+        ("testThatDeleteRecordSucceeds", testThatDeleteRecordSucceeds),
+        ("testThatDeleteRecordThrowsUnauthorizedIfTokenIsWrong", testThatDeleteRecordThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatDeleteRecordThrowsUnauthorizedIfUserCannotAccessResource", testThatDeleteRecordThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatDeleteRecordThrowsNotFoundIfRecordIsDeleted", testThatDeleteRecordThrowsNotFoundIfRecordIsDeleted),
+        ("testThatUploadAttachmentSucceeds", testThatUploadAttachmentSucceeds),
+        ("testThatUploadAttachmentThrowsUnauthorizedIfTokenIsWrong", testThatUploadAttachmentThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatUploadAttachmentThrowsUnauthorizedIfUserCannotAccessResource", testThatUploadAttachmentThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatUploadAttachmentThrowsNotFoundIfRecordIsDeleted", testThatUploadAttachmentThrowsNotFoundIfRecordIsDeleted),
+        ("testThatUploadAttachmentThrowsBadRequestIfSavingDataThrowsBadRequest", testThatUploadAttachmentThrowsBadRequestIfSavingDataThrowsBadRequest),
+        ("testThatDownloadAttachmentSucceeds", testThatDownloadAttachmentSucceeds),
+        ("testThatDownloadAttachmentThrowsUnauthorizedIfTokenIsWrong", testThatDownloadAttachmentThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatDownloadAttachmentThrowsUnauthorizedIfUserCannotAccessResource", testThatDownloadAttachmentThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatDownloadAttachmentThrowsNotFoundIfRecordIsDeleted", testThatDownloadAttachmentThrowsNotFoundIfRecordIsDeleted),
+        ("testThatDownloadAttachmentThrowsNotFoundIfFetchingDataThrowsNotFound", testThatDownloadAttachmentThrowsNotFoundIfFetchingDataThrowsNotFound),
+        ("testThatDownloadAttachmentThrowsBadRequestIfAttachmentDoesNotBelongToRecord", testThatDownloadAttachmentThrowsBadRequestIfAttachmentDoesNotBelongToRecord),
+        ("testThatDeleteAttachmentSucceeds", testThatDeleteAttachmentSucceeds),
+        ("testThatDeleteAttachmentThrowsUnauthorizedIfTokenIsWrong", testThatDeleteAttachmentThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatDeleteAttachmentThrowsUnauthorizedIfUserCannotAccessResource", testThatDeleteAttachmentThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatDeleteAttachmentThrowsNotFoundIfRecordIsDeleted", testThatDeleteAttachmentThrowsNotFoundIfRecordIsDeleted),
+        ("testThatDeleteAttachmentThrowsNotFoundIfDeletingDataThrowsNotFound", testThatDeleteAttachmentThrowsNotFoundIfDeletingDataThrowsNotFound),
+        ("testThatDeleteAttachmentThrowsBadRequestIfAttachmentDoesNotBelongToRecord", testThatDeleteAttachmentThrowsBadRequestIfAttachmentDoesNotBelongToRecord)
+    ]
+}
+
 // MARK: - Private
 private extension RecordTests {
     // TODO: Clean up with randomness

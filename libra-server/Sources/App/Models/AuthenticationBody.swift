@@ -1,6 +1,6 @@
 import Vapor
 
-struct AuthenticationBody {
+struct AuthenticationBody: Codable {
     enum CodingKeys: String, CodingKey {
         case userInfo = "user_info"
         case osName = "os_name"
@@ -13,7 +13,7 @@ struct AuthenticationBody {
 }
 
 extension AuthenticationBody {
-    struct UserInfo {
+    struct UserInfo: Codable {
         enum CodingKeys: String, CodingKey {
             case username
             case password

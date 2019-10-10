@@ -669,6 +669,58 @@ final class UserTests: XCTestCase {
     }
 }
 
+extension UserTests {
+    static let allTests = [
+        ("testThatSignupSucceeds", testThatSignupSucceeds),
+        ("testThatSignupThrowsBadRequestIfThereIsNoUserInfo", testThatSignupThrowsBadRequestIfThereIsNoUserInfo),
+        ("testThatLoginSucceedsWithAnExistingToken", testThatLoginSucceedsWithAnExistingToken),
+        ("testThatLoginSucceedsWithANewToken", testThatLoginSucceedsWithANewToken),
+        ("testThatLoginThrowsUnauthorizedIfUserDoesNotExist", testThatLoginThrowsUnauthorizedIfUserDoesNotExist),
+        ("testThatLoginThrowsUnauthorizedIfUsernameIsWrong", testThatLoginThrowsUnauthorizedIfUsernameIsWrong),
+        ("testThatLoginThrowsUnauthorizedIfPasswordIsWrong", testThatLoginThrowsUnauthorizedIfPasswordIsWrong),
+        ("testThatLogoutSucceeds", testThatLogoutSucceeds),
+        ("testThatLogoutThrowsUnauthorizedIfTokenIsWrong", testThatLogoutThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatLogoutThrowsNotFoundIfOSNameIsWrong", testThatLogoutThrowsNotFoundIfOSNameIsWrong),
+        ("testThatLogoutThrowsNotFoundIfTimeZoneIsWrong", testThatLogoutThrowsNotFoundIfTimeZoneIsWrong),
+        ("testThatGetOneUserSucceeds", testThatGetOneUserSucceeds),
+        ("testThatGetOneUserThrowsUnauthorizedIfTokenIsWrong", testThatGetOneUserThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatGetOneUserThrowsUnauthorizedIfUserCannotAccessResource", testThatGetOneUserThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatUpdateUserSucceeds", testThatUpdateUserSucceeds),
+        ("testThatUpdateUserThrowsUnauthorizedIfTokenIsWrong", testThatUpdateUserThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatUdpateUserThrowsUnauthorizedIfUserCannotAccessResource", testThatUdpateUserThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatSearchUsersSucceeds", testThatSearchUsersSucceeds),
+        ("testThatSearchUsersSucceedsWithEmptyResult", testThatSearchUsersSucceedsWithEmptyResult),
+        ("testThatSearchUserThrowsUnauthorizedIfTokenIsWrong", testThatSearchUserThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatGetAllFriendsSucceeds", testThatGetAllFriendsSucceeds),
+        ("testThatGetAllFriendsSucceedsWithEmptyResult", testThatGetAllFriendsSucceedsWithEmptyResult),
+        ("testThatGetAllFriendsThrowsUnauthorizedIfTokenIsWrong", testThatGetAllFriendsThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatGetAllFriendsThrowsUnauthorizedIfUserCannotAccessResource", testThatGetAllFriendsThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatGetOneFriendSucceeds", testThatGetOneFriendSucceeds),
+        ("testThatGetOneFriendThrowsUnauthorizedIfTokenIsWrong", testThatGetOneFriendThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatGetOneFriendThrowsNotFoundIfThereIsNoFriendship", testThatGetOneFriendThrowsNotFoundIfThereIsNoFriendship),
+        ("testThatGetOneFriendThrowsUnauthorizedIfUserCannotAccessResource", testThatGetOneFriendThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatAddFriendSucceeds", testThatAddFriendSucceeds),
+        ("testThatAddFriendThrowsUnauthorizedIfTokenIsWrong", testThatAddFriendThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatAddFriendThrowsBadRequestIfFriendDoesNotExist", testThatAddFriendThrowsBadRequestIfFriendDoesNotExist),
+        ("testThatAddFriendThrowsUnauthorizedIfUserCannotAccessResource", testThatAddFriendThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatRemoveFriendSucceeds", testThatRemoveFriendSucceeds),
+        ("testThatRemoveFriendSucceedsIfThereIsNoFriendship", testThatRemoveFriendSucceedsIfThereIsNoFriendship),
+        ("testThatRemoveFriendThrowsUnauthorizedIfTokenIsWrong", testThatRemoveFriendThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatRemoveFriendThrowsUnauthorizedIfUserCannotAccessResource", testThatRemoveFriendThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatUploadAvatarSucceeds", testThatUploadAvatarSucceeds),
+        ("testThatUploadAvatarThrowsUnauthorizedIfTokenIsWrong", testThatUploadAvatarThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatUploadAvatarThrowsUnauthorizedIfUserCannotAccessResource", testThatUploadAvatarThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatDownloadAvatarSucceeds", testThatDownloadAvatarSucceeds),
+        ("testThatDownloadAvatarThrowsUnauthorizedIfTokenIsWrong", testThatDownloadAvatarThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatDownloadAvatarThrowsUnauthorizedIfUserCannotAccessResource", testThatDownloadAvatarThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatDownloadAvatarThrowsNotFoundIfFetchingDataThrowsNotFound", testThatDownloadAvatarThrowsNotFoundIfFetchingDataThrowsNotFound),
+        ("testThatDeleteAvatarSucceeds", testThatDeleteAvatarSucceeds),
+        ("testThatDeleteAvatarThrowsUnauthorizedIfTokenIsWrong", testThatDeleteAvatarThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatDeleteAvatarThrowsUnauthorizedIfUserCannotAccessResource", testThatDeleteAvatarThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatDeleteAvatarThrowsNotFoundIfDeletingDataThrowsNotFound", testThatDeleteAvatarThrowsNotFoundIfDeletingDataThrowsNotFound)
+    ]
+}
+
 extension File: Content {} // TODO: This is used for creating the body of the avatar requests (TBD)
 
 // MARK: - Private
