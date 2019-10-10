@@ -1,4 +1,5 @@
 // TODO: Move to anothet file
+/*
 struct AnyRandomNumberGenerator: RandomNumberGenerator {
     private var rng: RandomNumberGenerator
     
@@ -61,5 +62,6 @@ func zip<A, B>(_ genA: Gen<A>, _ genB: Gen<B>) -> Gen<(A, B)> {
 func zip<A, B, C>(with f: @escaping (A, B) -> C) -> (Gen<A>, Gen<B>) -> Gen<C> {
     return { genA, genB in zip(genA, genB).map(f) }
 }
+*/
 
 // TODO: Seed random data
