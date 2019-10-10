@@ -1,6 +1,6 @@
 import Vapor
 
-struct AddFriendBody: Decodable {
+struct AddFriendBody: Codable {
     enum CodingKeys: String, CodingKey {
         case personID = "person_id"
     }

@@ -1,6 +1,6 @@
 import Vapor
 
-struct Asset {
+struct Asset: Codable {
     let id: Int
 }
 
