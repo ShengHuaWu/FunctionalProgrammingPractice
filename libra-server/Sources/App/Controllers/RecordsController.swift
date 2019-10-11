@@ -61,11 +61,10 @@ private extension RecordsController {
     func deleteHandler(_ req: Request) throws -> Future<HTTPStatus> {
         let user = try req.requireAuthenticated(User.self)
         
-        // TODO: Delete all attachments
         return try req.parameters.next(Record.self)
             .map { try authorize(user, toAccess: $0, as: .creator) }
             .flatMap { mark($0, asDeletedOn: req) }
-            .transform(to: .noContent)
+            .flatMap { try deleteAllAttachments(of: $0, on: req) }
     }
     
     func uploadAttachmentHandler(_ req: Request) throws -> Future<Asset> {

@@ -240,6 +240,8 @@ final class RecordTests: XCTestCase {
         let deleteRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
         
         XCTAssertEqual(deleteRecordResponse.http.status, .noContent)
+        
+        // TODO: How to test all attachments are deleted too?
     }
     
     func testThatDeleteRecordThrowsUnauthorizedIfTokenIsWrong() throws {
