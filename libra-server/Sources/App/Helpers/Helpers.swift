@@ -138,6 +138,10 @@ func mark(_ record: Record, asDeletedOn conn: DatabaseConnectable) -> Future<Rec
     return record.save(on: conn)
 }
 
+func deleteAllAttachments(of record: Record, on conn: DatabaseConnectable) throws -> Future<HTTPStatus> {
+    return try record.attachments.query(on: conn).all().flatMap { try deleteAll($0, on: conn) }
+}
+
 func append(_ companions: [User], to record: Record, on conn: DatabaseConnectable) -> Future<Record> {
     return companions.map { record.companions.attach($0, on: conn) }.flatten(on: conn).map { _ in return record }
 }
@@ -167,6 +171,10 @@ func deleteFile(of attachment: Attachment) throws -> Attachment {
     try Current.resourcePersisting.delete(attachment.name)
     
     return attachment
+}
+
+private func deleteAll(_ attachments: [Attachment], on conn: DatabaseConnectable) throws -> Future<HTTPStatus> {
+    return try attachments.map { try deleteFile(of: $0).delete(on: conn) }.flatten(on: conn).transform(to: .noContent)
 }
 
 // MARK: - Avatar Helpers
