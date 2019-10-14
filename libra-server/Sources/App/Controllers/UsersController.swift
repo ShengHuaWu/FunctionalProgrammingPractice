@@ -139,10 +139,10 @@ private extension UsersController {
     func uploadAvatarHandler(_ req: Request) throws -> Future<Asset> {
         let authedUser = try req.requireAuthenticated(User.self)
         let userFuture = try req.parameters.next(User.self).map { try authorize(authedUser, toAccess: $0, as: .authenticated) }
+        let deletePreviousAvatarFuture = userFuture.flatMap { try deleteAvatar(of: $0, on: req) }
         let fileFuture = try req.content.decode(File.self) // There is a limitation of request size (1 MB by default)
         
-        return flatMap(to: Asset.self, userFuture, fileFuture) { user, file in
-            // TODO: Remove existing avatar before creating a new one
+        return flatMap(to: Asset.self, deletePreviousAvatarFuture, fileFuture) { user, file in
             return try createNewAvatar(of: user, with: file, on: req).map(Asset.init)
         }
     }

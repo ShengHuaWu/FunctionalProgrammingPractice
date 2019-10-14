@@ -70,6 +70,15 @@ func createNewAvatar(of user: User, with file: File, on conn: DatabaseConnectabl
     return try Avatar(name: name, userID: user.requireID()).save(on: conn)
 }
 
+// TODO: Is it necessary to return `user`?
+func deleteAvatar(of user: User, on conn: DatabaseConnectable) throws -> Future<User> {
+    return try user.avatar.query(on: conn).first().flatMap { avatar in
+        guard let unwrappedAvatar = avatar else { return .done(on: conn) }
+        
+        return try deleteFile(of: unwrappedAvatar).delete(on: conn)
+    }.map { return user }
+}
+
 private func createNewToken(for user: User, with body: AuthenticationBody) throws -> Token {
     let random = try CryptoRandom().generateData(count: 16)
     
