@@ -535,8 +535,12 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(removeFriendResponse.http.status, .unauthorized)
     }
     
+    // TODO: Update tests for uploading avatar
+    // 1. assert call counts for `save` & `delete` of `resourcePersisting`
+    // 2. check previous avatar is deleted
     func testThatUploadAvatarSucceeds() throws {
         Current.resourcePersisting.save = { _, _ in }
+        Current.resourcePersisting.delete = { _ in }
         let (user, token, _) = try seedData()
         
         var headers = HTTPHeaders()
