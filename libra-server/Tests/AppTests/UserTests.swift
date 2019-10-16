@@ -553,6 +553,8 @@ final class UserTests: XCTestCase {
     }
     
     func testThatUploadAvatarThrowsUnauthorizedIfTokenIsWrong() throws {
+        Current.resourcePersisting.save = { _, _ in }
+        Current.resourcePersisting.delete = { _ in }
         let (user, _, _) = try seedData()
         
         var headers = HTTPHeaders()
@@ -564,6 +566,8 @@ final class UserTests: XCTestCase {
     }
     
     func testThatUploadAvatarThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        Current.resourcePersisting.save = { _, _ in }
+        Current.resourcePersisting.delete = { _ in }
         let (_, token, _) = try seedData()
         let (anotherUser, _, _) = try seedData(username: "Sheng2")
         
@@ -573,6 +577,32 @@ final class UserTests: XCTestCase {
         let uploadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())/avatars", method: .POST, headers: headers, body: body)
         
         XCTAssertEqual(uploadAvatarResponse.http.status, .unauthorized)
+    }
+    
+    func testThatUploadAvatarThrowsBadRequestIfSavingDataThrowsBadRequest() throws {
+        Current.resourcePersisting.save = { _, _ in throw Abort(.badRequest) }
+        Current.resourcePersisting.delete = { _ in }
+        let (user, token, _) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = File(data: "0okm5tgbrfdsawer", filename: "new_avatar")
+        let uploadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/avatars", method: .POST, headers: headers, body: body)
+        
+        XCTAssertEqual(uploadAvatarResponse.http.status, .badRequest)
+    }
+    
+    func testThatUploadAvatarThrowsBadRequestIfDeletingDataThrowsBadRequest() throws {
+        Current.resourcePersisting.save = { _, _ in }
+        Current.resourcePersisting.delete = { _ in throw Abort(.badRequest) }
+        let (user, token, _) = try seedData()
+        
+        var headers = HTTPHeaders()
+        headers.bearerAuthorization = BearerAuthorization(token: token.token)
+        let body = File(data: "0okm5tgbrfdsawer", filename: "new_avatar")
+        let uploadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/avatars", method: .POST, headers: headers, body: body)
+        
+        XCTAssertEqual(uploadAvatarResponse.http.status, .badRequest)
     }
 
     func testThatDownloadAvatarSucceeds() throws {
