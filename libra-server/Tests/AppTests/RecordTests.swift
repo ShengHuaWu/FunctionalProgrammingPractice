@@ -484,6 +484,7 @@ extension RecordTests {
         ("testThatGetAllRecordsThrowsUnauthorizedIfTokenIsWrong", testThatGetAllRecordsThrowsUnauthorizedIfTokenIsWrong),
         ("testThatGetOneRecordSucceeds", testThatGetOneRecordSucceeds),
         ("testThatGetOneRecordThrowsUnauthorizedIfTokenIsWrong", testThatGetOneRecordThrowsUnauthorizedIfTokenIsWrong),
+        ("testThatGetOneRecordThrowsNotFoundIfRecordDoesNotExist", testThatGetOneRecordThrowsNotFoundIfRecordDoesNotExist),
         ("testThatGetOneRecordThrowsUnauthorizedIfUserCannotAccessResource", testThatGetOneRecordThrowsUnauthorizedIfUserCannotAccessResource),
         ("testThatGetOneRecordThrowsNotFoundIfRecordIsDeleted", testThatGetOneRecordThrowsNotFoundIfRecordIsDeleted),
         ("testThatCreateRecordSucceeds", testThatCreateRecordSucceeds),
