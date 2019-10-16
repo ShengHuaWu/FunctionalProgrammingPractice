@@ -722,6 +722,8 @@ extension UserTests {
         ("testThatUpdateUserSucceeds", testThatUpdateUserSucceeds),
         ("testThatUpdateUserThrowsUnauthorizedIfTokenIsWrong", testThatUpdateUserThrowsUnauthorizedIfTokenIsWrong),
         ("testThatUdpateUserThrowsUnauthorizedIfUserCannotAccessResource", testThatUdpateUserThrowsUnauthorizedIfUserCannotAccessResource),
+        ("testThatUploadAvatarThrowsBadRequestIfSavingDataThrowsBadRequest", testThatUploadAvatarThrowsBadRequestIfSavingDataThrowsBadRequest),
+        ("testThatUploadAvatarThrowsBadRequestIfDeletingDataThrowsBadRequest", testThatUploadAvatarThrowsBadRequestIfDeletingDataThrowsBadRequest),
         ("testThatSearchUsersSucceeds", testThatSearchUsersSucceeds),
         ("testThatSearchUsersSucceedsWithEmptyResult", testThatSearchUsersSucceedsWithEmptyResult),
         ("testThatSearchUserThrowsUnauthorizedIfTokenIsWrong", testThatSearchUserThrowsUnauthorizedIfTokenIsWrong),
