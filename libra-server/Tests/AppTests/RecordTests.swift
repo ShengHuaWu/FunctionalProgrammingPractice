@@ -233,6 +233,9 @@ final class RecordTests: XCTestCase {
     }
     
     func testThatDeleteRecordSucceeds() throws {
+        var deleteCallCount = 0
+        Current.resourcePersisting.delete = { _ in deleteCallCount += 1 }
+        
         let (_, token, _, record, _) = try seedDataIncludingRecord()
         
         var headers = HTTPHeaders()
@@ -240,11 +243,12 @@ final class RecordTests: XCTestCase {
         let deleteRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
         
         XCTAssertEqual(deleteRecordResponse.http.status, .noContent)
-        
-        // TODO: How to test all attachments are deleted too?
+        XCTAssertEqual(deleteCallCount, 1)
     }
     
     func testThatDeleteRecordThrowsUnauthorizedIfTokenIsWrong() throws {
+        var deleteCallCount = 0
+        Current.resourcePersisting.delete = { _ in deleteCallCount += 1 }
         let (_, _, _, record, _) = try seedDataIncludingRecord()
         
         var headers = HTTPHeaders()
@@ -252,9 +256,12 @@ final class RecordTests: XCTestCase {
         let deleteRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
         
         XCTAssertEqual(deleteRecordResponse.http.status, .unauthorized)
+        XCTAssertEqual(deleteCallCount, 0)
     }
     
     func testThatDeleteRecordThrowsUnauthorizedIfUserCannotAccessResource() throws {
+        var deleteCallCount = 0
+        Current.resourcePersisting.delete = { _ in deleteCallCount += 1 }
         let (_, _, _, record, _) = try seedDataIncludingRecord()
         let (_, anotherToken, _) = try seedDataWithoutRecord(username: "sheng1")
         
@@ -263,9 +270,12 @@ final class RecordTests: XCTestCase {
         let deleteRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
         
         XCTAssertEqual(deleteRecordResponse.http.status, .unauthorized)
+        XCTAssertEqual(deleteCallCount, 0)
     }
     
     func testThatDeleteRecordThrowsNotFoundIfRecordIsDeleted() throws {
+        var deleteCallCount = 0
+        Current.resourcePersisting.delete = { _ in deleteCallCount += 1 }
         let (_, token, _, record, _) = try seedDataIncludingRecord(isDeleted: true)
         
         var headers = HTTPHeaders()
@@ -273,6 +283,7 @@ final class RecordTests: XCTestCase {
         let deleteRecordResponse = try app.sendRequest(to: "api/v1/records/\(record.requireID())", method: .DELETE, headers: headers, body: EmptyBody())
         
         XCTAssertEqual(deleteRecordResponse.http.status, .notFound)
+        XCTAssertEqual(deleteCallCount, 0)
     }
     
     func testThatUploadAttachmentSucceeds() throws {
