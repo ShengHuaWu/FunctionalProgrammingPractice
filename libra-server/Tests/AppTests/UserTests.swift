@@ -535,12 +535,11 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(removeFriendResponse.http.status, .unauthorized)
     }
 
-    // TODO: Update tests for uploading avatar
-    // 1. assert call counts for `save` & `delete` of `resourcePersisting`
-    // 2. check previous avatar is deleted
     func testThatUploadAvatarSucceeds() throws {
-        Current.resourcePersisting.save = { _, _ in }
-        Current.resourcePersisting.delete = { _ in }
+        var saveCallCount = 0
+        var deleteCallCount = 0
+        Current.resourcePersisting.save = { _, _ in saveCallCount += 1 }
+        Current.resourcePersisting.delete = { _ in deleteCallCount += 1 }
         let (user, token, _) = try seedData()
 
         var headers = HTTPHeaders()
@@ -550,11 +549,15 @@ final class UserTests: XCTestCase {
         let receivedAsset = try uploadAvatarResponse.content.decode(Asset.self).wait()
 
         XCTAssertNotNil(receivedAsset.id)
+        XCTAssertEqual(saveCallCount, 1)
+        XCTAssertEqual(deleteCallCount, 1)
     }
 
     func testThatUploadAvatarThrowsUnauthorizedIfTokenIsWrong() throws {
-        Current.resourcePersisting.save = { _, _ in }
-        Current.resourcePersisting.delete = { _ in }
+        var saveCallCount = 0
+        var deleteCallCount = 0
+        Current.resourcePersisting.save = { _, _ in saveCallCount += 1 }
+        Current.resourcePersisting.delete = { _ in deleteCallCount += 1 }
         let (user, _, _) = try seedData()
 
         var headers = HTTPHeaders()
@@ -563,11 +566,15 @@ final class UserTests: XCTestCase {
         let uploadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/avatars", method: .POST, headers: headers, body: body)
 
         XCTAssertEqual(uploadAvatarResponse.http.status, .unauthorized)
+        XCTAssertEqual(saveCallCount, 0)
+        XCTAssertEqual(deleteCallCount, 0)
     }
 
     func testThatUploadAvatarThrowsUnauthorizedIfUserCannotAccessResource() throws {
-        Current.resourcePersisting.save = { _, _ in }
-        Current.resourcePersisting.delete = { _ in }
+        var saveCallCount = 0
+        var deleteCallCount = 0
+        Current.resourcePersisting.save = { _, _ in saveCallCount += 1 }
+        Current.resourcePersisting.delete = { _ in deleteCallCount += 1 }
         let (_, token, _) = try seedData()
         let (anotherUser, _, _) = try seedData(username: "Sheng2")
 
@@ -577,11 +584,18 @@ final class UserTests: XCTestCase {
         let uploadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(anotherUser.requireID())/avatars", method: .POST, headers: headers, body: body)
 
         XCTAssertEqual(uploadAvatarResponse.http.status, .unauthorized)
+        XCTAssertEqual(saveCallCount, 0)
+        XCTAssertEqual(deleteCallCount, 0)
     }
 
     func testThatUploadAvatarThrowsBadRequestIfSavingDataThrowsBadRequest() throws {
-        Current.resourcePersisting.save = { _, _ in throw Abort(.badRequest) }
-        Current.resourcePersisting.delete = { _ in }
+        var saveCallCount = 0
+        var deleteCallCount = 0
+        Current.resourcePersisting.save = { _, _ in
+            saveCallCount += 1
+            throw Abort(.badRequest)
+        }
+        Current.resourcePersisting.delete = { _ in deleteCallCount += 1 }
         let (user, token, _) = try seedData()
 
         var headers = HTTPHeaders()
@@ -590,11 +604,18 @@ final class UserTests: XCTestCase {
         let uploadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/avatars", method: .POST, headers: headers, body: body)
 
         XCTAssertEqual(uploadAvatarResponse.http.status, .badRequest)
+        XCTAssertEqual(saveCallCount, 1)
+        XCTAssertEqual(deleteCallCount, 1)
     }
 
     func testThatUploadAvatarThrowsBadRequestIfDeletingDataThrowsBadRequest() throws {
-        Current.resourcePersisting.save = { _, _ in }
-        Current.resourcePersisting.delete = { _ in throw Abort(.badRequest) }
+        var saveCallCount = 0
+        var deleteCallCount = 0
+        Current.resourcePersisting.save = { _, _ in saveCallCount += 1 }
+        Current.resourcePersisting.delete = { _ in
+            deleteCallCount += 1
+            throw Abort(.badRequest)
+        }
         let (user, token, _) = try seedData()
 
         var headers = HTTPHeaders()
@@ -603,6 +624,8 @@ final class UserTests: XCTestCase {
         let uploadAvatarResponse = try app.sendRequest(to: "api/v1/users/\(user.requireID())/avatars", method: .POST, headers: headers, body: body)
 
         XCTAssertEqual(uploadAvatarResponse.http.status, .badRequest)
+        XCTAssertEqual(saveCallCount, 0)
+        XCTAssertEqual(deleteCallCount, 1)
     }
 
     func testThatDownloadAvatarSucceeds() throws {
